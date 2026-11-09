@@ -8,139 +8,35 @@
     body {
       margin: 0;
       font-family: Tahoma, Geneva, sans-serif;
-      background: #d4d0c8;
-      color: #000;
       height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
-    .topbar {
-      background: #4a6b4a;
-      color: white;
-      padding: 4px 10px;
-      font-size: 13px;
-      font-weight: bold;
-    }
-    .tabs {
-      background: #d4d0c8;
-      border-bottom: 1px solid #808080;
-      padding: 2px 6px 0 6px;
-      display: flex;
-      gap: 2px;
-    }
-    .tab {
-      background: #d4d0c8;
-      border: 1px solid #808080;
-      border-bottom: none;
-      padding: 3px 14px;
-      font-size: 12px;
-      cursor: default;
-    }
-    .tab.active {
-      background: #fff;
-      font-weight: bold;
-      position: relative;
-      top: 1px;
-    }
-    .toolbar {
-      background: #d4d0c8;
-      border-bottom: 1px solid #808080;
-      padding: 4px 8px;
-      display: flex;
-      gap: 6px;
-      font-size: 11px;
-    }
-    .tool {
-      background: #ece9d8;
-      border: 1px solid #808080;
-      padding: 2px 8px;
-    }
-    .main {
-      flex: 1;
-      display: flex;
-      overflow: hidden;
-    }
-    .sidebar {
-      width: 210px;
-      background: #f0f0f0;
-      border-right: 1px solid #808080;
-      padding: 8px;
-      font-size: 12px;
-    }
-    .sidebar strong {
-      display: block;
-      margin-bottom: 8px;
-    }
-    .map {
-      flex: 1;
-      background: #fff;
-      position: relative;
+      background: #d4d0c8 url('old-map.png') center center / cover no-repeat;
       display: flex;
       align-items: center;
       justify-content: center;
     }
     .coming {
       text-align: center;
-      background: rgba(255,255,255,0.92);
+      background: rgba(255,255,255,0.94);
       border: 1px solid #808080;
-      padding: 24px 32px;
-      box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
+      padding: 28px 36px;
+      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
     }
     .coming h1 {
-      margin: 0 0 6px 0;
-      font-size: 20px;
+      margin: 0 0 8px 0;
+      font-size: 22px;
       color: #4a6b4a;
     }
     .coming p {
       margin: 0;
-      font-size: 13px;
+      font-size: 14px;
       color: #333;
-    }
-    .scale {
-      position: absolute;
-      bottom: 10px;
-      left: 10px;
-      background: rgba(255,255,255,0.8);
-      border: 1px solid #999;
-      padding: 2px 6px;
-      font-size: 11px;
-    }
-    .logo {
-      position: absolute;
-      bottom: 8px;
-      right: 10px;
-      font-size: 11px;
-      color: #4a6b4a;
-      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="topbar">Old Indiana Map</div>
-  <div class="tabs">
-    <div class="tab active">Map Viewer</div>
-    <div class="tab">Map Gallery</div>
-    <div class="tab">Layer Gallery</div>
-  </div>
-  <div class="toolbar">
-    <div class="tool">Layers</div>
-    <div class="tool">Identify</div>
-    <div class="tool">Measure</div>
-    <div class="tool">Print</div>
-  </div>
-  <div class="main">
-    <div class="sidebar">
-      <strong>Active Layers</strong>
-      <div style="color:#666; font-size:11px;">No layers loaded</div>
-    </div>
-    <div class="map">
-      <div class="coming">
-        <h1>Coming Soon</h1>
-        <p>The original Indiana map is returning.</p>
-      </div>
-      <div class="scale">1:2,500,000</div>
-      <div class="logo">IGS</div>
-    </div>
+  <div class="coming">
+    <h1>Coming Soon</h1>
+    <p>The classic Indiana map is returning.</p>
   </div>
 </body>
 </html>
