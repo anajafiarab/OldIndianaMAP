@@ -1,10 +1,79 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+  <meta charset="UTF-8">
   <title>Old Indiana Map</title>
-</head>
-<body>
-  <h1>Old Indiana Map</h1>
-  <p>Site is connected. Ready to build.</p>
-</body>
-</html>
+  <style>
+    body {
+      margin: 0;
+      font-family: Tahoma, Geneva, sans-serif;
+      background: #e8e8e8;
+      color: #333;
+    }
+    .header {
+      background: #4a6b4a;
+      color: white;
+      padding: 8px 16px;
+      font-size: 14px;
+    }
+    .tabs {
+      background: #d4d4d4;
+      border-bottom: 1px solid #999;
+      padding: 4px 8px;
+    }
+    .tabs span {
+      display: inline-block;
+      padding: 4px 12px;
+      margin-right: 4px;
+      background: #eee;
+      border: 1px solid #999;
+      border-bottom: none;
+      font-size: 13px;
+    }
+    .tabs span.active {
+      background: white;
+      font-weight: bold;
+    }
+    .main {
+      display: flex;
+      height: calc(100vh - 70px);
+    }
+    .sidebar {
+      width: 220px;
+      background: #f0f0f0;
+      border-right: 1px solid #999;
+      padding: 12px;
+      font-size: 13px;
+    }
+    .map-area {
+      flex: 1;
+      background: #f7f7f7;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      border-left: 1px solid #ccc;
+    }
+    .map-placeholder {
+      width: 280px;
+      height: 360px;
+      border: 2px solid #4a6b4a;
+      background: #fff;
+      position: relative;
+      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    }
+    .map-placeholder::before {
+      content: "";
+      position: absolute;
+      top: 40px; left: 60px; right: 60px; bottom: 40px;
+      border: 1px dashed #999;
+      background: repeating-linear-gradient(
+        45deg,
+        #f9f9f9,
+        #f9f9f9 10px,
+        #f0f0f0 10px,
+        #f0f0f0 20px
+      );
+    }
+    h1 { margin: 0 0 8px 0; font-size: 22px; }
+    .subtitle { color: #555; font-size: 14px; margin-bottom: 20px; }
