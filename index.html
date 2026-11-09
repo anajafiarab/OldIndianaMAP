@@ -4,106 +4,143 @@
   <meta charset="UTF-8">
   <title>Old Indiana Map</title>
   <style>
+    * { box-sizing: border-box; }
     body {
       margin: 0;
       font-family: Tahoma, Geneva, sans-serif;
-      background: #e8e8e8;
-      color: #333;
+      background: #d4d0c8;
+      color: #000;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
-    .header {
+    .topbar {
       background: #4a6b4a;
       color: white;
-      padding: 8px 16px;
-      font-size: 14px;
-    }
-    .tabs {
-      background: #d4d4d4;
-      border-bottom: 1px solid #999;
-      padding: 4px 8px;
-    }
-    .tabs span {
-      display: inline-block;
-      padding: 4px 12px;
-      margin-right: 4px;
-      background: #eee;
-      border: 1px solid #999;
-      border-bottom: none;
+      padding: 4px 10px;
       font-size: 13px;
-    }
-    .tabs span.active {
-      background: white;
       font-weight: bold;
     }
-    .main {
+    .tabs {
+      background: #d4d0c8;
+      border-bottom: 1px solid #808080;
+      padding: 2px 6px 0 6px;
       display: flex;
-      height: calc(100vh - 70px);
+      gap: 2px;
+    }
+    .tab {
+      background: #d4d0c8;
+      border: 1px solid #808080;
+      border-bottom: none;
+      padding: 3px 14px;
+      font-size: 12px;
+      cursor: default;
+    }
+    .tab.active {
+      background: #fff;
+      font-weight: bold;
+      position: relative;
+      top: 1px;
+    }
+    .toolbar {
+      background: #d4d0c8;
+      border-bottom: 1px solid #808080;
+      padding: 4px 8px;
+      display: flex;
+      gap: 6px;
+      font-size: 11px;
+    }
+    .tool {
+      background: #ece9d8;
+      border: 1px solid #808080;
+      padding: 2px 8px;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
     }
     .sidebar {
-      width: 220px;
+      width: 210px;
       background: #f0f0f0;
-      border-right: 1px solid #999;
-      padding: 12px;
-      font-size: 13px;
+      border-right: 1px solid #808080;
+      padding: 8px;
+      font-size: 12px;
     }
-    .map-area {
+    .sidebar strong {
+      display: block;
+      margin-bottom: 8px;
+    }
+    .map {
       flex: 1;
-      background: #f7f7f7;
+      background: #fff;
+      position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      flex-direction: column;
-      border-left: 1px solid #ccc;
     }
-    .map-placeholder {
-      width: 280px;
-      height: 360px;
-      border: 2px solid #4a6b4a;
-      background: #fff;
-      position: relative;
-      box-shadow: 2px 2px 6px rgba(0,0,0,0.1);
+    .coming {
+      text-align: center;
+      background: rgba(255,255,255,0.92);
+      border: 1px solid #808080;
+      padding: 24px 32px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.15);
     }
-    .map-placeholder::before {
-      content: "";
+    .coming h1 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+      color: #4a6b4a;
+    }
+    .coming p {
+      margin: 0;
+      font-size: 13px;
+      color: #333;
+    }
+    .scale {
       position: absolute;
-      top: 40px; left: 60px; right: 60px; bottom: 40px;
-      border: 1px dashed #999;
-      background: repeating-linear-gradient(
-        45deg,
-        #f9f9f9,
-        #f9f9f9 10px,
-        #f0f0f0 10px,
-        #f0f0f0 20px
-      );
-    }
-    h1 { margin: 0 0 8px 0; font-size: 22px; }
-    .subtitle { color: #555; font-size: 14px; margin-bottom: 20px; }
-    .footer-note {
-      position: absolute;
-      bottom: 12px;
-      right: 16px;
+      bottom: 10px;
+      left: 10px;
+      background: rgba(255,255,255,0.8);
+      border: 1px solid #999;
+      padding: 2px 6px;
       font-size: 11px;
-      color: #777;
+    }
+    .logo {
+      position: absolute;
+      bottom: 8px;
+      right: 10px;
+      font-size: 11px;
+      color: #4a6b4a;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="header">Old Indiana Map</div>
+  <div class="topbar">Old Indiana Map</div>
   <div class="tabs">
-    <span class="active">Map Viewer</span>
-    <span>Map Gallery</span>
-    <span>Layer Gallery</span>
+    <div class="tab active">Map Viewer</div>
+    <div class="tab">Map Gallery</div>
+    <div class="tab">Layer Gallery</div>
+  </div>
+  <div class="toolbar">
+    <div class="tool">Layers</div>
+    <div class="tool">Identify</div>
+    <div class="tool">Measure</div>
+    <div class="tool">Print</div>
   </div>
   <div class="main">
     <div class="sidebar">
       <strong>Active Layers</strong>
-      <p style="margin-top: 12px; color: #666;">Coming soon</p>
+      <div style="color:#666; font-size:11px;">No layers loaded</div>
     </div>
-    <div class="map-area">
-      <h1>Coming Soon</h1>
-      <div class="subtitle">The simple Indiana map is on its way.</div>
-      <div class="map-placeholder"></div>
+    <div class="map">
+      <div class="coming">
+        <h1>Coming Soon</h1>
+        <p>The original Indiana map is returning.</p>
+      </div>
+      <div class="scale">1:2,500,000</div>
+      <div class="logo">IGS</div>
     </div>
   </div>
-  <div class="footer-note">OldIndianaMAP.com</div>
 </body>
 </html>
