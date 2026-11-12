@@ -131,6 +131,13 @@
   // Indiana counties layer
   let countiesLayer;
 
+  // Remember checkbox state
+  const checkbox = document.getElementById('counties');
+  const savedState = localStorage.getItem('countiesVisible');
+  if (savedState !== null) {
+    checkbox.checked = savedState === 'true';
+  }
+
   fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
     .then(response => response.json())
     .then(data => {
@@ -151,12 +158,14 @@
         }
       });
 
-      // Add it by default
-      countiesLayer.addTo(map);
+      // Add it only if the checkbox is checked
+      if (checkbox.checked) {
+        countiesLayer.addTo(map);
+      }
 
-      // Wire up the checkbox
-      const checkbox = document.getElementById('counties');
+      // Wire up the checkbox + save state
       checkbox.addEventListener('change', function () {
+        localStorage.setItem('countiesVisible', this.checked);
         if (this.checked) {
           countiesLayer.addTo(map);
         } else {
