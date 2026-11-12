@@ -109,7 +109,7 @@
       <div id="layer-list">
         <div class="layer-item">
           <input type="checkbox" id="counties" checked>
-          <label for="counties">Indiana Counties (placeholder)</label>
+          <label for="counties">Indiana Counties</label>
         </div>
       </div>
     </div>
@@ -117,19 +117,54 @@
   </div>
   <div class="scale-note">Scale bar appears here</div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script>
-    // Initialize map centered on Indiana
-    const map = L.map('map').setView([39.8, -86.2], 7);
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  // Initialize map centered on Indiana
+  const map = L.map('map').setView([39.8, -86.2], 7);
 
-    // OpenStreetMap basemap
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 18
-    }).addTo(map);
+  // OpenStreetMap basemap
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap contributors',
+    maxZoom: 18
+  }).addTo(map);
 
-    // Placeholder: you will replace this with a real layer next
-    console.log('Map ready. Next step: add a real layer.');
-  </script>
+  // Indiana counties layer
+  let countiesLayer;
+
+  fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
+    .then(response => response.json())
+    .then(data => {
+      // Filter to Indiana only (FIPS starts with 18)
+      const indiana = {
+        type: 'FeatureCollection',
+        features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
+      };
+
+      countiesLayer = L.geoJSON(indiana, {
+        style: {
+          color: '#4a6b4a',
+          weight: 1,
+          fillOpacity: 0.1
+        },
+        onEachFeature: function (feature, layer) {
+          layer.bindPopup(feature.properties.NAME || 'County');
+        }
+      });
+
+      // Add it by default
+      countiesLayer.addTo(map);
+
+      // Wire up the checkbox
+      const checkbox = document.getElementById('counties');
+      checkbox.addEventListener('change', function () {
+        if (this.checked) {
+          countiesLayer.addTo(map);
+        } else {
+          map.removeLayer(countiesLayer);
+        }
+      });
+    })
+    .catch(err => console.error('Failed to load counties:', err));
+</script>
 </body>
 </html>
