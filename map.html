@@ -94,6 +94,13 @@
   color: #5a3a1a;
   text-shadow: 1px 1px 1px #fff;
 }
+#prev-hit, #next-hit {
+  background: #f5f4ea;
+  border: 1px solid #808080;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
 
   </style>
 </head>
@@ -275,114 +282,83 @@
   }
 
   // Identify → Legend panel
+let highlight = null;
+
+function clearHighlight() {
+  if (highlight) {
+    map.removeLayer(highlight);
+    highlight = null;
+  }
+}
+
+function pointInLayer(latlng, layer) {
+  if (!layer.getBounds || !layer.getBounds().contains(latlng)) return false;
+  // Simple point-in-polygon using Leaflet's internal method when available
+  if (layer._containsPoint) {
+    const p = map.latLngToLayerPoint(latlng);
+    return layer._containsPoint(p);
+  }
+  return true; // fallback
+}
+
 map.on('click', function (e) {
-  const results = [];
-  const seen = new Set();
+  clearHighlight();
+  const hits = [];
 
-  function addResult(layerName, attrs) {
-    if (seen.has(layerName)) return;
-    seen.add(layerName);
-    results.push({ layer: layerName, attrs });
-  }
-
-  if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
-    layerDefs.counties.layer.eachLayer(l => {
-      if (l.getBounds && l.getBounds().contains(e.latlng)) {
-        addResult('Indiana Counties', { Name: l.feature.properties.NAME || '—' });
+  function checkLayer(def, layerName, attrFn) {
+    if (!def.layer || !map.hasLayer(def.layer)) return;
+    def.layer.eachLayer(l => {
+      if (pointInLayer(e.latlng, l)) {
+        hits.push({ layerName, layer: l, attrs: attrFn(l.feature.properties) });
       }
     });
   }
 
-  if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
-    layerDefs.plss.layer.eachLayer(l => {
-      if (l.getBounds && l.getBounds().contains(e.latlng)) {
-        const p = l.feature.properties;
-        addResult('PLSS Townships', {
-          'Principal Meridian': p.meridian || '—',
-          'Township': p.twp || '—',
-          'Township Direction': (p.twpd || '').trim() || '—',
-          'Range': p.rng || '—',
-          'Range Direction': (p.rngd || '').trim() || '—'
-        });
-      }
-    });
-  }
+  checkLayer(layerDefs.counties, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
+  checkLayer(layerDefs.plss, 'PLSS Townships', p => ({
+    'Principal Meridian': p.meridian || '—',
+    'Township': p.twp || '—',
+    'Township Direction': (p.twpd || '').trim() || '—',
+    'Range': p.rng || '—',
+    'Range Direction': (p.rngd || '').trim() || '—'
+  }));
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
-  if (!results.length) {
+
+  if (!hits.length) {
     sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
     return;
   }
-  let html = `<h3>Legend</h3>`;
-  results.forEach(r => {
-    html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
-    for (let k in r.attrs) html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
-    html += `</table></div>`;
-  });
-  sb.innerHTML = html;
-});
 
-  const sidebar = document.getElementById('sidebar');
-  const tools = document.querySelectorAll('.tool');
-  function setActiveTool(id) {
-    tools.forEach(t => t.classList.remove('active'));
-    document.getElementById(id).classList.add('active');
+  let idx = 0;
+  function show(i) {
+    idx = (i + hits.length) % hits.length;
+    const h = hits[idx];
+    clearHighlight();
+    highlight = L.geoJSON(h.layer.toGeoJSON(), {
+      style: { color: '#ff7800', weight: 3, fillOpacity: 0.25 }
+    }).addTo(map);
+
+    let html = `<h3>Legend</h3>`;
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
+    html += `<button id="prev-hit">‹</button>`;
+    html += `<span>${idx + 1} of ${hits.length}</span>`;
+    html += `<button id="next-hit">›</button>`;
+    html += `</div>`;
+    html += `<strong>${h.layerName}</strong>`;
+    html += `<table style="width:100%; font-size:13px; margin-top:6px;">`;
+    for (let k in h.attrs) {
+      html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${h.attrs[k]}</td></tr>`;
+    }
+    html += `</table>`;
+    sb.innerHTML = html;
+
+    document.getElementById('prev-hit').onclick = () => show(idx - 1);
+    document.getElementById('next-hit').onclick = () => show(idx + 1);
   }
-
-  document.getElementById('basemaps-btn').addEventListener('click', () => {
-    setActiveTool('basemaps-btn');
-    sidebar.innerHTML = `
-      <h3>Basemaps</h3>
-      <div class="basemap-item" data-id="streets">Streets</div>
-      <div class="basemap-item" data-id="imagery">Imagery</div>
-      <div class="basemap-item" data-id="hybrid">Hybrid</div>
-      <div class="basemap-item" data-id="topo">Topographic</div>
-    `;
-    sidebar.querySelectorAll('.basemap-item').forEach(item => {
-      item.addEventListener('click', () => {
-        const id = item.dataset.id;
-        map.removeLayer(currentBasemap);
-        if (map.hasLayer(hybridLabels)) map.removeLayer(hybridLabels);
-        currentBasemap = basemaps[id];
-        currentBasemap.addTo(map);
-        if (id === 'hybrid') hybridLabels.addTo(map);
-        localStorage.setItem('basemap', id);
-        sidebar.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
-        item.classList.add('active');
-      });
-    });
-  });
-
-  document.getElementById('add-content-btn').addEventListener('click', () => {
-    setActiveTool('add-content-btn');
-    sidebar.innerHTML = `
-      <h3>Add Content</h3>
-      <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div>
-      <div class="basemap-item" data-add="counties">Indiana Counties</div>
-      <div class="basemap-item" data-add="plss">PLSS Townships</div>
-      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
-      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
-      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
-      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
-    `;
-    sidebar.querySelectorAll('[data-add]').forEach(item => {
-      item.addEventListener('click', () => addLayer(item.dataset.add));
-    });
-  });
-
-  document.getElementById('active-layers-btn').addEventListener('click', () => {
-    setActiveTool('active-layers-btn');
-    sidebar.innerHTML = `<h3>Active Layers</h3><div id="active-list"></div>`;
-    renderActive();
-  });
-
-  document.getElementById('legend-btn').addEventListener('click', () => {
-    setActiveTool('legend-btn');
-    sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
-  });
-
-  document.getElementById('active-layers-btn').click();
+  show(0);
+});
 </script>
 </body>
 </html>
