@@ -275,32 +275,53 @@
   }
 
   // Identify → Legend panel
-  map.on('click', function (e) {
-    const results = [];
-    if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
-      layerDefs.counties.layer.eachLayer(l => {
-        if (l.getBounds && l.getBounds().contains(e.latlng)) {
-          results.push({ layer: 'Indiana Counties', attrs: { Name: l.feature.properties.NAME || '—' } });
-        }
-      });
-    }
-    if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
-      layerDefs.plss.layer.eachLayer(l => {
-        if (l.getBounds && l.getBounds().contains(e.latlng)) {
-          const p = l.feature.properties;
-          results.push({
-            layer: 'PLSS Townships',
-            attrs: {
-              'Principal Meridian': p.meridian || '—',
-              'Township': p.twp || '—',
-              'Township Direction': (p.twpd || '').trim() || '—',
-              'Range': p.rng || '—',
-              'Range Direction': (p.rngd || '').trim() || '—'
-            }
-          });
-        }
-      });
-    }
+map.on('click', function (e) {
+  const results = [];
+  const seen = new Set();
+
+  function addResult(layerName, attrs) {
+    if (seen.has(layerName)) return;
+    seen.add(layerName);
+    results.push({ layer: layerName, attrs });
+  }
+
+  if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
+    layerDefs.counties.layer.eachLayer(l => {
+      if (l.getBounds && l.getBounds().contains(e.latlng)) {
+        addResult('Indiana Counties', { Name: l.feature.properties.NAME || '—' });
+      }
+    });
+  }
+
+  if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
+    layerDefs.plss.layer.eachLayer(l => {
+      if (l.getBounds && l.getBounds().contains(e.latlng)) {
+        const p = l.feature.properties;
+        addResult('PLSS Townships', {
+          'Principal Meridian': p.meridian || '—',
+          'Township': p.twp || '—',
+          'Township Direction': (p.twpd || '').trim() || '—',
+          'Range': p.rng || '—',
+          'Range Direction': (p.rngd || '').trim() || '—'
+        });
+      }
+    });
+  }
+
+  document.getElementById('legend-btn').click();
+  const sb = document.getElementById('sidebar');
+  if (!results.length) {
+    sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
+    return;
+  }
+  let html = `<h3>Legend</h3>`;
+  results.forEach(r => {
+    html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
+    for (let k in r.attrs) html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
+    html += `</table></div>`;
+  });
+  sb.innerHTML = html;
+});
 
     document.getElementById('legend-btn').click();
     const sb = document.getElementById('sidebar');
