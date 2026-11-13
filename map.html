@@ -23,10 +23,7 @@
       display: flex;
       align-items: center;
     }
-    .banner img {
-      height: 40px;
-      width: auto;
-    }
+    .banner img { height: 40px; width: auto; }
     .tabs {
       background: #d4d0c8;
       border-bottom: 1px solid #808080;
@@ -65,16 +62,9 @@
       display: inline-flex;
       align-items: center;
     }
-    .tool img {
-      height: 16px;
-      width: auto;
-      margin-right: 5px;
-    }
-    .tool:hover { background: #fff; }
-    .main {
-      display: flex;
-      height: calc(100vh - 130px);
-    }
+    .tool img { height: 16px; width: auto; margin-right: 5px; }
+    .tool:hover, .tool.active { background: #fff; }
+    .main { display: flex; height: calc(100vh - 130px); }
     .sidebar {
       width: 240px;
       background: #f0f0f0;
@@ -83,19 +73,18 @@
       font-size: 14px;
       overflow-y: auto;
     }
-    .sidebar h3 {
-      margin: 0 0 10px 0;
-      font-size: 15px;
-      font-weight: bold;
-    }
+    .sidebar h3 { margin: 0 0 10px 0; font-size: 15px; font-weight: bold; }
     #map { flex: 1; }
-    .layer-item {
+    .layer-item, .basemap-item {
       margin: 6px 0;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 14px;
+      cursor: pointer;
     }
+    .basemap-item:hover { background: #e0e0e0; }
+    .basemap-item.active { font-weight: bold; }
   </style>
 </head>
 <body>
@@ -130,7 +119,7 @@
     </div>
   </div>
   <div class="main">
-    <div class="sidebar">
+    <div class="sidebar" id="sidebar">
       <h3>Active Layers</h3>
       <div id="layer-list">
         <div class="layer-item">
@@ -145,11 +134,27 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const map = L.map('map').setView([39.8, -86.2], 7);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '&copy; OpenStreetMap contributors',
-      maxZoom: 18
-    }).addTo(map);
 
+    // Basemap definitions
+    const basemaps = {
+      streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
+      }),
+      imagery: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri', maxZoom: 19
+      }),
+      hybrid: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        attribution: 'Tiles &copy; Esri', maxZoom: 19
+      }),
+      topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap', maxZoom: 17
+      })
+    };
+
+    let currentBasemap = basemaps.streets;
+    currentBasemap.addTo(map);
+
+    // Counties layer (unchanged)
     let countiesLayer;
     const checkbox = document.getElementById('counties');
     const savedState = localStorage.getItem('countiesVisible');
@@ -174,6 +179,60 @@
           this.checked ? countiesLayer.addTo(map) : map.removeLayer(countiesLayer);
         });
       });
+
+    // Sidebar switching
+    const sidebar = document.getElementById('sidebar');
+    const tools = document.querySelectorAll('.tool');
+
+    function setActiveTool(id) {
+      tools.forEach(t => t.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+    }
+
+    document.getElementById('basemaps-btn').addEventListener('click', () => {
+      setActiveTool('basemaps-btn');
+      sidebar.innerHTML = `
+        <h3>Basemaps</h3>
+        <div class="basemap-item" data-id="streets">Streets</div>
+        <div class="basemap-item" data-id="imagery">Imagery</div>
+        <div class="basemap-item" data-id="hybrid">Hybrid</div>
+        <div class="basemap-item" data-id="topo">Topographic</div>
+        <div class="basemap-item" data-id="plss">PLSS (coming soon)</div>
+      `;
+      document.querySelectorAll('.basemap-item').forEach(item => {
+        item.addEventListener('click', () => {
+          const id = item.dataset.id;
+          if (id === 'plss') return;
+          map.removeLayer(currentBasemap);
+          currentBasemap = basemaps[id];
+          currentBasemap.addTo(map);
+          document.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
+          item.classList.add('active');
+        });
+      });
+    });
+
+    document.getElementById('active-layers-btn').addEventListener('click', () => {
+      setActiveTool('active-layers-btn');
+      sidebar.innerHTML = `
+        <h3>Active Layers</h3>
+        <div id="layer-list">
+          <div class="layer-item">
+            <input type="checkbox" id="counties" ${checkbox.checked ? 'checked' : ''}>
+            <label for="counties">Indiana Counties</label>
+          </div>
+        </div>
+      `;
+      // Re-bind checkbox
+      const newCheckbox = document.getElementById('counties');
+      newCheckbox.addEventListener('change', function () {
+        localStorage.setItem('countiesVisible', this.checked);
+        this.checked ? countiesLayer.addTo(map) : map.removeLayer(countiesLayer);
+      });
+    });
+
+    // Default to Active Layers
+    document.getElementById('active-layers-btn').click();
   </script>
 </body>
 </html>
