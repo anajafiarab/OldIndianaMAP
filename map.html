@@ -142,7 +142,6 @@
   </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
   const wideBounds = L.latLngBounds([25, -100], [50, -70]);
   const map = L.map('map', {
@@ -174,13 +173,12 @@
   currentBasemap.addTo(map);
   if (savedBasemap === 'hybrid') hybridLabels.addTo(map);
 
-  // Layer definitions
   const layerDefs = {
     counties: { name: 'Indiana Counties', group: 'Boundaries', layer: null, opacity: 1 },
     plss: { name: 'PLSS Townships', group: 'Boundaries', layer: null, opacity: 1 }
   };
 
-  // Load Counties
+  // Counties
   fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
     .then(r => r.json())
     .then(data => {
@@ -189,12 +187,11 @@
         features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
       };
       layerDefs.counties.layer = L.geoJSON(indiana, {
-        style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
-        onEachFeature: (f, l) => {}
+        style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 }
       });
     });
 
-  // Load PLSS (paged)
+  // PLSS (paged, no popup)
   async function loadPLSS() {
     const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
     let all = [], offset = 0, page = 1000, more = true;
@@ -212,7 +209,7 @@
       onEachFeature: (f, l) => {
         const p = f.properties;
         const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
-                l.bindPopup(label || 'Township');
+        if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
       }
     });
     updatePLSSLabels();
@@ -227,12 +224,8 @@
   }
   map.on('zoomend', updatePLSSLabels);
 
-  // Active layers state
   let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
-
-  function saveActive() {
-    localStorage.setItem('activeLayers', JSON.stringify(active));
-  }
+  function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
 
   function renderActive() {
     const list = document.getElementById('active-list');
@@ -259,13 +252,10 @@
       cb.addEventListener('change', () => {
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
-        if (def.layer.setStyle) def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
       });
       slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
-        if (def.layer && def.layer.setStyle) {
-          def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
-        }
+        if (def.layer && def.layer.setStyle) def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
         saveActive();
       });
       btn.addEventListener('click', () => {
@@ -276,105 +266,57 @@
       });
     });
   }
-// Identify on click → show in Legend panel
-map.on('click', function (e) {
-  L.DomEvent.stopPropagation(e);   // prevent layer popups
-  const results = [];
 
-  if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
-    layerDefs.counties.layer.eachLayer(l => {
-      if (l.getBounds && l.getBounds().contains(e.latlng)) {
-        results.push({
-          layer: 'Indiana Counties',
-          attrs: { Name: l.feature.properties.NAME || '—' }
-        });
-      }
-    });
-  }
-
-  if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
-    layerDefs.plss.layer.eachLayer(l => {
-      if (l.getBounds && l.getBounds().contains(e.latlng)) {
-        const p = l.feature.properties;
-        results.push({
-          layer: 'PLSS Townships',
-          attrs: {
-            'Principal Meridian': p.meridian || '—',
-            'Township': p.twp || '—',
-            'Township Direction': (p.twpd || '').trim() || '—',
-            'Range': p.rng || '—',
-            'Range Direction': (p.rngd || '').trim() || '—'
-          }
-        });
-      }
-    });
-  }
-
-  document.getElementById('legend-btn').click();
-  const sb = document.getElementById('sidebar');
-  if (results.length === 0) {
-    sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
-    return;
-  }
-  let html = `<h3>Legend</h3>`;
-  results.forEach(r => {
-    html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
-    for (let k in r.attrs) {
-      html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
-    }
-    html += `</table></div>`;
-  });
-  sb.innerHTML = html;
-});
-
-  // Check PLSS
-  if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
-    layerDefs.plss.layer.eachLayer(l => {
-      if (l.getBounds && l.getBounds().contains(e.latlng)) {
-        const p = l.feature.properties;
-        results.push({
-          layer: 'PLSS Townships',
-          attrs: {
-            'Principal Meridian': p.meridian || '—',
-            'Township': p.twp || '—',
-            'Township Direction': (p.twpd || '').trim() || '—',
-            'Range': p.rng || '—',
-            'Range Direction': (p.rngd || '').trim() || '—'
-          }
-        });
-      }
-    });
-  }
-
-  // Switch to Legend and render
-  document.getElementById('legend-btn').click();
-  const sidebar = document.getElementById('sidebar');
-  if (results.length === 0) {
-    sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
-    return;
-  }
-
-  let html = `<h3>Legend</h3>`;
-  results.forEach(r => {
-    html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
-    for (let k in r.attrs) {
-      html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
-    }
-    html += `</table></div>`;
-  });
-  sidebar.innerHTML = html;
-});
   function addLayer(id) {
-    if (!active.includes(id)) {
-      active.push(id);
-      saveActive();
-    }
+    if (!active.includes(id)) { active.push(id); saveActive(); }
     const def = layerDefs[id];
     if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
     renderActive();
   }
 
-  // Sidebar switching
+  // Identify → Legend panel
+  map.on('click', function (e) {
+    const results = [];
+    if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
+      layerDefs.counties.layer.eachLayer(l => {
+        if (l.getBounds && l.getBounds().contains(e.latlng)) {
+          results.push({ layer: 'Indiana Counties', attrs: { Name: l.feature.properties.NAME || '—' } });
+        }
+      });
+    }
+    if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
+      layerDefs.plss.layer.eachLayer(l => {
+        if (l.getBounds && l.getBounds().contains(e.latlng)) {
+          const p = l.feature.properties;
+          results.push({
+            layer: 'PLSS Townships',
+            attrs: {
+              'Principal Meridian': p.meridian || '—',
+              'Township': p.twp || '—',
+              'Township Direction': (p.twpd || '').trim() || '—',
+              'Range': p.rng || '—',
+              'Range Direction': (p.rngd || '').trim() || '—'
+            }
+          });
+        }
+      });
+    }
+
+    document.getElementById('legend-btn').click();
+    const sb = document.getElementById('sidebar');
+    if (!results.length) {
+      sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
+      return;
+    }
+    let html = `<h3>Legend</h3>`;
+    results.forEach(r => {
+      html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
+      for (let k in r.attrs) html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
+      html += `</table></div>`;
+    });
+    sb.innerHTML = html;
+  });
+
   const sidebar = document.getElementById('sidebar');
   const tools = document.querySelectorAll('.tool');
   function setActiveTool(id) {
