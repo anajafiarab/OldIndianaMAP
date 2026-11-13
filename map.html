@@ -379,12 +379,20 @@
       slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
         if (!def.layer) return;
+
         if (def.layer.setStyle) {
           def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
         } else if (def.layer.eachLayer) {
           def.layer.eachLayer(l => {
-            if (l.setStyle) l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
+            if (l.setStyle) {
+              l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
+            }
             if (l.setOpacity) l.setOpacity(def.opacity);
+            // tooltip / label
+            if (l.getTooltip && l.getTooltip()) {
+              const tip = l.getTooltip();
+              if (tip.getElement()) tip.getElement().style.opacity = def.opacity;
+            }
           });
         }
         saveActive();
@@ -798,7 +806,6 @@ function dropMarker(lat, lon, label) {
       iconAnchor: [10, 28]
     });
 
-    searchMarker = L.marker([lat, lon], { icon: pinIcon }).addTo(map);
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
