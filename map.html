@@ -101,6 +101,15 @@
   line-height: 1.2;
   min-width: 18px;
 }
+.county-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2a402a;
+  text-shadow: 1px 1px 1px #fff;
+}
 
   </style>
 </head>
@@ -206,9 +215,28 @@
         features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
       };
       layerDefs.counties.layer = L.geoJSON(indiana, {
-        style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 }
+        style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
+        onEachFeature: (f, l) => {
+          const name = f.properties.NAME || '';
+          if (name) {
+            l.bindTooltip(name, {
+              permanent: true,
+              direction: 'center',
+              className: 'county-label'
+            });
+          }
+        }
       });
+      updateCountyLabels();   // run once on load
     });
+
+  function updateCountyLabels() {
+    const lyr = layerDefs.counties.layer;
+    if (!lyr) return;
+    const show = map.getZoom() >= 8;
+    lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
+  }
+  map.on('zoomend', updateCountyLabels);
 
   // PLSS (paged, no popup)
   async function loadPLSS() {
