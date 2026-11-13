@@ -200,75 +200,44 @@
       if (checkbox.checked) countiesLayer.addTo(map);
     });
 
- // PLSS Townships
-let plssLayer = null;
-fetch('https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query?where=1%3D1&outFields=*&f=geojson')
-  .then(r => r.json())
-  .then(data => {
-    plssLayer = L.geoJSON(data, {
-      style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
-      onEachFeature: (f, l) => {
-        const p = f.properties;
-        const twp = p.twp || '';
-        const twpd = (p.twpd || '').trim();
-        const rng = p.rng || '';
-        const rngd = (p.rngd || '').trim();
-        const label = (twp && rng) ? `T${twp}${twpd} R${rng}${rngd}` : '';
-        if (label) {
-          l.bindTooltip(label, {
-            permanent: true,
-            direction: 'center',
-            className: 'plss-label'
-          });
+  // PLSS Townships
+  let plssLayer = null;
+  fetch('https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query?where=1%3D1&outFields=*&f=geojson')
+    .then(r => r.json())
+    .then(data => {
+      plssLayer = L.geoJSON(data, {
+        style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
+        onEachFeature: (f, l) => {
+          const p = f.properties;
+          const twp = p.twp || '';
+          const twpd = (p.twpd || '').trim();
+          const rng = p.rng || '';
+          const rngd = (p.rngd || '').trim();
+          const label = (twp && rng) ? `T${twp}${twpd} R${rng}${rngd}` : '';
+          if (label) {
+            l.bindTooltip(label, {
+              permanent: true,
+              direction: 'center',
+              className: 'plss-label'
+            });
+          }
+          l.bindPopup(label || 'Township');
         }
-        l.bindPopup(label || 'Township');
+      });
+      updatePLSSLabels();
+    })
+    .catch(err => console.error('PLSS failed to load', err));
+
+  function updatePLSSLabels() {
+    if (!plssLayer) return;
+    const show = map.getZoom() >= 8;
+    plssLayer.eachLayer(l => {
+      if (l.getTooltip()) {
+        show ? l.openTooltip() : l.closeTooltip();
       }
     });
-    updatePLSSLabels();
-  })
-  .catch(err => console.error('PLSS failed to load', err));
-
-function updatePLSSLabels() {
-  if (!plssLayer) return;
-  const show = map.getZoom() >= 8;
-  plssLayer.eachLayer(l => {
-    if (l.getTooltip()) {
-      if (show) l.openTooltip();
-      else l.closeTooltip();
-    }
-  });
-}
-map.on('zoomend', updatePLSSLabels);
-
-// In the basemaps-btn click handler, add PLSS as an option:
-sidebar.innerHTML = `
-  <h3>Basemaps</h3>
-  <div class="basemap-item" data-id="streets">Streets</div>
-  <div class="basemap-item" data-id="imagery">Imagery</div>
-  <div class="basemap-item" data-id="hybrid">Hybrid</div>
-  <div class="basemap-item" data-id="topo">Topographic</div>
-  <div class="basemap-item" data-id="plss">PLSS Townships</div>
-`;
-
-// And in the basemap click logic, handle PLSS separately:
-item.addEventListener('click', () => {
-  const id = item.dataset.id;
-  if (id === 'plss') {
-    if (plssLayer) {
-      if (map.hasLayer(plssLayer)) map.removeLayer(plssLayer);
-      else plssLayer.addTo(map);
-    }
-    return;
   }
-  map.removeLayer(currentBasemap);
-  if (map.hasLayer(hybridLabels)) map.removeLayer(hybridLabels);
-  currentBasemap = basemaps[id];
-  currentBasemap.addTo(map);
-  if (id === 'hybrid') hybridLabels.addTo(map);
-  localStorage.setItem('basemap', id);
-  document.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
-  item.classList.add('active');
-});
+  map.on('zoomend', updatePLSSLabels);
 
   // Sidebar
   const sidebar = document.getElementById('sidebar');
@@ -287,10 +256,18 @@ item.addEventListener('click', () => {
       <div class="basemap-item" data-id="imagery">Imagery</div>
       <div class="basemap-item" data-id="hybrid">Hybrid</div>
       <div class="basemap-item" data-id="topo">Topographic</div>
+      <div class="basemap-item" data-id="plss">PLSS Townships</div>
     `;
     document.querySelectorAll('.basemap-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
+        if (id === 'plss') {
+          if (plssLayer) {
+            if (map.hasLayer(plssLayer)) map.removeLayer(plssLayer);
+            else plssLayer.addTo(map);
+          }
+          return;
+        }
         map.removeLayer(currentBasemap);
         if (map.hasLayer(hybridLabels)) map.removeLayer(hybridLabels);
         currentBasemap = basemaps[id];
@@ -311,21 +288,11 @@ item.addEventListener('click', () => {
         <input type="checkbox" id="counties" ${checkbox.checked ? 'checked' : ''}>
         <label for="counties">Indiana Counties</label>
       </div>
-      <div class="layer-item">
-        <input type="checkbox" id="plss">
-        <label for="plss">PLSS Townships</label>
-      </div>
     `;
-
     document.getElementById('counties').addEventListener('change', function () {
       localStorage.setItem('countiesVisible', this.checked);
       if (!countiesLayer) return;
       this.checked ? countiesLayer.addTo(map) : map.removeLayer(countiesLayer);
-    });
-
-    document.getElementById('plss').addEventListener('change', function () {
-      if (!plssLayer) return;
-      this.checked ? plssLayer.addTo(map) : map.removeLayer(plssLayer);
     });
   });
 
