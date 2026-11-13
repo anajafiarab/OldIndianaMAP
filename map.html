@@ -377,10 +377,12 @@ map.on('click', function (e) {
     html += `<button id="next-hit">›</button>`;
     html += `<button id="clear-hit" style="margin-left:8px;">Clear</button>`;
     html += `</div>`;
+    html += `<strong>${h.layerName}</strong>`;
+    html += `<div style="margin-top:6px; font-size:13px;">`;
     for (let k in h.attrs) {
-      html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${h.attrs[k]}</td></tr>`;
+      html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
     }
-    html += `</table>`;
+    html += `</div>`;
     sb.innerHTML = html;
 
     document.getElementById('prev-hit').onclick = () => show(idx - 1);
