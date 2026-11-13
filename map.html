@@ -139,8 +139,6 @@ const indianaBounds = L.latLngBounds(
 );
 
 const map = L.map('map', {
-  maxBounds: indianaBounds,
-  maxBoundsViscosity: 0.5,   // gentler resistance
   minZoom: 6
 }).setView([39.8, -86.2], 7);
 
