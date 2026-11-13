@@ -383,14 +383,7 @@ map.on('click', function (e) {
   let idx = 0;
   function show(i) {
     idx = (i + hits.length) % hits.length;
-        // Layer-specific source
-    const src = hits[idx].source;
-    if (src) {
-      html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
-      html += `Source: <a href="${src.url}" target="_blank" style="color:#3d5c3d;">${src.label}</a>`;
-      html += `</div>`;
-    }
-    sb.innerHTML = html;
+    const h = hits[idx];
     clearHighlight();
     highlight = L.geoJSON(h.layer.toGeoJSON(), {
       style: { color: '#ff7800', weight: 3, fillOpacity: 0.25 }
@@ -409,11 +402,19 @@ map.on('click', function (e) {
       html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
     }
     html += `</div>`;
+
+    // Layer-specific source
+    if (h.source) {
+      html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
+      html += `Source: <a href="${h.source.url}" target="_blank" style="color:#3d5c3d;">${h.source.label}</a>`;
+      html += `</div>`;
+    }
+
     sb.innerHTML = html;
 
     document.getElementById('prev-hit').onclick = () => show(idx - 1);
     document.getElementById('next-hit').onclick = () => show(idx + 1);
-        document.getElementById('clear-hit').onclick = () => {
+    document.getElementById('clear-hit').onclick = () => {
       clearHighlight();
       sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
     };
