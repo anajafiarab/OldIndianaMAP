@@ -228,15 +228,15 @@
     })
     .catch(err => console.error('PLSS failed to load', err));
 
-  function updatePLSSLabels() {
-    if (!plssLayer) return;
-    const show = map.getZoom() >= 8;
-    plssLayer.eachLayer(l => {
-      if (l.getTooltip()) {
-        show ? l.openTooltip() : l.closeTooltip();
-      }
-    });
-  }
+ function updatePLSSLabels() {
+  if (!plssLayer) return;
+  const show = map.getZoom() >= 10;
+  plssLayer.eachLayer(l => {
+    if (l.getTooltip()) {
+      show ? l.openTooltip() : l.closeTooltip();
+    }
+  });
+}
   map.on('zoomend', updatePLSSLabels);
 
   // Sidebar
