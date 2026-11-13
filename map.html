@@ -13,28 +13,33 @@
       font-family: Tahoma, Geneva, sans-serif;
       background: #d4d0c8;
       color: #000;
+      font-size: 14px;
     }
-    .topbar {
-      background: #3d5c3d;
-      color: #fff;
-      padding: 3px 8px;
-      font-size: 13px;
-      font-weight: bold;
-      border-bottom: 1px solid #2a402a;
+    .banner {
+      background: #3d5c3d url('banner1.png') center / cover no-repeat;
+      padding: 6px 12px;
+      border-bottom: 2px solid #2a402a;
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+    }
+    .banner img {
+      height: 40px;
+      width: auto;
     }
     .tabs {
       background: #d4d0c8;
       border-bottom: 1px solid #808080;
-      padding: 1px 4px 0 4px;
+      padding: 2px 6px 0 6px;
       display: flex;
-      gap: 1px;
+      gap: 2px;
     }
     .tab {
       background: #d4d0c8;
       border: 1px solid #808080;
       border-bottom: none;
-      padding: 2px 12px 3px;
-      font-size: 11px;
+      padding: 6px 16px;
+      font-size: 14px;
       cursor: pointer;
     }
     .tab.active {
@@ -47,47 +52,49 @@
     .toolbar {
       background: #ece9d8;
       border-bottom: 1px solid #808080;
-      padding: 3px 6px;
+      padding: 6px 8px;
       display: flex;
-      gap: 4px;
-      font-size: 11px;
+      gap: 6px;
+      font-size: 13px;
     }
     .tool {
       background: #f5f4ea;
       border: 1px solid #808080;
-      padding: 1px 7px;
+      padding: 4px 10px;
       cursor: pointer;
     }
     .tool:hover { background: #fff; }
     .main {
       display: flex;
-      height: calc(100vh - 62px);
+      height: calc(100vh - 110px);
     }
     .sidebar {
-      width: 210px;
+      width: 240px;
       background: #f0f0f0;
       border-right: 1px solid #808080;
-      padding: 6px 8px;
-      font-size: 12px;
+      padding: 10px 12px;
+      font-size: 14px;
       overflow-y: auto;
     }
     .sidebar h3 {
-      margin: 0 0 6px 0;
-      font-size: 12px;
+      margin: 0 0 10px 0;
+      font-size: 15px;
       font-weight: bold;
     }
     #map { flex: 1; }
     .layer-item {
-      margin: 3px 0;
+      margin: 6px 0;
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 11px;
+      gap: 8px;
+      font-size: 14px;
     }
   </style>
 </head>
 <body>
-  <div class="topbar">Old Indiana Map</div>
+  <div class="banner">
+    <img src="logo.png" alt="IndianaMAP">
+  </div>
   <div class="tabs">
     <div class="tab active">Map Viewer</div>
     <div class="tab">Map Gallery</div>
@@ -135,7 +142,7 @@
           )
         };
         countiesLayer = L.geoJSON(indiana, {
-          style: { color: '#3d5c3d', weight: 1, fillOpacity: 0.08 },
+          style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
           onEachFeature: (f, l) => l.bindPopup(f.properties.NAME || 'County')
         });
         if (checkbox.checked) countiesLayer.addTo(map);
