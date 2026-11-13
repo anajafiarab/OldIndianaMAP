@@ -133,16 +133,16 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const indianaBounds = L.latLngBounds(
-    [37.5, -88.3],
-    [42.0, -84.5]
-  );
+const indianaBounds = L.latLngBounds(
+  [37.0, -89.0],   // farther southwest
+  [42.5, -84.0]    // farther northeast
+);
 
-  const map = L.map('map', {
-    maxBounds: indianaBounds,
-    maxBoundsViscosity: 0.7,
-    minZoom: 6
-  }).setView([39.8, -86.2], 7);
+const map = L.map('map', {
+  maxBounds: indianaBounds,
+  maxBoundsViscosity: 0.5,   // gentler resistance
+  minZoom: 6
+}).setView([39.8, -86.2], 7);
 
   const basemaps = {
     streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
