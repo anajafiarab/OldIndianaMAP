@@ -542,7 +542,7 @@ map.on('click', function (e) {
       });
     });
   });
-
+// Button Handlers
   document.getElementById('add-content-btn').addEventListener('click', () => {
     setActiveTool('add-content-btn');
     sidebar.innerHTML = `
@@ -569,6 +569,49 @@ map.on('click', function (e) {
   document.getElementById('legend-btn').addEventListener('click', () => {
     setActiveTool('legend-btn');
     sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
+  });
+    document.getElementById('reset-btn').addEventListener('click', () => {
+    // Clear active layers
+    active.forEach(id => {
+      const def = layerDefs[id];
+      if (def && def.layer && map.hasLayer(def.layer)) {
+        map.removeLayer(def.layer);
+      }
+    });
+    active = [];
+    saveActive();
+
+    // Clear highlight and search pin
+    clearHighlight();
+    if (searchMarker) {
+      map.removeLayer(searchMarker);
+      searchMarker = null;
+    }
+
+    // Reset basemap to Streets
+    if (currentBasemap && map.hasLayer(currentBasemap)) {
+      map.removeLayer(currentBasemap);
+    }
+    if (map.hasLayer(hybridLabels)) {
+      map.removeLayer(hybridLabels);
+    }
+    currentBasemap = basemaps.streets;
+    currentBasemap.addTo(map);
+    localStorage.setItem('basemap', 'streets');
+
+    // Reset view
+    map.setView([39.8, -86.2], 7);
+
+    // Refresh Active Layers panel if it's open
+    if (document.getElementById('active-list')) {
+      renderActive();
+    }
+
+    // Reset Legend panel
+    const sb = document.getElementById('sidebar');
+    if (sb && sb.querySelector('h3') && sb.querySelector('h3').textContent === 'Legend') {
+      sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
+    }
   });
   // Search
   let searchMarker = null;
