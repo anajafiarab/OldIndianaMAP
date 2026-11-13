@@ -142,12 +142,9 @@
   </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-  const wideBounds = L.latLngBounds(
-    [25, -100],
-    [50, -70]
-  );
-
+  const wideBounds = L.latLngBounds([25, -100], [50, -70]);
   const map = L.map('map', {
     maxBounds: wideBounds,
     maxBoundsViscosity: 0.3,
@@ -168,7 +165,6 @@
       attribution: 'Map data: &copy; OpenStreetMap contributors, SRTM | Map style: &copy; OpenTopoMap', maxZoom: 17
     })
   };
-
   const hybridLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri', maxZoom: 19
   });
@@ -178,78 +174,123 @@
   currentBasemap.addTo(map);
   if (savedBasemap === 'hybrid') hybridLabels.addTo(map);
 
-  // Counties
-  let countiesLayer;
-  const checkbox = document.getElementById('counties');
-  const savedCounties = localStorage.getItem('countiesVisible');
-  if (savedCounties !== null) checkbox.checked = savedCounties === 'true';
+  // Layer definitions
+  const layerDefs = {
+    counties: { name: 'Indiana Counties', group: 'Boundaries', layer: null, opacity: 1 },
+    plss: { name: 'PLSS Townships', group: 'Boundaries', layer: null, opacity: 1 }
+  };
 
+  // Load Counties
   fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
     .then(r => r.json())
     .then(data => {
       const indiana = {
         type: 'FeatureCollection',
-        features: data.features.filter(f => 
-          f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18'))
-        )
+        features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
       };
-      countiesLayer = L.geoJSON(indiana, {
+      layerDefs.counties.layer = L.geoJSON(indiana, {
         style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
         onEachFeature: (f, l) => l.bindPopup(f.properties.NAME || 'County')
       });
-      if (checkbox.checked) countiesLayer.addTo(map);
     });
 
-  // PLSS Townships (paged)
-let plssLayer = null;
-
-async function loadAllPLSS() {
-  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
-  let allFeatures = [];
-  let offset = 0;
-  const pageSize = 1000;
-  let keepGoing = true;
-
-  while (keepGoing) {
-    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${pageSize}`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (data.features && data.features.length) {
-      allFeatures = allFeatures.concat(data.features);
-      offset += pageSize;
-      if (data.features.length < pageSize) keepGoing = false;
-    } else {
-      keepGoing = false;
+  // Load PLSS (paged)
+  async function loadPLSS() {
+    const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
+    let all = [], offset = 0, page = 1000, more = true;
+    while (more) {
+      const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += page;
+        if (data.features.length < page) more = false;
+      } else more = false;
     }
+    layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
+      onEachFeature: (f, l) => {
+        const p = f.properties;
+        const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
+        if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
+        l.bindPopup(label || 'Township');
+      }
+    });
+    updatePLSSLabels();
+  }
+  loadPLSS();
+
+  function updatePLSSLabels() {
+    const lyr = layerDefs.plss.layer;
+    if (!lyr) return;
+    const show = map.getZoom() >= 10;
+    lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
+  }
+  map.on('zoomend', updatePLSSLabels);
+
+  // Active layers state
+  let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
+
+  function saveActive() {
+    localStorage.setItem('activeLayers', JSON.stringify(active));
   }
 
-  const fc = { type: 'FeatureCollection', features: allFeatures };
-  plssLayer = L.geoJSON(fc, {
-    style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
-    onEachFeature: (f, l) => {
-      const p = f.properties;
-      const twp = p.twp || '';
-      const twpd = (p.twpd || '').trim();
-      const rng = p.rng || '';
-      const rngd = (p.rngd || '').trim();
-      const label = (twp && rng) ? `T${twp}${twpd} R${rng}${rngd}` : '';
-      if (label) {
-        l.bindTooltip(label, {
-          permanent: true,
-          direction: 'center',
-          className: 'plss-label'
-        });
-      }
-      l.bindPopup(label || 'Township');
+  function renderActive() {
+    const list = document.getElementById('active-list');
+    if (!list) return;
+    list.innerHTML = active.map(id => {
+      const def = layerDefs[id];
+      if (!def) return '';
+      return `
+        <div class="layer-item" data-id="${id}">
+          <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
+          <span style="flex:1">${def.name}</span>
+          <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px">
+          <button class="remove">✕</button>
+        </div>`;
+    }).join('');
+
+    list.querySelectorAll('.layer-item').forEach(row => {
+      const id = row.dataset.id;
+      const def = layerDefs[id];
+      const cb = row.querySelector('input[type=checkbox]');
+      const slider = row.querySelector('input[type=range]');
+      const btn = row.querySelector('.remove');
+
+      cb.addEventListener('change', () => {
+        if (!def.layer) return;
+        cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
+        if (def.layer.setStyle) def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
+      });
+      slider.addEventListener('input', () => {
+        def.opacity = slider.value / 100;
+        if (def.layer && def.layer.setStyle) {
+          def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
+        }
+        saveActive();
+      });
+      btn.addEventListener('click', () => {
+        if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
+        active = active.filter(x => x !== id);
+        saveActive();
+        renderActive();
+      });
+    });
+  }
+
+  function addLayer(id) {
+    if (!active.includes(id)) {
+      active.push(id);
+      saveActive();
     }
-  });
-  updatePLSSLabels();
-}
-loadAllPLSS();
-  // Sidebar
+    const def = layerDefs[id];
+    if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
+    renderActive();
+  }
+
+  // Sidebar switching
   const sidebar = document.getElementById('sidebar');
   const tools = document.querySelectorAll('.tool');
-
   function setActiveTool(id) {
     tools.forEach(t => t.classList.remove('active'));
     document.getElementById(id).classList.add('active');
@@ -263,44 +304,49 @@ loadAllPLSS();
       <div class="basemap-item" data-id="imagery">Imagery</div>
       <div class="basemap-item" data-id="hybrid">Hybrid</div>
       <div class="basemap-item" data-id="topo">Topographic</div>
-      <div class="basemap-item" data-id="plss">PLSS Townships</div>
     `;
-    document.querySelectorAll('.basemap-item').forEach(item => {
+    sidebar.querySelectorAll('.basemap-item').forEach(item => {
       item.addEventListener('click', () => {
         const id = item.dataset.id;
-        if (id === 'plss') {
-          if (plssLayer) {
-            if (map.hasLayer(plssLayer)) map.removeLayer(plssLayer);
-            else plssLayer.addTo(map);
-          }
-          return;
-        }
         map.removeLayer(currentBasemap);
         if (map.hasLayer(hybridLabels)) map.removeLayer(hybridLabels);
         currentBasemap = basemaps[id];
         currentBasemap.addTo(map);
         if (id === 'hybrid') hybridLabels.addTo(map);
         localStorage.setItem('basemap', id);
-        document.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
+        sidebar.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
         item.classList.add('active');
       });
     });
   });
 
+  document.getElementById('add-content-btn').addEventListener('click', () => {
+    setActiveTool('add-content-btn');
+    sidebar.innerHTML = `
+      <h3>Add Content</h3>
+      <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div>
+      <div class="basemap-item" data-add="counties">Indiana Counties</div>
+      <div class="basemap-item" data-add="plss">PLSS Townships</div>
+      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
+      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
+      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+    `;
+    sidebar.querySelectorAll('[data-add]').forEach(item => {
+      item.addEventListener('click', () => addLayer(item.dataset.add));
+    });
+  });
+
   document.getElementById('active-layers-btn').addEventListener('click', () => {
     setActiveTool('active-layers-btn');
-    sidebar.innerHTML = `
-      <h3>Active Layers</h3>
-      <div class="layer-item">
-        <input type="checkbox" id="counties" ${checkbox.checked ? 'checked' : ''}>
-        <label for="counties">Indiana Counties</label>
-      </div>
-    `;
-    document.getElementById('counties').addEventListener('change', function () {
-      localStorage.setItem('countiesVisible', this.checked);
-      if (!countiesLayer) return;
-      this.checked ? countiesLayer.addTo(map) : map.removeLayer(countiesLayer);
-    });
+    sidebar.innerHTML = `<h3>Active Layers</h3><div id="active-list"></div>`;
+    renderActive();
+  });
+
+  // Restore active layers on load
+  active.forEach(id => {
+    const def = layerDefs[id];
+    if (def && def.layer) def.layer.addTo(map);
   });
 
   document.getElementById('active-layers-btn').click();
