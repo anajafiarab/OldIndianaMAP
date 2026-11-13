@@ -469,10 +469,12 @@
       const st = styles[styleUrl] || { color: '#3388ff', weight: 2 };
       const name = pm.querySelector('name')?.textContent || '';
 
-            // Point
+      // Point — circles only, no default marker
       const pt = pm.querySelector('Point coordinates');
       if (pt) {
         const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+        if (isNaN(lat) || isNaN(lon)) return;
+
         const m = L.circleMarker([lat, lon], {
           radius: 6,
           color: '#000',
@@ -480,7 +482,6 @@
           fillColor: '#e00',
           fillOpacity: 1
         });
-        // black center dot
         const dot = L.circleMarker([lat, lon], {
           radius: 2,
           color: '#000',
@@ -498,8 +499,7 @@
         }
         layer.addLayer(m);
         layer.addLayer(dot);
-      }
-
+    }
       // LineString
       const ls = pm.querySelector('LineString coordinates');
       if (ls) {
@@ -805,7 +805,7 @@ function dropMarker(lat, lon, label) {
       iconSize: [20, 28],
       iconAnchor: [10, 28]
     });
-
+    searchMarker = L.marker([lat, lon], { icon: pinIcon }).addTo(map);
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
