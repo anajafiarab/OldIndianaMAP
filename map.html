@@ -184,7 +184,10 @@
       maxZoom: 16
     })
   };
-
+  const hybridLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+    attribution: 'Tiles &copy; Esri', maxZoom: 19
+  });
+  
   const savedBasemap = localStorage.getItem('basemap') || 'streets';
   let currentBasemap = basemaps[savedBasemap] || basemaps.streets;
   currentBasemap.addTo(map);
