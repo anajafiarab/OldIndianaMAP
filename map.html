@@ -359,6 +359,66 @@ map.on('click', function (e) {
   }
   show(0);
 });
+  const sidebar = document.getElementById('sidebar');
+  const tools = document.querySelectorAll('.tool');
+  function setActiveTool(id) {
+    tools.forEach(t => t.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  document.getElementById('basemaps-btn').addEventListener('click', () => {
+    setActiveTool('basemaps-btn');
+    sidebar.innerHTML = `
+      <h3>Basemaps</h3>
+      <div class="basemap-item" data-id="streets">Streets</div>
+      <div class="basemap-item" data-id="imagery">Imagery</div>
+      <div class="basemap-item" data-id="hybrid">Hybrid</div>
+      <div class="basemap-item" data-id="topo">Topographic</div>
+    `;
+    sidebar.querySelectorAll('.basemap-item').forEach(item => {
+      item.addEventListener('click', () => {
+        const id = item.dataset.id;
+        map.removeLayer(currentBasemap);
+        if (map.hasLayer(hybridLabels)) map.removeLayer(hybridLabels);
+        currentBasemap = basemaps[id];
+        currentBasemap.addTo(map);
+        if (id === 'hybrid') hybridLabels.addTo(map);
+        localStorage.setItem('basemap', id);
+        sidebar.querySelectorAll('.basemap-item').forEach(i => i.classList.remove('active'));
+        item.classList.add('active');
+      });
+    });
+  });
+
+  document.getElementById('add-content-btn').addEventListener('click', () => {
+    setActiveTool('add-content-btn');
+    sidebar.innerHTML = `
+      <h3>Add Content</h3>
+      <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div>
+      <div class="basemap-item" data-add="counties">Indiana Counties</div>
+      <div class="basemap-item" data-add="plss">PLSS Townships</div>
+      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
+      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
+      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+    `;
+    sidebar.querySelectorAll('[data-add]').forEach(item => {
+      item.addEventListener('click', () => addLayer(item.dataset.add));
+    });
+  });
+
+  document.getElementById('active-layers-btn').addEventListener('click', () => {
+    setActiveTool('active-layers-btn');
+    sidebar.innerHTML = `<h3>Active Layers</h3><div id="active-list"></div>`;
+    renderActive();
+  });
+
+  document.getElementById('legend-btn').addEventListener('click', () => {
+    setActiveTool('legend-btn');
+    sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
+  });
+
+  document.getElementById('active-layers-btn').click();
 </script>
 </body>
 </html>
