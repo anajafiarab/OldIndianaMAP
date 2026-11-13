@@ -240,11 +240,13 @@
     list.innerHTML = active.map(id => {
       const def = layerDefs[id];
       if (!def) return '';
-      return `
+            return `
         <div class="layer-item" data-id="${id}">
           <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
           <span style="flex:1">${def.name}</span>
           <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px">
+          <button class="up">↑</button>
+          <button class="down">↓</button>
           <button class="remove">✕</button>
         </div>`;
     }).join('');
@@ -270,6 +272,26 @@
         active = active.filter(x => x !== id);
         saveActive();
         renderActive();
+      });
+
+      // Up / Down reorder
+      const up = row.querySelector('.up');
+      const down = row.querySelector('.down');
+      up.addEventListener('click', () => {
+        const i = active.indexOf(id);
+        if (i > 0) {
+          [active[i-1], active[i]] = [active[i], active[i-1]];
+          saveActive();
+          renderActive();
+        }
+      });
+      down.addEventListener('click', () => {
+        const i = active.indexOf(id);
+        if (i < active.length - 1) {
+          [active[i+1], active[i]] = [active[i], active[i+1]];
+          saveActive();
+          renderActive();
+        }
       });
     });
   }
@@ -314,14 +336,22 @@ map.on('click', function (e) {
     });
   }
 
-  checkLayer(layerDefs.counties, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
-  checkLayer(layerDefs.plss, 'PLSS Townships', p => ({
-    'Principal Meridian': p.meridian || '—',
-    'Township': p.twp || '—',
-    'Township Direction': (p.twpd || '').trim() || '—',
-    'Range': p.rng || '—',
-    'Range Direction': (p.rngd || '').trim() || '—'
-  }));
+  // Walk Active Layers in order so the first one appears as "1 of N"
+  active.forEach(id => {
+    const def = layerDefs[id];
+    if (!def || !def.layer || !map.hasLayer(def.layer)) return;
+    if (id === 'counties') {
+      checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
+    } else if (id === 'plss') {
+      checkLayer(def, 'PLSS Townships', p => ({
+        'Principal Meridian': p.meridian || '—',
+        'Township': p.twp || '—',
+        'Township Direction': (p.twpd || '').trim() || '—',
+        'Range': p.rng || '—',
+        'Range Direction': (p.rngd || '').trim() || '—'
+      }));
+    }
+  });
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -345,9 +375,8 @@ map.on('click', function (e) {
     html += `<button id="prev-hit">‹</button>`;
     html += `<span>${idx + 1} of ${hits.length}</span>`;
     html += `<button id="next-hit">›</button>`;
+    html += `<button id="clear-hit" style="margin-left:8px;">Clear</button>`;
     html += `</div>`;
-    html += `<strong>${h.layerName}</strong>`;
-    html += `<table style="width:100%; font-size:13px; margin-top:6px;">`;
     for (let k in h.attrs) {
       html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${h.attrs[k]}</td></tr>`;
     }
@@ -356,6 +385,10 @@ map.on('click', function (e) {
 
     document.getElementById('prev-hit').onclick = () => show(idx - 1);
     document.getElementById('next-hit').onclick = () => show(idx + 1);
+        document.getElementById('clear-hit').onclick = () => {
+      clearHighlight();
+      sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
+    };
   }
   show(0);
 });
