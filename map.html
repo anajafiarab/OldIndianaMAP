@@ -133,7 +133,17 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const map = L.map('map').setView([39.8, -86.2], 7);
+    // Indiana bounds (approximate)
+const indianaBounds = L.latLngBounds(
+  [37.7, -88.1],  // southwest
+  [41.8, -84.7]   // northeast
+);
+
+const map = L.map('map', {
+  maxBounds: indianaBounds,
+  maxBoundsViscosity: 1.0,  // hard stop at the edge
+  minZoom: 6
+}).setView([39.8, -86.2], 7);
 
     // Basemap definitions
     const basemaps = {
