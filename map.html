@@ -190,7 +190,7 @@
       };
       layerDefs.counties.layer = L.geoJSON(indiana, {
         style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
-        onEachFeature: (f, l) => l.bindPopup(f.properties.NAME || 'County')
+        onEachFeature: (f, l) => {}
       });
     });
 
@@ -212,8 +212,7 @@
       onEachFeature: (f, l) => {
         const p = f.properties;
         const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
-        if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
-        l.bindPopup(label || 'Township');
+                l.bindPopup(label || 'Township');
       }
     });
     updatePLSSLabels();
@@ -279,9 +278,9 @@
   }
 // Identify on click → show in Legend panel
 map.on('click', function (e) {
+  L.DomEvent.stopPropagation(e);   // prevent layer popups
   const results = [];
 
-  // Check Counties
   if (layerDefs.counties.layer && map.hasLayer(layerDefs.counties.layer)) {
     layerDefs.counties.layer.eachLayer(l => {
       if (l.getBounds && l.getBounds().contains(e.latlng)) {
@@ -292,6 +291,41 @@ map.on('click', function (e) {
       }
     });
   }
+
+  if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
+    layerDefs.plss.layer.eachLayer(l => {
+      if (l.getBounds && l.getBounds().contains(e.latlng)) {
+        const p = l.feature.properties;
+        results.push({
+          layer: 'PLSS Townships',
+          attrs: {
+            'Principal Meridian': p.meridian || '—',
+            'Township': p.twp || '—',
+            'Township Direction': (p.twpd || '').trim() || '—',
+            'Range': p.rng || '—',
+            'Range Direction': (p.rngd || '').trim() || '—'
+          }
+        });
+      }
+    });
+  }
+
+  document.getElementById('legend-btn').click();
+  const sb = document.getElementById('sidebar');
+  if (results.length === 0) {
+    sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
+    return;
+  }
+  let html = `<h3>Legend</h3>`;
+  results.forEach(r => {
+    html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
+    for (let k in r.attrs) {
+      html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
+    }
+    html += `</table></div>`;
+  });
+  sb.innerHTML = html;
+});
 
   // Check PLSS
   if (layerDefs.plss.layer && map.hasLayer(layerDefs.plss.layer)) {
