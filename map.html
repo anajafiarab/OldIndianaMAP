@@ -246,14 +246,16 @@
     list.innerHTML = active.map(id => {
       const def = layerDefs[id];
       if (!def) return '';
-            return `
-        <div class="layer-item" data-id="${id}">
+      return `
+        <div class="layer-item" data-id="${id}" style="align-items:center;">
           <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
-          <span style="flex:1">${def.name}</span>
-          <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px">
-          <button class="up" style="padding:0 4px; font-size:11px; line-height:1;">↑</button>
-          <button class="down" style="padding:0 4px; font-size:11px; line-height:1;">↓</button>
-          <button class="remove" style="padding:0 4px; font-size:11px; line-height:1;">✕</button>
+          <span style="flex:1; min-width:0;">${def.name}</span>
+          <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:70px; margin:0 6px;">
+          <div style="display:flex; flex-direction:column; font-size:10px; line-height:1; gap:1px;">
+            <button class="up" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">↑</button>
+            <button class="remove" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">✕</button>
+            <button class="down" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">↓</button>
+          </div>
         </div>`;
     }).join('');
 
