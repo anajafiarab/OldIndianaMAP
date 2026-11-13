@@ -57,13 +57,21 @@
       gap: 6px;
       font-size: 13px;
     }
-    .tool {
-      background: #f5f4ea;
-      border: 1px solid #808080;
-      padding: 4px 10px;
-      cursor: pointer;
-    }
-    .tool:hover { background: #fff; }
+.tool {
+  background: #f5f4ea;
+  border: 1px solid #808080;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+}
+.tool img {
+  height: 16px;
+  width: auto;
+  margin-right: 5px;
+}
+.tool:hover { background: #fff; }
     .main {
       display: flex;
       height: calc(100vh - 110px);
@@ -100,12 +108,15 @@
     <div class="tab">Map Gallery</div>
     <div class="tab">Layer Gallery</div>
   </div>
-  <div class="toolbar">
-    <div class="tool">Layers</div>
-    <div class="tool">Identify</div>
-    <div class="tool">Measure</div>
-    <div class="tool">Print</div>
+<div class="toolbar">
+  <div class="tool" id="basemaps-btn">
+    <img src="basemaps.icon.png" alt="Basemaps" style="height: 16px; vertical-align: middle; margin-right: 4px;">
+    Basemaps
   </div>
+  <div class="tool">Identify</div>
+  <div class="tool">Measure</div>
+  <div class="tool">Print</div>
+</div>
   <div class="main">
     <div class="sidebar">
       <h3>Active Layers</h3>
