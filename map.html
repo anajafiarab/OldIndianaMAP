@@ -57,24 +57,23 @@
       gap: 6px;
       font-size: 13px;
     }
-.tool {
-  background: #f5f4ea;
-  border: 1px solid #808080;
-  padding: 4px 10px;
-  cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  font-size: 13px;
-}
-.tool img {
-  height: 16px;
-  width: auto;
-  margin-right: 5px;
-}
-.tool:hover { background: #fff; }
+    .tool {
+      background: #f5f4ea;
+      border: 1px solid #808080;
+      padding: 4px 10px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+    }
+    .tool img {
+      height: 16px;
+      width: auto;
+      margin-right: 5px;
+    }
+    .tool:hover { background: #fff; }
     .main {
       display: flex;
-      height: calc(100vh - 110px);
+      height: calc(100vh - 130px);
     }
     .sidebar {
       width: 240px;
@@ -108,28 +107,40 @@
     <div class="tab">Map Gallery</div>
     <div class="tab">Layer Gallery</div>
   </div>
-<div class="toolbar">
-  <div class="tool" id="basemaps-btn">
-    <img src="basemaps.icon.png" alt="Basemaps">
-    Basemaps
+  <div class="toolbar">
+    <div class="tool" id="basemaps-btn">
+      <img src="basemaps.icon.png" alt="Basemaps">
+      Basemaps
+    </div>
+    <div class="tool" id="add-content-btn">
+      <img src="addContent.png" alt="Add Content">
+      Add Content
+    </div>
+    <div class="tool" id="active-layers-btn">
+      <img src="activeLayers.png" alt="Active Layers">
+      Active Layers
+    </div>
+    <div class="tool" id="legend-btn">
+      <img src="legend.png" alt="Legend">
+      Legend
+    </div>
+    <div class="tool" id="reset-btn">
+      <img src="reset.png" alt="Reset">
+      Reset
+    </div>
   </div>
-  <div class="tool" id="add-content-btn">
-    <img src="addContent.png" alt="Add Content">
-    Add Content
+  <div class="main">
+    <div class="sidebar">
+      <h3>Active Layers</h3>
+      <div id="layer-list">
+        <div class="layer-item">
+          <input type="checkbox" id="counties" checked>
+          <label for="counties">Indiana Counties</label>
+        </div>
+      </div>
+    </div>
+    <div id="map"></div>
   </div>
-  <div class="tool" id="active-layers-btn">
-    <img src="activeLayers.png" alt="Active Layers">
-    Active Layers
-  </div>
-  <div class="tool" id="legend-btn">
-    <img src="legend.png" alt="Legend">
-    Legend
-  </div>
-  <div class="tool" id="reset-btn">
-    <img src="reset.png" alt="Reset">
-    Reset
-  </div>
-</div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
