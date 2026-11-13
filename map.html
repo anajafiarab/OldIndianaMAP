@@ -601,29 +601,21 @@ map.on('click', function (e) {
   function dropMarker(lat, lon, label) {
     if (searchMarker) map.removeLayer(searchMarker);
 
-    const pinIcon = L.divIcon({
+    const arrowIcon = L.divIcon({
       className: 'old-marker',
-      html: `
-        <div style="position:relative; width:20px; height:28px;">
-          <div style="
-            width:16px; height:16px;
-            background:#ffcc00;
-            border:2px solid #333;
-            border-radius:50%;
-            position:absolute; top:0; left:2px;
-            box-shadow:1px 1px 2px rgba(0,0,0,0.4);
-          "></div>
-          <div style="
-            width:2px; height:12px;
-            background:#333;
-            position:absolute; top:14px; left:9px;
-          "></div>
-        </div>`,
-      iconSize: [20, 28],
-      iconAnchor: [10, 28]
+      html: `<div style="
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 14px solid #000;
+        filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.4));
+      "></div>`,
+      iconSize: [12, 14],
+      iconAnchor: [6, 14]
     });
 
-    searchMarker = L.marker([lat, lon], { icon: pinIcon }).addTo(map);
+    searchMarker = L.marker([lat, lon], { icon: arrowIcon }).addTo(map);
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
