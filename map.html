@@ -110,12 +110,51 @@
   color: #2a402a;
   text-shadow: 1px 1px 1px #fff;
 }
+.banner {
+  background: #113d43 url('banner1.png') center / cover no-repeat;
+  padding: 6px 12px;
+  border-bottom: 2px solid #0d2e33;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.search-box {
+  display: flex;
+  gap: 4px;
+  background: rgba(255,255,255,0.9);
+  padding: 4px;
+  border: 1px solid #808080;
+}
+.search-box select,
+.search-box input,
+.search-box button {
+  font-family: Tahoma, Geneva, sans-serif;
+  font-size: 13px;
+  padding: 3px 6px;
+  border: 1px solid #999;
+}
+.search-box input {
+  width: 180px;
+}
+.search-box button {
+  background: #f5f4ea;
+  cursor: pointer;
+}
 
   </style>
 </head>
 <body>
   <div class="banner">
     <img src="logo.png" alt="IndianaMAP">
+    <div class="search-box">
+      <select id="search-type">
+        <option value="address">Address</option>
+        <option value="latlon">Lon/Lat</option>
+      </select>
+      <input id="search-input" type="text" placeholder="100 N. Senate 46204">
+      <button id="search-btn">Go</button>
+    </div>
   </div>
   <div class="tabs">
     <div class="tab active">Map Viewer</div>
@@ -187,7 +226,7 @@
   const hybridLabels = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Tiles &copy; Esri', maxZoom: 19
   });
-  
+
   const savedBasemap = localStorage.getItem('basemap') || 'streets';
   let currentBasemap = basemaps[savedBasemap] || basemaps.streets;
   currentBasemap.addTo(map);
@@ -512,7 +551,50 @@ map.on('click', function (e) {
     setActiveTool('legend-btn');
     sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
   });
+  // Search
+  let searchMarker = null;
+  document.getElementById('search-btn').addEventListener('click', doSearch);
+  document.getElementById('search-input').addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSearch();
+  });
 
+  function doSearch() {
+    const type = document.getElementById('search-type').value;
+    const q = document.getElementById('search-input').value.trim();
+    if (!q) return;
+
+    if (type === 'latlon') {
+      const parts = q.split(/[,\s]+/).map(Number);
+      if (parts.length >= 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+        // Accept either "lat, lon" or "lon, lat" — try both if needed
+        const lat = parts[0];
+        const lon = parts[1];
+        dropMarker(lat, lon, q);
+      } else {
+        alert('Enter as latitude, longitude (e.g. 39.77, -86.16)');
+      }
+    } else {
+      // Address via Nominatim
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q + ', Indiana')}&format=json&limit=1`;
+      fetch(url, { headers: { 'Accept': 'application/json' } })
+        .then(r => r.json())
+        .then(data => {
+          if (data && data[0]) {
+            dropMarker(parseFloat(data[0].lat), parseFloat(data[0].lon), data[0].display_name);
+          } else {
+            alert('Address not found');
+          }
+        })
+        .catch(() => alert('Search failed'));
+    }
+  }
+
+  function dropMarker(lat, lon, label) {
+    if (searchMarker) map.removeLayer(searchMarker);
+    searchMarker = L.marker([lat, lon]).addTo(map);
+    searchMarker.bindPopup(label).openPopup();
+    map.setView([lat, lon], 14);
+  }
   document.getElementById('active-layers-btn').click();
 </script>
 </body>
