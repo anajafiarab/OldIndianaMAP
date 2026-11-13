@@ -245,9 +245,9 @@
           <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
           <span style="flex:1">${def.name}</span>
           <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px">
-          <button class="up">↑</button>
-          <button class="down">↓</button>
-          <button class="remove">✕</button>
+          <button class="up" style="padding:0 4px; font-size:11px; line-height:1;">↑</button>
+          <button class="down" style="padding:0 4px; font-size:11px; line-height:1;">↓</button>
+          <button class="remove" style="padding:0 4px; font-size:11px; line-height:1;">✕</button>
         </div>`;
     }).join('');
 
