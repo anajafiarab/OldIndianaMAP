@@ -133,13 +133,15 @@
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-const indianaBounds = L.latLngBounds(
-  [37.0, -89.0],   // farther southwest
-  [42.5, -84.0]    // farther northeast
+const wideBounds = L.latLngBounds(
+  [25, -100],   // well south and west of Indiana
+  [50, -70]     // well north and east of Indiana
 );
 
 const map = L.map('map', {
-  minZoom: 6
+  maxBounds: wideBounds,
+  maxBoundsViscosity: 0.3,   // very soft
+  minZoom: 5
 }).setView([39.8, -86.2], 7);
 
   const basemaps = {
