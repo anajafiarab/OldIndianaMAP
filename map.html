@@ -496,6 +496,10 @@ map.on('click', function (e) {
     document.getElementById('next-hit').onclick = () => show(idx + 1);
     document.getElementById('clear-hit').onclick = () => {
       clearHighlight();
+      if (searchMarker) {
+        map.removeLayer(searchMarker);
+        searchMarker = null;
+      }
       sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
     };
   }
