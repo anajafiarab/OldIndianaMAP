@@ -5,6 +5,7 @@
   <title>Old Indiana Map</title>
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -402,7 +403,80 @@
     if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
     renderActive();
   }
+  async function loadKMZ(file) {
+    const name = file.name.replace(/\.(kmz|kml)$/i, '');
+    let kmlText = '';
 
+    if (file.name.toLowerCase().endsWith('.kmz')) {
+      const zip = await JSZip.loadAsync(file);
+      const kmlFile = Object.keys(zip.files).find(f => f.toLowerCase().endsWith('.kml'));
+      if (!kmlFile) { alert('No KML found in KMZ'); return; }
+      kmlText = await zip.files[kmlFile].async('text');
+    } else {
+      kmlText = await file.text();
+    }
+
+    const parser = new DOMParser();
+    const xml = parser.parseFromString(kmlText, 'text/xml');
+    const layer = L.layerGroup();
+
+    // Styles (basic)
+    const styles = {};
+    xml.querySelectorAll('Style').forEach(s => {
+      const id = s.getAttribute('id');
+      if (!id) return;
+      const line = s.querySelector('LineStyle');
+      const icon = s.querySelector('IconStyle');
+      styles[id] = {
+        color: line ? '#' + (line.querySelector('color')?.textContent || 'ff0000ff').slice(2) : '#3388ff',
+        weight: line ? parseFloat(line.querySelector('width')?.textContent || 2) : 2
+      };
+    });
+
+    // Placemarks
+    xml.querySelectorAll('Placemark').forEach(pm => {
+      const styleUrl = (pm.querySelector('styleUrl')?.textContent || '').replace('#', '');
+      const st = styles[styleUrl] || { color: '#3388ff', weight: 2 };
+      const name = pm.querySelector('name')?.textContent || '';
+
+      // Point
+      const pt = pm.querySelector('Point coordinates');
+      if (pt) {
+        const [lon, lat] = pt.textContent.trim().split(',').map(Number);
+        const m = L.circleMarker([lat, lon], {
+          radius: 5,
+          color: st.color,
+          fillColor: st.color,
+          fillOpacity: 0.8,
+          weight: 1
+        });
+        if (name) m.bindTooltip(name, { permanent: true, direction: 'top', className: 'county-label' });
+        layer.addLayer(m);
+      }
+
+      // LineString
+      const ls = pm.querySelector('LineString coordinates');
+      if (ls) {
+        const coords = ls.textContent.trim().split(/\s+/).map(c => {
+          const [lon, lat] = c.split(',').map(Number);
+          return [lat, lon];
+        });
+        layer.addLayer(L.polyline(coords, { color: st.color, weight: st.weight }));
+      }
+    });
+
+    // Register as a temporary layer
+    const id = 'kmz-' + Date.now();
+    layerDefs[id] = {
+      name: name,
+      group: 'User',
+      layer: layer,
+      opacity: 1,
+      source: { label: 'Local KMZ: ' + file.name, url: '' }
+    };
+    addLayer(id);
+    document.getElementById('active-layers-btn').click();
+  }
   // Identify → Legend panel
 let highlight = null;
 
@@ -554,10 +628,20 @@ map.on('click', function (e) {
       <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
       <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+        <div style="margin-top:16px; padding-top:10px; border-top:1px solid #ccc;">
+        <button id="add-kmz-btn" style="width:100%; padding:6px;">Add KMZ…</button>
+        <input type="file" id="kmz-file" accept=".kmz,.kml" style="display:none;">
+      </div>
     `;
     sidebar.querySelectorAll('[data-add]').forEach(item => {
       item.addEventListener('click', () => addLayer(item.dataset.add));
     });
+        document.getElementById('add-kmz-btn').onclick = () => {
+      document.getElementById('kmz-file').click();
+    };
+    document.getElementById('kmz-file').onchange = (e) => {
+      if (e.target.files[0]) loadKMZ(e.target.files[0]);
+    };
   });
 
   document.getElementById('active-layers-btn').addEventListener('click', () => {
