@@ -598,35 +598,32 @@ map.on('click', function (e) {
     }
   }
 
-  function dropMarker(lat, lon, label) {
+function dropMarker(lat, lon, label) {
     if (searchMarker) map.removeLayer(searchMarker);
 
-    const arrowIcon = L.divIcon({
+    const pinIcon = L.divIcon({
       className: 'old-marker',
       html: `
-        <div style="position:relative; width:40px; height:40px; transform:rotate(-35deg);">
-          <!-- shaft -->
+        <div style="position:relative; width:20px; height:28px;">
           <div style="
-            position:absolute;
-            left:18px; top:4px;
-            width:2px; height:28px;
-            background:#000;
+            width:16px; height:16px;
+            background:#ffcc00;
+            border:2px solid #333;
+            border-radius:50%;
+            position:absolute; top:0; left:2px;
+            box-shadow:1px 1px 2px rgba(0,0,0,0.4);
           "></div>
-          <!-- head (set back from the tip) -->
           <div style="
-            position:absolute;
-            left:12px; top:8px;
-            width:0; height:0;
-            border-left:7px solid transparent;
-            border-right:7px solid transparent;
-            border-bottom:10px solid #000;
+            width:2px; height:20px;
+            background:#333;
+            position:absolute; top:14px; left:9px;
           "></div>
         </div>`,
-      iconSize: [40, 40],
-      iconAnchor: [20, 36]
+      iconSize: [20, 28],
+      iconAnchor: [10, 28]
     });
 
-    searchMarker = L.marker([lat, lon], { icon: arrowIcon }).addTo(map);
+    searchMarker = L.marker([lat, lon], { icon: pinIcon }).addTo(map);
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
