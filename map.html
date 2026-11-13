@@ -323,21 +323,6 @@ map.on('click', function (e) {
   sb.innerHTML = html;
 });
 
-    document.getElementById('legend-btn').click();
-    const sb = document.getElementById('sidebar');
-    if (!results.length) {
-      sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
-      return;
-    }
-    let html = `<h3>Legend</h3>`;
-    results.forEach(r => {
-      html += `<div style="margin-bottom:12px;"><strong>${r.layer}</strong><table style="width:100%; font-size:13px; margin-top:4px;">`;
-      for (let k in r.attrs) html += `<tr><td style="color:#555; padding:2px 8px 2px 0;">${k}</td><td>${r.attrs[k]}</td></tr>`;
-      html += `</table></div>`;
-    });
-    sb.innerHTML = html;
-  });
-
   const sidebar = document.getElementById('sidebar');
   const tools = document.querySelectorAll('.tool');
   function setActiveTool(id) {
