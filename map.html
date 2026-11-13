@@ -12,27 +12,29 @@
       height: 100%;
       font-family: Tahoma, Geneva, sans-serif;
       background: #d4d0c8;
+      color: #000;
     }
     .topbar {
-      background: #4a6b4a;
-      color: white;
-      padding: 4px 10px;
+      background: #3d5c3d;
+      color: #fff;
+      padding: 3px 8px;
       font-size: 13px;
       font-weight: bold;
+      border-bottom: 1px solid #2a402a;
     }
     .tabs {
       background: #d4d0c8;
       border-bottom: 1px solid #808080;
-      padding: 2px 6px 0 6px;
+      padding: 1px 4px 0 4px;
       display: flex;
-      gap: 2px;
+      gap: 1px;
     }
     .tab {
       background: #d4d0c8;
       border: 1px solid #808080;
       border-bottom: none;
-      padding: 3px 14px;
-      font-size: 12px;
+      padding: 2px 12px 3px;
+      font-size: 11px;
       cursor: pointer;
     }
     .tab.active {
@@ -40,53 +42,47 @@
       font-weight: bold;
       position: relative;
       top: 1px;
+      border-bottom: 1px solid #fff;
     }
     .toolbar {
-      background: #d4d0c8;
+      background: #ece9d8;
       border-bottom: 1px solid #808080;
-      padding: 4px 8px;
+      padding: 3px 6px;
       display: flex;
-      gap: 6px;
+      gap: 4px;
       font-size: 11px;
     }
     .tool {
-      background: #ece9d8;
+      background: #f5f4ea;
       border: 1px solid #808080;
-      padding: 2px 8px;
+      padding: 1px 7px;
       cursor: pointer;
     }
+    .tool:hover { background: #fff; }
     .main {
       display: flex;
-      height: calc(100vh - 72px);
+      height: calc(100vh - 62px);
     }
     .sidebar {
-      width: 220px;
+      width: 210px;
       background: #f0f0f0;
       border-right: 1px solid #808080;
-      padding: 8px;
+      padding: 6px 8px;
       font-size: 12px;
       overflow-y: auto;
     }
-    .sidebar strong { display: block; margin-bottom: 8px; }
-    #map {
-      flex: 1;
-      background: #ddd;
+    .sidebar h3 {
+      margin: 0 0 6px 0;
+      font-size: 12px;
+      font-weight: bold;
     }
+    #map { flex: 1; }
     .layer-item {
-      margin: 4px 0;
+      margin: 3px 0;
       display: flex;
       align-items: center;
-      gap: 6px;
-    }
-    .scale-note {
-      position: absolute;
-      bottom: 8px;
-      left: 230px;
-      background: rgba(255,255,255,0.85);
-      border: 1px solid #999;
-      padding: 2px 6px;
+      gap: 5px;
       font-size: 11px;
-      z-index: 1000;
     }
   </style>
 </head>
@@ -105,7 +101,7 @@
   </div>
   <div class="main">
     <div class="sidebar">
-      <strong>Active Layers</strong>
+      <h3>Active Layers</h3>
       <div id="layer-list">
         <div class="layer-item">
           <input type="checkbox" id="counties" checked>
@@ -115,65 +111,39 @@
     </div>
     <div id="map"></div>
   </div>
-  <div class="scale-note">Scale bar appears here</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-  // Initialize map centered on Indiana
-  const map = L.map('map').setView([39.8, -86.2], 7);
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const map = L.map('map').setView([39.8, -86.2], 7);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      attribution: '&copy; OpenStreetMap contributors',
+      maxZoom: 18
+    }).addTo(map);
 
-  // OpenStreetMap basemap
-  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap contributors',
-    maxZoom: 18
-  }).addTo(map);
+    let countiesLayer;
+    const checkbox = document.getElementById('counties');
+    const savedState = localStorage.getItem('countiesVisible');
+    if (savedState !== null) checkbox.checked = savedState === 'true';
 
-  // Indiana counties layer
-  let countiesLayer;
-
-  // Remember checkbox state
-  const checkbox = document.getElementById('counties');
-  const savedState = localStorage.getItem('countiesVisible');
-  if (savedState !== null) {
-    checkbox.checked = savedState === 'true';
-  }
-
-  fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
-    .then(response => response.json())
-    .then(data => {
-      // Filter to Indiana only (FIPS starts with 18)
-      const indiana = {
-        type: 'FeatureCollection',
-        features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
-      };
-
-      countiesLayer = L.geoJSON(indiana, {
-        style: {
-          color: '#4a6b4a',
-          weight: 1,
-          fillOpacity: 0.1
-        },
-        onEachFeature: function (feature, layer) {
-          layer.bindPopup(feature.properties.NAME || 'County');
-        }
+    fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
+      .then(r => r.json())
+      .then(data => {
+        const indiana = {
+          type: 'FeatureCollection',
+          features: data.features.filter(f => 
+            f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18'))
+          )
+        };
+        countiesLayer = L.geoJSON(indiana, {
+          style: { color: '#3d5c3d', weight: 1, fillOpacity: 0.08 },
+          onEachFeature: (f, l) => l.bindPopup(f.properties.NAME || 'County')
+        });
+        if (checkbox.checked) countiesLayer.addTo(map);
+        checkbox.addEventListener('change', function () {
+          localStorage.setItem('countiesVisible', this.checked);
+          this.checked ? countiesLayer.addTo(map) : map.removeLayer(countiesLayer);
+        });
       });
-
-      // Add it only if the checkbox is checked
-      if (checkbox.checked) {
-        countiesLayer.addTo(map);
-      }
-
-      // Wire up the checkbox + save state
-      checkbox.addEventListener('change', function () {
-        localStorage.setItem('countiesVisible', this.checked);
-        if (this.checked) {
-          countiesLayer.addTo(map);
-        } else {
-          map.removeLayer(countiesLayer);
-        }
-      });
-    })
-    .catch(err => console.error('Failed to load counties:', err));
-</script>
+  </script>
 </body>
 </html>
