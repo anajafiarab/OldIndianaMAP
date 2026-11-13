@@ -181,8 +181,20 @@
   if (savedBasemap === 'hybrid') hybridLabels.addTo(map);
 
   const layerDefs = {
-    counties: { name: 'Indiana Counties', group: 'Boundaries', layer: null, opacity: 1 },
-    plss: { name: 'PLSS Townships', group: 'Boundaries', layer: null, opacity: 1 }
+    counties: {
+      name: 'Indiana Counties',
+      group: 'Boundaries',
+      layer: null,
+      opacity: 1,
+      source: { label: 'U.S. County Boundaries (public GeoJSON)', url: 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json' }
+    },
+    plss: {
+      name: 'PLSS Townships',
+      group: 'Boundaries',
+      layer: null,
+      opacity: 1,
+      source: { label: 'Indiana GIO PLSS Townships', url: 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2' }
+    }
   };
 
   // Counties
@@ -333,7 +345,12 @@ map.on('click', function (e) {
     if (!def.layer || !map.hasLayer(def.layer)) return;
     def.layer.eachLayer(l => {
       if (pointInLayer(e.latlng, l)) {
-        hits.push({ layerName, layer: l, attrs: attrFn(l.feature.properties) });
+        hits.push({
+          layerName,
+          layer: l,
+          attrs: attrFn(l.feature.properties),
+          source: def.source || null
+        });
       }
     });
   }
@@ -366,7 +383,14 @@ map.on('click', function (e) {
   let idx = 0;
   function show(i) {
     idx = (i + hits.length) % hits.length;
-    const h = hits[idx];
+        // Layer-specific source
+    const src = hits[idx].source;
+    if (src) {
+      html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
+      html += `Source: <a href="${src.url}" target="_blank" style="color:#3d5c3d;">${src.label}</a>`;
+      html += `</div>`;
+    }
+    sb.innerHTML = html;
     clearHighlight();
     highlight = L.geoJSON(h.layer.toGeoJSON(), {
       style: { color: '#ff7800', weight: 3, fillOpacity: 0.25 }
