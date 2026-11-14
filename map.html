@@ -291,6 +291,23 @@
         ZFactor: hsSettings.zFactor
       }
     }));
+    const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
+      '?bbox=' + b.toBBoxString() +
+      '&bboxSR=4326' +
+      '&imageSR=3857' +
+      '&size=' + size.x + ',' + size.y +
+      '&format=png' +
+      '&renderingRule=' + rule +
+      '&f=image';
+
+    const currentOpacity = (layerDefs.lidarhs && layerDefs.lidarhs.opacity != null)
+      ? layerDefs.lidarhs.opacity
+      : hsSettings.opacity;
+
+    const img = L.imageOverlay(url, b, { opacity: currentOpacity, interactive: false });
+    lidarHS.addLayer(img);
+  }
+
       function renderHSControls() {
     const container = document.getElementById('hs-controls');
     if (!container) return;
@@ -523,7 +540,8 @@
 
 
         slider.addEventListener('input', () => {
-        def.opacity = slider.value / 100;
+                def.opacity = slider.value / 100;
+        if (id === 'lidarhs') hsSettings.opacity = def.opacity;
         if (!def.layer) return;
 
         // Tile layers (hillshade, etc.)
