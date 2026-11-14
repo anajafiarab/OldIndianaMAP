@@ -393,22 +393,20 @@
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
-      slider.addEventListener('input', () => {
+           slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
         if (!def.layer) return;
 
-        if (def.layer.setStyle) {
+        if (def.layer.setOpacity) {
+          def.layer.setOpacity(def.opacity);
+        } else if (def.layer.setStyle) {
           def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
         } else if (def.layer.eachLayer) {
           def.layer.eachLayer(l => {
-            if (l.setStyle) {
-              l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
-            }
+            if (l.setStyle) l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
             if (l.setOpacity) l.setOpacity(def.opacity);
-            // tooltip / label
-            if (l.getTooltip && l.getTooltip()) {
-              const tip = l.getTooltip();
-              if (tip.getElement()) tip.getElement().style.opacity = def.opacity;
+            if (l.getTooltip && l.getTooltip() && l.getTooltip().getElement()) {
+              l.getTooltip().getElement().style.opacity = def.opacity;
             }
           });
         }
