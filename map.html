@@ -309,6 +309,85 @@
   background: #fff;
   border-color: #808080;
 }
+/* Soft shadow under the main toolbar */
+.toolbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 500;
+}
+
+/* Measurement drop-down panel */
+#measure-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 8px;
+  width: 280px;
+  background: #f0f0f0;
+  border: 1px solid #808080;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
+  z-index: 600;
+  font-size: 13px;
+}
+#measure-panel.open { display: block; }
+
+.measure-header {
+  background: #113d43;
+  color: #fff;
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  border-radius: 0;
+}
+.measure-header .close-x {
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0 4px;
+}
+.measure-header .close-x:hover { color: #ccc; }
+
+.measure-body {
+  padding: 8px;
+}
+.measure-tools {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.measure-tools img {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  padding: 4px;
+  border: 1px solid transparent;
+  background: #e8e8e8;
+}
+.measure-tools img:hover,
+.measure-tools img.active {
+  border-color: #808080;
+  background: #fff;
+}
+.measure-tools .sep {
+  color: #999;
+  margin: 0 4px;
+}
+#measure-units {
+  font-size: 12px;
+  padding: 2px 4px;
+}
+.measure-result {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid #ccc;
+  font-size: 12px;
+  min-height: 32px;
+  color: #333;
+}
   </style>
 </head>
 <body>
@@ -370,6 +449,24 @@
         <img src="printer.png" alt="Print">
       </div>
     </div>
+      <div id="measure-panel">
+    <div class="measure-header">
+      <span>Measurement Tool</span>
+      <span class="close-x" id="measure-close">×</span>
+    </div>
+    <div class="measure-body">
+      <div class="measure-tools">
+        <img src="Measure_Area16.png" id="meas-area" title="Area" alt="Area">
+        <img src="Measure_Distance16.png" id="meas-dist" title="Distance" alt="Distance">
+        <img src="Measure_Point.png" id="meas-point" title="Location" alt="Location">
+        <span class="sep">|</span>
+        <select id="measure-units"></select>
+      </div>
+      <div class="measure-result" id="measure-result">
+        Click the map to measure.
+      </div>
+    </div>
+  </div>
   </div>
   </div>
   <div class="main">
@@ -1003,6 +1100,29 @@ map.on('click', function (e) {
       if (e.target.files[0]) loadKMZ(e.target.files[0]);
     };
   });
+  // Measurement panel open/close
+  const measurePanel = document.getElementById('measure-panel');
+  document.getElementById('measure-btn').addEventListener('click', () => {
+    measurePanel.classList.toggle('open');
+  });
+  document.getElementById('measure-close').addEventListener('click', () => {
+    measurePanel.classList.remove('open');
+  });
+
+  // Unit dropdowns
+  const unitSets = {
+    area: ['Acres', 'Square Miles', 'Square Kilometers', 'Hectares', 'Square Yards', 'Square Feet', 'Square Meters'],
+    dist: ['Miles', 'Kilometers', 'Feet', 'Meters', 'Yards'],
+    point: ['Degrees', 'DMS']
+  };
+  function setUnits(type) {
+    const sel = document.getElementById('measure-units');
+    sel.innerHTML = unitSets[type].map(u => `<option>${u}</option>`).join('');
+  }
+  document.getElementById('meas-area').onclick = () => { setUnits('area'); };
+  document.getElementById('meas-dist').onclick = () => { setUnits('dist'); };
+  document.getElementById('meas-point').onclick = () => { setUnits('point'); };
+  setUnits('area'); // default
 
   document.getElementById('active-layers-btn').addEventListener('click', () => {
     setActiveTool('active-layers-btn');
