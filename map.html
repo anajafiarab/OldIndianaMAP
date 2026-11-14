@@ -455,18 +455,18 @@
 .draw-colors span.active {
   outline: 2px solid #000;
 }
+
+.tool-wrap {
+  position: relative;
+}
 #measure-panel,
 #draw-panel {
   position: absolute;
-  top: 128px;          /* adjust if needed — height of banner + tabs + toolbar */
+  top: 100%;          /* sits flush under the toolbar */
   z-index: 600;
 }
-#measure-panel {
-  right: 8px;
-}
-#draw-panel {
-  right: 48px;
-}
+#measure-panel { right: 8px; }
+#draw-panel { right: 48px; }
   </style>
 </head>
 <body>
@@ -486,6 +486,7 @@
     <div class="tab">Map Gallery</div>
     <div class="tab">Layer Gallery</div>
   </div>
+  <div class="tool-wrap"></div>
 <div class="toolbar">
     <div class="tool" id="basemaps-btn">
       <img src="basemaps.icon.png" alt="Basemaps">
@@ -573,7 +574,7 @@
       </div>
     </div>
   </div>
-
+</div>
   <div class="main">
     <div class="sidebar" id="sidebar">
       <h3>Active Layers</h3>
