@@ -262,7 +262,7 @@
   const hillshade = L.tileLayer('https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer/tile/{z}/{y}/{x}', {
     attribution: 'Esri, USGS',
     maxZoom: 19,
-    opacity: 0.55
+    opacity: 0.9
   });
 
   const savedBasemap = localStorage.getItem('basemap') || 'streets';
@@ -275,7 +275,7 @@
       name: 'Hillshade',
       group: 'Elevation',
       layer: hillshade,
-      opacity: 0.55,
+      opacity: 0.8,
       source: { label: 'Esri World Hillshade', url: 'https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer' }
     },
     counties: {
@@ -393,21 +393,23 @@
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
-           slider.addEventListener('input', () => {
+      slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
         if (!def.layer) return;
 
-        if (def.layer.setOpacity) {
+        // Tile layers (hillshade, etc.)
+        if (typeof def.layer.setOpacity === 'function') {
           def.layer.setOpacity(def.opacity);
-        } else if (def.layer.setStyle) {
+        }
+        // GeoJSON / feature layers
+        else if (typeof def.layer.setStyle === 'function') {
           def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
-        } else if (def.layer.eachLayer) {
+        }
+        // Layer groups (KMZ)
+        else if (typeof def.layer.eachLayer === 'function') {
           def.layer.eachLayer(l => {
-            if (l.setStyle) l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
-            if (l.setOpacity) l.setOpacity(def.opacity);
-            if (l.getTooltip && l.getTooltip() && l.getTooltip().getElement()) {
-              l.getTooltip().getElement().style.opacity = def.opacity;
-            }
+            if (typeof l.setOpacity === 'function') l.setOpacity(def.opacity);
+            if (typeof l.setStyle === 'function') l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
           });
         }
         saveActive();
