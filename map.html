@@ -391,19 +391,15 @@
             <option value="0" ${hsSettings.type===0?'selected':''}>Traditional</option>
           </select>
         </div>
-        ${showAz ? `
+                ${showAz ? `
           <div style="margin-top:4px;">Azimuth: 
-            <span style="font-size:9px; color:#666;">0</span>
-            <input id="hs-az" type="range" min="0" max="360" value="${hsSettings.azimuth}" style="width:80px">
-            <span style="font-size:9px; color:#666;">360</span>
-            <span id="hs-az-val">${hsSettings.azimuth}</span>
+            <input id="hs-az" type="range" min="0" max="360" value="${hsSettings.azimuth}" style="width:70px">
+            <span id="hs-az-val" style="font-size:9px; color:#666; margin-left:4px;">${hsSettings.azimuth}</span>
           </div>
         ` : ''}
         <div>Altitude: 
-          <span style="font-size:9px; color:#666;">0</span>
-          <input id="hs-alt" type="range" min="0" max="90" value="${hsSettings.altitude}" style="width:80px">
-          <span style="font-size:9px; color:#666;">90</span>
-          <span id="hs-alt-val">${hsSettings.altitude}</span>
+          <input id="hs-alt" type="range" min="0" max="90" value="${hsSettings.altitude}" style="width:70px">
+          <span id="hs-alt-val" style="font-size:9px; color:#666; margin-left:4px;">${hsSettings.altitude}</span>
         </div>
     `;
     document.getElementById('hs-type').onchange = (e) => {
@@ -544,9 +540,9 @@
         <div class="layer-item" data-id="${id}" style="align-items:center;">
           <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
           <span style="flex:1; min-width:60px; overflow:hidden; text-overflow:ellipsis;">${def.name}</span>
-          <span style="font-size:9px; color:#666; margin-left:4px;">0</span>
-          <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px; margin:0 2px;">
-          <span style="font-size:9px; color:#666;">100</span>
+           <span style="flex:1; min-width:60px; overflow:hidden; text-overflow:ellipsis;">${def.name}</span>
+          <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px; margin:0 4px;">
+          <span class="slider-val" style="font-size:9px; color:#666; min-width:22px; text-align:right;">${Math.round(def.opacity*100)}</span>
           <div style="display:flex; flex-direction:column; font-size:10px; line-height:1; gap:1px; margin-left:4px;">
             <button class="up" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">↑</button>
             <button class="remove" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">✕</button>
@@ -574,6 +570,7 @@
         slider.addEventListener('input', () => {
                 def.opacity = slider.value / 100;
         if (id === 'lidarhs') hsSettings.opacity = def.opacity;
+        row.querySelector('.slider-val').textContent = slider.value;
         if (!def.layer) return;
 
         // Tile layers (hillshade, etc.)
