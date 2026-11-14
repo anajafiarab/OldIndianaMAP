@@ -6,6 +6,7 @@
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -264,6 +265,20 @@
     maxZoom: 19,
     opacity: 0.9
   });
+    const lidarHS = L.esri.imageMapLayer({
+    url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer',
+    renderingRule: {
+      rasterFunction: 'Hillshade',
+      rasterFunctionArguments: {
+        HillshadeType: 1,   // 1 = multidirectional
+        Azimuth: 315,
+        Altitude: 45,
+        ZFactor: 1
+      }
+    },
+    opacity: 0.65,
+    maxZoom: 19
+  });
 
   const savedBasemap = localStorage.getItem('basemap') || 'streets';
   let currentBasemap = basemaps[savedBasemap] || basemaps.streets;
@@ -292,6 +307,13 @@
       opacity: 1,
       source: { label: 'Indiana GIO PLSS Townships', url: 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2' }
     }
+        lidarhs: {
+      name: 'Lidar Hillshade (2016-2020)',
+      group: 'Elevation',
+      layer: lidarHS,
+      opacity: 0.65,
+      source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
+    },
     
   };
 
@@ -687,15 +709,20 @@ map.on('click', function (e) {
       <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div>
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
+
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
       <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
       <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
-        <div style="margin-top:16px; padding-top:10px; border-top:1px solid #ccc;">
+
+      <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
+      <div class="basemap-item" data-add="lidarhs">Lidar Hillshade (2016-2020)</div>
+      <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
+
+      <div style="margin-top:16px; padding-top:10px; border-top:1px solid #ccc;">
         <button id="add-kmz-btn" style="width:100%; padding:6px;">Add .kmz</button>
         <input type="file" id="kmz-file" accept=".kmz,.kml" style="display:none;">
-              <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
-      <div class="basemap-item" data-add="hillshade">Hillshade</div>
       </div>
     `;
     sidebar.querySelectorAll('[data-add]').forEach(item => {
