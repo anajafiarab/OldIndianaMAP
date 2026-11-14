@@ -269,6 +269,46 @@
 .layer-item input[type=checkbox]:active {
   background: #e0e0e0;
 }
+.toolbar {
+  background: #ece9d8;
+  border-bottom: 1px solid #808080;
+  padding: 4px 8px;
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  font-size: 13px;
+}
+.tool-right {
+  margin-left: auto;
+  display: flex;
+  gap: 3px;
+  align-items: flex-end;
+}
+.tool-tab {
+  background: rgb(151, 168, 151);
+  border: 1px solid #5a6b5a;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  padding: 6px 10px 4px 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 28px;
+}
+.tool-tab img {
+  height: 16px;
+  width: auto;
+  display: block;
+}
+.tool-tab:hover {
+  background: rgb(171, 188, 171);
+}
+.tool-tab.active {
+  background: #fff;
+  border-color: #808080;
+}
   </style>
 </head>
 <body>
@@ -288,7 +328,7 @@
     <div class="tab">Map Gallery</div>
     <div class="tab">Layer Gallery</div>
   </div>
-  <div class="toolbar">
+<div class="toolbar">
     <div class="tool" id="basemaps-btn">
       <img src="basemaps.icon.png" alt="Basemaps">
       Basemaps
@@ -309,6 +349,28 @@
       <img src="reset.png" alt="Reset">
       Reset
     </div>
+
+    <div class="tool-right">
+      <div class="tool-tab" id="identify-btn" title="Identify">
+        <img src="identify.png" alt="Identify">
+      </div>
+      <div class="tool-tab" id="draw-btn" title="Draw">
+        <img src="draw.png" alt="Draw">
+      </div>
+      <div class="tool-tab" id="measure-btn" title="Measure">
+        <img src="Measurement.png" alt="Measure">
+      </div>
+      <div class="tool-tab" id="query-btn" title="Query">
+        <img src="query.png" alt="Query">
+      </div>
+      <div class="tool-tab" id="share-btn" title="Share">
+        <img src="share.png" alt="Share">
+      </div>
+      <div class="tool-tab" id="print-btn" title="Print">
+        <img src="printer.png" alt="Print">
+      </div>
+    </div>
+  </div>
   </div>
   <div class="main">
     <div class="sidebar" id="sidebar">
