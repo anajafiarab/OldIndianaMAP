@@ -455,6 +455,18 @@
 .draw-colors span.active {
   outline: 2px solid #000;
 }
+#measure-panel,
+#draw-panel {
+  position: absolute;
+  top: 128px;          /* adjust if needed — height of banner + tabs + toolbar */
+  z-index: 600;
+}
+#measure-panel {
+  right: 8px;
+}
+#draw-panel {
+  right: 48px;
+}
   </style>
 </head>
 <body>
@@ -536,7 +548,7 @@
     </div>
     </div>
 
-      <div id="draw-panel">
+    <div id="draw-panel">
     <div class="draw-header">
       <span>Draw Tool</span>
       <span class="close-x" id="draw-close">×</span>
