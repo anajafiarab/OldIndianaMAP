@@ -389,6 +389,72 @@
   min-height: 32px;
   color: #333;
 }
+#draw-panel {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 48px;
+  width: 260px;
+  background: #f0f0f0;
+  border: 1px solid #808080;
+  border-radius: 0 0 8px 8px;
+  box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
+  z-index: 600;
+  font-size: 13px;
+}
+#draw-panel.open { display: block; }
+
+.draw-header {
+  background: #113d43;
+  color: #fff;
+  padding: 4px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+}
+.draw-header .close-x {
+  cursor: pointer;
+  font-size: 16px;
+  padding: 0 4px;
+}
+.draw-header .close-x:hover { color: #ccc; }
+
+.draw-body { padding: 8px; }
+.draw-tools {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.draw-tools button {
+  font-size: 12px;
+  padding: 4px 8px;
+  cursor: pointer;
+  background: #e8e8e8;
+  border: 1px solid #999;
+}
+.draw-tools button.active {
+  background: #fff;
+  border-color: #333;
+  font-weight: bold;
+}
+.draw-colors {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+.draw-colors span {
+  width: 18px;
+  height: 18px;
+  border: 1px solid #666;
+  cursor: pointer;
+  display: inline-block;
+}
+.draw-colors span.active {
+  outline: 2px solid #000;
+}
   </style>
 </head>
 <body>
@@ -467,6 +533,31 @@
         Click the map to measure.
       </div>
     </div>
+      <div id="draw-panel">
+    <div class="draw-header">
+      <span>Draw Tool</span>
+      <span class="close-x" id="draw-close">×</span>
+    </div>
+    <div class="draw-body">
+      <div class="draw-tools">
+        <button id="draw-point">Point</button>
+        <button id="draw-line">Line</button>
+        <button id="draw-poly">Polygon</button>
+        <button id="draw-clear">Clear</button>
+      </div>
+      <div class="draw-colors" id="draw-colors">
+        <span data-color="#c00" style="background:#c00" class="active"></span>
+        <span data-color="#e60" style="background:#e60"></span>
+        <span data-color="#090" style="background:#090"></span>
+        <span data-color="#06c" style="background:#06c"></span>
+        <span data-color="#000" style="background:#000"></span>
+        <span data-color="#fff" style="background:#fff"></span>
+      </div>
+      <div style="font-size:12px; color:#555;">
+        Click to draw. Double-click to finish lines and polygons.
+      </div>
+    </div>
+  </div>
   </div>
   </div>
   </div>
@@ -1244,6 +1335,79 @@ map.on('click', function (e) {
   });
 
   document.getElementById('measure-units').onchange = updateMeasureDisplay;
+  // Draw panel
+  const drawPanel = document.getElementById('draw-panel');
+  document.getElementById('draw-btn').addEventListener('click', () => {
+    drawPanel.classList.toggle('open');
+  });
+  document.getElementById('draw-close').addEventListener('click', () => {
+    drawPanel.classList.remove('open');
+  });
+
+  let drawMode = null;
+  let drawColor = '#c00';
+  let drawPoints = [];
+  const drawLayer = L.layerGroup().addTo(map);
+
+  document.querySelectorAll('#draw-colors span').forEach(s => {
+    s.onclick = () => {
+      document.querySelectorAll('#draw-colors span').forEach(x => x.classList.remove('active'));
+      s.classList.add('active');
+      drawColor = s.dataset.color;
+    };
+  });
+
+  function setDrawMode(mode) {
+    drawMode = mode;
+    drawPoints = [];
+    document.querySelectorAll('.draw-tools button').forEach(b => b.classList.remove('active'));
+    if (mode) document.getElementById('draw-' + mode).classList.add('active');
+  }
+  document.getElementById('draw-point').onclick = () => setDrawMode('point');
+  document.getElementById('draw-line').onclick = () => setDrawMode('line');
+  document.getElementById('draw-poly').onclick = () => setDrawMode('poly');
+  document.getElementById('draw-clear').onclick = () => {
+    drawLayer.clearLayers();
+    drawPoints = [];
+  };
+
+  map.on('click', function (e) {
+    if (!drawMode || !drawPanel.classList.contains('open')) return;
+    if (e.originalEvent.target.closest('#draw-panel, .toolbar, #measure-panel')) return;
+
+    if (drawMode === 'point') {
+      L.circleMarker(e.latlng, {
+        radius: 6,
+        color: '#000',
+        weight: 1,
+        fillColor: drawColor,
+        fillOpacity: 1
+      }).addTo(drawLayer);
+      return;
+    }
+
+    drawPoints.push(e.latlng);
+    if (drawPoints.length > 1) {
+      const latlngs = drawPoints.map(p => [p.lat, p.lng]);
+      // remove temp line/poly
+      drawLayer.eachLayer(l => {
+        if (l.options && l.options.temp) drawLayer.removeLayer(l);
+      });
+      if (drawMode === 'line') {
+        L.polyline(latlngs, { color: drawColor, weight: 2, temp: true }).addTo(drawLayer);
+      } else if (drawMode === 'poly' && drawPoints.length >= 3) {
+        L.polygon(latlngs, { color: drawColor, weight: 2, fillColor: drawColor, fillOpacity: 0.2, temp: true }).addTo(drawLayer);
+      }
+    }
+  });
+
+  map.on('dblclick', function (e) {
+    if (!drawMode || drawMode === 'point' || !drawPanel.classList.contains('open')) return;
+    L.DomEvent.stop(e);
+    // finalize: remove temp flag
+    drawLayer.eachLayer(l => { if (l.options) delete l.options.temp; });
+    drawPoints = [];
+  });
 
   document.getElementById('active-layers-btn').addEventListener('click', () => {
     setActiveTool('active-layers-btn');
