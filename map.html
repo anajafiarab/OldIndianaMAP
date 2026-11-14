@@ -5,7 +5,7 @@
   <title>Old Indiana Map</title>
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <script src="https://unpkg.com/esri-leaflet@3.0.12/dist/esri-leaflet.js"></script>
+
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
   <style>
@@ -266,19 +266,35 @@
     maxZoom: 19,
     opacity: 0.9
   });
-    const lidarHS = L.esri.imageMapLayer({
-    url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer',
-    renderingRule: {
+     const lidarHS = L.layerGroup(); // placeholder; real requests happen on add
+
+  function refreshLidarHS() {
+    lidarHS.clearLayers();
+    const b = map.getBounds();
+    const size = map.getSize();
+    const rule = encodeURIComponent(JSON.stringify({
       rasterFunction: 'Hillshade',
       rasterFunctionArguments: {
-        HillshadeType: 1,   // 1 = multidirectional
+        HillshadeType: 1,
         Azimuth: 315,
         Altitude: 45,
         ZFactor: 1
       }
-    },
-    opacity: 0.65,
-    maxZoom: 19
+    }));
+    const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
+      '?bbox=' + b.toBBoxString() +
+      '&bboxSR=4326' +
+      '&imageSR=3857' +
+      '&size=' + size.x + ',' + size.y +
+      '&format=png' +
+      '&renderingRule=' + rule +
+      '&f=image';
+    const img = L.imageOverlay(url, b, { opacity: 0.65, interactive: false });
+    lidarHS.addLayer(img);
+  }
+
+  map.on('moveend', () => {
+    if (map.hasLayer(lidarHS)) refreshLidarHS();
   });
 
   const savedBasemap = localStorage.getItem('basemap') || 'streets';
@@ -471,6 +487,7 @@
     if (!active.includes(id)) { active.push(id); saveActive(); }
     const def = layerDefs[id];
     if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
+        if (id === 'lidarhs') refreshLidarHS();
     renderActive();
   }
   async function loadKMZ(file) {
