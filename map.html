@@ -310,6 +310,25 @@
     document.getElementById('hs-az').oninput = (e) => { hsSettings.azimuth = +e.target.value; document.getElementById('hs-az-val').textContent = hsSettings.azimuth; refreshLidarHS(); };
     document.getElementById('hs-alt').oninput = (e) => { hsSettings.altitude = +e.target.value; document.getElementById('hs-alt-val').textContent = hsSettings.altitude; refreshLidarHS(); };
   }
+      function renderHSControls() {
+    const container = document.getElementById('hs-controls');
+    if (!container) return;
+    container.innerHTML = `
+      <div style="font-size:12px; margin-top:8px; padding-top:6px; border-top:1px solid #ccc;">
+        <div>Type: 
+          <select id="hs-type">
+            <option value="1" ${hsSettings.type===1?'selected':''}>Multidirectional</option>
+            <option value="0" ${hsSettings.type===0?'selected':''}>Traditional</option>
+          </select>
+        </div>
+        <div style="margin-top:4px;">Azimuth: <input id="hs-az" type="range" min="0" max="360" value="${hsSettings.azimuth}" style="width:80px"> <span id="hs-az-val">${hsSettings.azimuth}</span></div>
+        <div>Altitude: <input id="hs-alt" type="range" min="0" max="90" value="${hsSettings.altitude}" style="width:80px"> <span id="hs-alt-val">${hsSettings.altitude}</span></div>
+      </div>
+    `;
+    document.getElementById('hs-type').onchange = (e) => { hsSettings.type = +e.target.value; refreshLidarHS(); };
+    document.getElementById('hs-az').oninput = (e) => { hsSettings.azimuth = +e.target.value; document.getElementById('hs-az-val').textContent = hsSettings.azimuth; refreshLidarHS(); };
+    document.getElementById('hs-alt').oninput = (e) => { hsSettings.altitude = +e.target.value; document.getElementById('hs-alt-val').textContent = hsSettings.altitude; refreshLidarHS(); };
+  }
     const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
       '?bbox=' + b.toBBoxString() +
       '&bboxSR=4326' +
