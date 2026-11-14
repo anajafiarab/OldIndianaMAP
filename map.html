@@ -177,6 +177,68 @@
 .kmz-label::after {
   display: none !important;
 }
+/* Old-school range sliders in Active Layers */
+.layer-item input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 70px;
+  height: 14px;
+  background: transparent;
+  margin: 0 6px;
+  cursor: pointer;
+}
+
+/* Track */
+.layer-item input[type=range]::-webkit-slider-runnable-track {
+  height: 4px;
+  background: #c0c0c0;
+  border: 1px solid #808080;
+  border-radius: 0;
+}
+.layer-item input[type=range]::-moz-range-track {
+  height: 4px;
+  background: #c0c0c0;
+  border: 1px solid #808080;
+  border-radius: 0;
+}
+
+/* Thumb — thin triangle */
+.layer-item input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 0;
+  height: 0;
+  margin-top: -6px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #808080;
+  background: transparent;
+  cursor: pointer;
+}
+.layer-item input[type=range]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 8px solid #808080;
+  background: transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* Optional tick marks under the track */
+.layer-item input[type=range] {
+  background-image: repeating-linear-gradient(
+    to right,
+    #a0a0a0 0,
+    #a0a0a0 1px,
+    transparent 1px,
+    transparent 14px
+  );
+  background-size: 100% 4px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
   </style>
 </head>
 <body>
