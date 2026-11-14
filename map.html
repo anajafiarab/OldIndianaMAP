@@ -10,110 +10,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
   <style>
-    * { box-sizing: border-box; }
-    html, body {
-      margin: 0;
-      height: 100%;
-      font-family: Tahoma, Geneva, sans-serif;
-      background: #d4d0c8;
-      color: #000;
-      font-size: 14px;
-    }
-.banner {
-  background: #113d43 url('banner1.png') center / cover no-repeat;
-  padding: 6px 12px;
-  border-bottom: 2px solid #0d2e33;
-  min-height: 52px;
-  display: flex;
-  align-items: center;
-}
-    .banner img { height: 40px; width: auto; }
-.tabs {
-  background: #113d43;
-  border-bottom: 1px solid #0d2e33;
-  padding: 2px 6px 0 6px;
-  display: flex;
-  gap: 2px;
-}
-.tab {
-  background: #113d43;
-  color: #fff;
-  border: 1px solid #0d2e33;
-  border-bottom: none;
-  padding: 6px 16px;
-  font-size: 14px;
-  cursor: pointer;
-}
-.tab.active {
-  background: #8BA6AA;
+   * { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  height: 100%;
+  font-family: Tahoma, Geneva, sans-serif;
+  background: #d4d0c8;
   color: #000;
-  font-weight: bold;
-  position: relative;
-  top: 1px;
-  border-bottom: 1px solid #8BA6AA;
+  font-size: 14px;
 }
-    .tool {
-      background: #f5f4ea;
-      border: 1px solid #808080;
-      padding: 4px 10px;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-    }
-    .tool img { height: 16px; width: auto; margin-right: 5px; }
-    .tool:hover, .tool.active { background: #fff; }
-    .main { display: flex; height: calc(100vh - 130px); }
-    .sidebar {
-      width: 240px;
-      background: #f0f0f0;
-      border-right: 1px solid #808080;
-      padding: 10px 12px;
-      font-size: 14px;
-      overflow-y: auto;
-    }
-    .sidebar h3 { margin: 0 0 10px 0; font-size: 15px; font-weight: bold; }
-    #map { flex: 1; }
-    .layer-item, .basemap-item {
-      margin: 6px 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 14px;
-      cursor: pointer;
-    }
-    .basemap-item:hover { background: #e0e0e0; }
-    .basemap-item.active { font-weight: bold; }
-    .plss-label {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  font-size: 11px;
-  font-weight: bold;
-  color: #5a3a1a;
-  text-shadow: 1px 1px 1px #fff;
-}
-#prev-hit, #next-hit {
-  background: #f5f4ea;
-  border: 1px solid #808080;
-  padding: 2px 10px;
-  cursor: pointer;
-  font-size: 16px;
-}
-.layer-item button {
-  padding: 0 5px;
-  font-size: 11px;
-  line-height: 1.2;
-  min-width: 18px;
-}
-.county-label {
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  font-size: 12px;
-  font-weight: bold;
-  color: #2a402a;
-  text-shadow: 1px 1px 1px #fff;
-}
+
+/* Banner */
 .banner {
   background: #113d43 url('banner1.png') center / cover no-repeat;
   padding: 6px 12px;
@@ -123,6 +30,8 @@
   align-items: center;
   justify-content: space-between;
 }
+.banner img { height: 40px; width: auto; }
+
 .search-box {
   display: flex;
   gap: 4px;
@@ -137,148 +46,68 @@
   font-size: 13px;
   padding: 3px 6px;
   border: 1px solid #999;
+  border-radius: 5px;
 }
-.search-box input {
-  width: 180px;
-}
+.search-box input { width: 180px; }
 .search-box button {
   background: #f5f4ea;
   cursor: pointer;
 }
-.old-marker .pin {
-  width: 12px;
-  height: 12px;
-  background: #c00;
-  border: 2px solid #fff;
-  border-radius: 50% 50% 50% 0;
-  transform: rotate(-45deg);
-  box-shadow: 1px 1px 2px rgba(0,0,0,0.4);
+
+/* Tabs */
+.tabs {
+  background: #113d43;
+  border-bottom: 1px solid #0d2e33;
+  padding: 2px 6px 0 6px;
+  display: flex;
+  gap: 2px;
 }
-.tab,
-.tool,
-.search-box button,
-.search-box select,
-.search-box input {
-  border-radius: 5px;
-}
-.kmz-label {
-  background: transparent;
-  border: none;
-  box-shadow: none;
+.tab {
+  background: #113d43;
   color: #fff;
-  font-weight: bold;
-  font-size: 11px;
-  text-shadow: 
-    -1px -1px 0 #000,
-     1px -1px 0 #000,
-    -1px  1px 0 #000,
-     1px  1px 0 #000;
-}
-.kmz-label::before,
-.kmz-label::after {
-  display: none !important;
-}
-/* Old-school analog sliders */
-.layer-item input[type=range],
-#hs-controls input[type=range] {
-  -webkit-appearance: none;
-  appearance: none;
-  width: 60px;
-  height: 18px;
-  background: transparent;
-  margin: 0 2px;
+  border: 1px solid #0d2e33;
+  border-bottom: none;
+  border-radius: 5px 5px 0 0;
+  padding: 6px 16px;
+  font-size: 14px;
   cursor: pointer;
 }
-
-/* Track */
-.layer-item input[type=range]::-webkit-slider-runnable-track,
-#hs-controls input[type=range]::-webkit-slider-runnable-track {
-  height: 3px;
-  background: #b0b0b0;
-  border: 1px solid #606060;
-}
-.layer-item input[type=range]::-moz-range-track,
-#hs-controls input[type=range]::-moz-range-track {
-  height: 3px;
-  background: #b0b0b0;
-  border: 1px solid #606060;
-}
-
-/* Ticks above the track at ends + quarters */
-.layer-item input[type=range],
-#hs-controls input[type=range] {
-  background-image:
-    linear-gradient(#404040, #404040),
-    linear-gradient(#404040, #404040),
-    linear-gradient(#404040, #404040),
-    linear-gradient(#404040, #404040),
-    linear-gradient(#404040, #404040);
-  background-size: 1px 5px, 1px 5px, 1px 5px, 1px 5px, 1px 5px;
-  background-position: 0% 2px, 25% 2px, 50% 2px, 75% 2px, 100% 2px;
-  background-repeat: no-repeat;
-}
-
-/* Triangular thumb pointing up */
-.layer-item input[type=range]::-webkit-slider-thumb,
-#hs-controls input[type=range]::-webkit-slider-thumb {
-  -webkit-appearance: none;
-  width: 0;
-  height: 0;
-  margin-top: -8px;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 9px solid #505050;
-  background: transparent;
-  cursor: pointer;
-}
-.layer-item input[type=range]::-moz-range-thumb,
-#hs-controls input[type=range]::-moz-range-thumb {
-  width: 0;
-  height: 0;
-  border: none;
-  border-left: 5px solid transparent;
-  border-right: 5px solid transparent;
-  border-bottom: 9px solid #505050;
-  background: transparent;
-  border-radius: 0;
-  cursor: pointer;
-}
-/* Windows 95/98 style checkboxes */
-.layer-item input[type=checkbox] {
-  appearance: none;
-  -webkit-appearance: none;
-  width: 13px;
-  height: 13px;
-  border: 1px solid #808080;
-  background: #fff;
-  box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #404040;
-  cursor: pointer;
-  position: relative;
-  vertical-align: middle;
-  margin: 0;
-}
-.layer-item input[type=checkbox]:checked::after {
-  content: "✓";
-  position: absolute;
-  top: -3px;
-  left: 1px;
-  font-size: 13px;
+.tab.active {
+  background: #8BA6AA;
   color: #000;
   font-weight: bold;
-  line-height: 1;
+  position: relative;
+  top: 1px;
+  border-bottom: 1px solid #8BA6AA;
 }
-.layer-item input[type=checkbox]:active {
-  background: #e0e0e0;
-}
+
+/* Toolbar */
+.tool-wrap { position: relative; }
 .toolbar {
   background: #ece9d8;
   border-bottom: 1px solid #808080;
-  padding: 4px 8px;
+  padding: 4px 8px 0 8px;
   display: flex;
   align-items: flex-end;
   gap: 6px;
   font-size: 13px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 500;
 }
+.tool {
+  background: #f5f4ea;
+  border: 1px solid #808080;
+  border-radius: 5px;
+  padding: 4px 10px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+.tool img { height: 16px; width: auto; margin-right: 5px; }
+.tool:hover, .tool.active { background: #fff; }
+
 .tool-right {
   margin-left: auto;
   display: flex;
@@ -297,33 +126,18 @@
   justify-content: center;
   min-width: 36px;
   height: 28px;
+  margin-bottom: 0;
 }
-.tool-tab img {
-  height: 16px;
-  width: auto;
-  display: block;
-}
-.tool-tab:hover {
-  background: rgb(171, 188, 171);
-}
-.tool-tab.active {
-  background: #fff;
-  border-color: #808080;
-}
-/* Soft shadow under the main toolbar */
-.toolbar {
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25);
-  position: relative;
-  z-index: 500;
-}
+.tool-tab img { height: 16px; width: auto; display: block; }
+.tool-tab:hover { background: rgb(171, 188, 171); }
+.tool-tab.active { background: #fff; border-color: #808080; }
 
-/* Measurement drop-down panel */
-#measure-panel {
+/* Panels */
+#measure-panel,
+#draw-panel {
   display: none;
   position: absolute;
   top: 100%;
-  right: 8px;
-  width: 280px;
   background: #f0f0f0;
   border: 1px solid #808080;
   border-radius: 0 0 8px 8px;
@@ -331,9 +145,13 @@
   z-index: 600;
   font-size: 13px;
 }
-#measure-panel.open { display: block; }
+#measure-panel { right: 8px; width: 280px; }
+#draw-panel { right: 48px; width: 260px; }
+#measure-panel.open,
+#draw-panel.open { display: block; }
 
-.measure-header {
+.measure-header,
+.draw-header {
   background: #113d43;
   color: #fff;
   padding: 4px 8px;
@@ -341,19 +159,19 @@
   justify-content: space-between;
   align-items: center;
   font-weight: bold;
-  border-radius: 0;
 }
-.measure-header .close-x {
+.measure-header .close-x,
+.draw-header .close-x {
   cursor: pointer;
   font-size: 16px;
-  line-height: 1;
   padding: 0 4px;
 }
-.measure-header .close-x:hover { color: #ccc; }
+.measure-header .close-x:hover,
+.draw-header .close-x:hover { color: #ccc; }
 
-.measure-body {
-  padding: 8px;
-}
+.measure-body,
+.draw-body { padding: 8px; }
+
 .measure-tools {
   display: flex;
   align-items: center;
@@ -373,14 +191,8 @@
   border-color: #808080;
   background: #fff;
 }
-.measure-tools .sep {
-  color: #999;
-  margin: 0 4px;
-}
-#measure-units {
-  font-size: 12px;
-  padding: 2px 4px;
-}
+.measure-tools .sep { color: #999; margin: 0 4px; }
+#measure-units { font-size: 12px; padding: 2px 4px; }
 .measure-result {
   margin-top: 8px;
   padding-top: 6px;
@@ -389,38 +201,7 @@
   min-height: 32px;
   color: #333;
 }
-#draw-panel {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 48px;
-  width: 260px;
-  background: #f0f0f0;
-  border: 1px solid #808080;
-  border-radius: 0 0 8px 8px;
-  box-shadow: 2px 3px 6px rgba(0,0,0,0.3);
-  z-index: 600;
-  font-size: 13px;
-}
-#draw-panel.open { display: block; }
 
-.draw-header {
-  background: #113d43;
-  color: #fff;
-  padding: 4px 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-weight: bold;
-}
-.draw-header .close-x {
-  cursor: pointer;
-  font-size: 16px;
-  padding: 0 4px;
-}
-.draw-header .close-x:hover { color: #ccc; }
-
-.draw-body { padding: 8px; }
 .draw-tools {
   display: flex;
   align-items: center;
@@ -452,21 +233,163 @@
   cursor: pointer;
   display: inline-block;
 }
-.draw-colors span.active {
-  outline: 2px solid #000;
+.draw-colors span.active { outline: 2px solid #000; }
+
+/* Main layout */
+.main { display: flex; height: calc(100vh - 130px); }
+.sidebar {
+  width: 240px;
+  background: #f0f0f0;
+  border-right: 1px solid #808080;
+  padding: 10px 12px;
+  font-size: 14px;
+  overflow-y: auto;
+}
+.sidebar h3 { margin: 0 0 10px 0; font-size: 15px; font-weight: bold; }
+#map { flex: 1; }
+
+.layer-item, .basemap-item {
+  margin: 6px 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.basemap-item:hover { background: #e0e0e0; }
+.basemap-item.active { font-weight: bold; }
+.layer-item button {
+  padding: 0 5px;
+  font-size: 11px;
+  line-height: 1.2;
+  min-width: 18px;
 }
 
-.tool-wrap {
+/* Labels */
+.plss-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: bold;
+  color: #5a3a1a;
+  text-shadow: 1px 1px 1px #fff;
+}
+.county-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 12px;
+  font-weight: bold;
+  color: #2a402a;
+  text-shadow: 1px 1px 1px #fff;
+}
+.kmz-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  color: #fff;
+  font-weight: bold;
+  font-size: 11px;
+  text-shadow:
+    -1px -1px 0 #000,
+     1px -1px 0 #000,
+    -1px  1px 0 #000,
+     1px  1px 0 #000;
+}
+.kmz-label::before,
+.kmz-label::after { display: none !important; }
+
+#prev-hit, #next-hit {
+  background: #f5f4ea;
+  border: 1px solid #808080;
+  padding: 2px 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Analog sliders */
+.layer-item input[type=range],
+#hs-controls input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 60px;
+  height: 18px;
+  background: transparent;
+  margin: 0 2px;
+  cursor: pointer;
+  background-image:
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040);
+  background-size: 1px 5px;
+  background-position: 0% 2px, 25% 2px, 50% 2px, 75% 2px, 100% 2px;
+  background-repeat: no-repeat;
+}
+.layer-item input[type=range]::-webkit-slider-runnable-track,
+#hs-controls input[type=range]::-webkit-slider-runnable-track {
+  height: 3px;
+  background: #b0b0b0;
+  border: 1px solid #606060;
+}
+.layer-item input[type=range]::-moz-range-track,
+#hs-controls input[type=range]::-moz-range-track {
+  height: 3px;
+  background: #b0b0b0;
+  border: 1px solid #606060;
+}
+.layer-item input[type=range]::-webkit-slider-thumb,
+#hs-controls input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 0;
+  height: 0;
+  margin-top: -8px;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 9px solid #505050;
+  background: transparent;
+  cursor: pointer;
+}
+.layer-item input[type=range]::-moz-range-thumb,
+#hs-controls input[type=range]::-moz-range-thumb {
+  width: 0;
+  height: 0;
+  border: none;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 9px solid #505050;
+  background: transparent;
+  border-radius: 0;
+  cursor: pointer;
+}
+
+/* Windows-style checkboxes */
+.layer-item input[type=checkbox] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #808080;
+  background: #fff;
+  box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #404040;
+  cursor: pointer;
   position: relative;
+  vertical-align: middle;
+  margin: 0;
 }
-#measure-panel,
-#draw-panel {
+.layer-item input[type=checkbox]:checked::after {
+  content: "✓";
   position: absolute;
-  top: 100%;          /* sits flush under the toolbar */
-  z-index: 600;
+  top: -3px;
+  left: 1px;
+  font-size: 13px;
+  color: #000;
+  font-weight: bold;
+  line-height: 1;
 }
-#measure-panel { right: 8px; }
-#draw-panel { right: 48px; }
+.layer-item input[type=checkbox]:active { background: #e0e0e0; }
   </style>
 </head>
 <body>
