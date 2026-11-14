@@ -5,6 +5,7 @@
   <title>Old Indiana Map</title>
   <link rel="icon" href="/favicon.ico">
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/@turf/turf@6/turf.min.js"></script>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   
@@ -1123,6 +1124,126 @@ map.on('click', function (e) {
   document.getElementById('meas-dist').onclick = () => { setUnits('dist'); };
   document.getElementById('meas-point').onclick = () => { setUnits('point'); };
   setUnits('area'); // default
+
+  let measureMode = null;      // 'area' | 'dist' | 'point' Measurment state and logic
+  let measurePoints = [];
+  let measureLayer = L.layerGroup().addTo(map);
+  let measureClickHandler = null;
+
+  function clearMeasure() {
+    measurePoints = [];
+    measureLayer.clearLayers();
+    document.getElementById('measure-result').textContent = 'Click the map to measure.';
+  }
+
+  function setMeasureMode(mode) {
+    measureMode = mode;
+    clearMeasure();
+    setUnits(mode === 'point' ? 'point' : mode === 'dist' ? 'dist' : 'area');
+    // highlight active icon
+    document.querySelectorAll('.measure-tools img').forEach(img => img.classList.remove('active'));
+    document.getElementById(mode === 'area' ? 'meas-area' : mode === 'dist' ? 'meas-dist' : 'meas-point').classList.add('active');
+  }
+
+  document.getElementById('meas-area').onclick = () => setMeasureMode('area');
+  document.getElementById('meas-dist').onclick = () => setMeasureMode('dist');
+  document.getElementById('meas-point').onclick = () => setMeasureMode('point');
+
+  function formatResult(value, unit) {
+    if (unit === 'Acres') return (value / 4046.86).toFixed(2) + ' acres';
+    if (unit === 'Square Miles') return (value / 2589988).toFixed(3) + ' mi²';
+    if (unit === 'Square Kilometers') return (value / 1e6).toFixed(3) + ' km²';
+    if (unit === 'Hectares') return (value / 10000).toFixed(2) + ' ha';
+    if (unit === 'Square Yards') return (value * 1.19599).toFixed(0) + ' yd²';
+    if (unit === 'Square Feet') return (value * 10.7639).toFixed(0) + ' ft²';
+    if (unit === 'Square Meters') return value.toFixed(0) + ' m²';
+    if (unit === 'Miles') return (value / 1609.34).toFixed(3) + ' mi';
+    if (unit === 'Kilometers') return (value / 1000).toFixed(3) + ' km';
+    if (unit === 'Feet') return (value * 3.28084).toFixed(1) + ' ft';
+    if (unit === 'Meters') return value.toFixed(1) + ' m';
+    if (unit === 'Yards') return (value * 1.09361).toFixed(1) + ' yd';
+    return value;
+  }
+
+  function toDMS(deg) {
+    const d = Math.floor(Math.abs(deg));
+    const mFloat = (Math.abs(deg) - d) * 60;
+    const m = Math.floor(mFloat);
+    const s = ((mFloat - m) * 60).toFixed(1);
+    return d + '° ' + m + '\' ' + s + '"';
+  }
+
+  function updateMeasureDisplay() {
+    const unit = document.getElementById('measure-units').value;
+    const resultEl = document.getElementById('measure-result');
+    if (!measurePoints.length) {
+      resultEl.textContent = 'Click the map to measure.';
+      return;
+    }
+    if (measureMode === 'point') {
+      const p = measurePoints[0];
+      if (unit === 'DMS') {
+        resultEl.innerHTML = 'Longitude: ' + toDMS(p.lng) + (p.lng < 0 ? ' W' : ' E') +
+          '<br>Latitude: ' + toDMS(p.lat) + (p.lat < 0 ? ' S' : ' N');
+      } else {
+        resultEl.innerHTML = 'Longitude: ' + p.lng.toFixed(6) +
+          '<br>Latitude: ' + p.lat.toFixed(6);
+      }
+      return;
+    }
+    if (measurePoints.length < 2) {
+      resultEl.textContent = 'Click to add points. Double-click to finish.';
+      return;
+    }
+    const coords = measurePoints.map(p => [p.lng, p.lat]);
+    if (measureMode === 'dist') {
+      const line = turf.lineString(coords);
+      const meters = turf.length(line, { units: 'meters' });
+      resultEl.textContent = 'Length: ' + formatResult(meters, unit);
+    } else if (measureMode === 'area' && measurePoints.length >= 3) {
+      const poly = turf.polygon([[...coords, coords[0]]]);
+      const sqMeters = turf.area(poly);
+      resultEl.textContent = 'Area: ' + formatResult(sqMeters, unit);
+    }
+  }
+
+  // Map clicks for measuring
+  map.on('click', function (e) {
+    if (!measureMode || !measurePanel.classList.contains('open')) return;
+    // ignore if clicking UI
+    if (e.originalEvent.target.closest('#measure-panel, .toolbar')) return;
+
+    if (measureMode === 'point') {
+      clearMeasure();
+      measurePoints = [e.latlng];
+      L.circleMarker(e.latlng, { radius: 5, color: '#c00', fillColor: '#c00', fillOpacity: 1 }).addTo(measureLayer);
+      updateMeasureDisplay();
+      return;
+    }
+
+    measurePoints.push(e.latlng);
+    L.circleMarker(e.latlng, { radius: 4, color: '#c00', fillOpacity: 0.8 }).addTo(measureLayer);
+
+    if (measurePoints.length > 1) {
+      const latlngs = measurePoints.map(p => [p.lat, p.lng]);
+      measureLayer.eachLayer(l => { if (l instanceof L.Polyline || l instanceof L.Polygon) measureLayer.removeLayer(l); });
+      if (measureMode === 'dist') {
+        L.polyline(latlngs, { color: '#c00', weight: 2 }).addTo(measureLayer);
+      } else if (measureMode === 'area' && measurePoints.length >= 3) {
+        L.polygon(latlngs, { color: '#c00', weight: 2, fillOpacity: 0.15 }).addTo(measureLayer);
+      }
+    }
+    updateMeasureDisplay();
+  });
+
+  map.on('dblclick', function (e) {
+    if (!measureMode || measureMode === 'point') return;
+    L.DomEvent.stop(e);
+    updateMeasureDisplay();
+    // leave the finished shape on the map
+  });
+
+  document.getElementById('measure-units').onchange = updateMeasureDisplay;
 
   document.getElementById('active-layers-btn').addEventListener('click', () => {
     setActiveTool('active-layers-btn');
