@@ -266,6 +266,17 @@
     maxZoom: 19,
     opacity: 0.9
   });
+  
+  const lidarHS = L.layerGroup();
+
+  let hsSettings = {
+    type: 1,
+    azimuth: 315,
+    altitude: 45,
+    zFactor: 1,
+    opacity: 0.65
+  };
+
   let hsSettings = {
     type: 1,        // 1 = multidirectional, 0 = traditional
     azimuth: 315,
