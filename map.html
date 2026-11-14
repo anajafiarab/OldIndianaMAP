@@ -242,6 +242,33 @@
   border-radius: 0;
   cursor: pointer;
 }
+/* Windows 95/98 style checkboxes */
+.layer-item input[type=checkbox] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 13px;
+  height: 13px;
+  border: 1px solid #808080;
+  background: #fff;
+  box-shadow: inset -1px -1px 0 #fff, inset 1px 1px 0 #404040;
+  cursor: pointer;
+  position: relative;
+  vertical-align: middle;
+  margin: 0;
+}
+.layer-item input[type=checkbox]:checked::after {
+  content: "✓";
+  position: absolute;
+  top: -3px;
+  left: 1px;
+  font-size: 13px;
+  color: #000;
+  font-weight: bold;
+  line-height: 1;
+}
+.layer-item input[type=checkbox]:active {
+  background: #e0e0e0;
+}
   </style>
 </head>
 <body>
