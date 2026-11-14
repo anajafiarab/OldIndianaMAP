@@ -747,19 +747,24 @@ map.on('click', function (e) {
   }
 
   // Elevation in feet (appended after Legend is written)
-  if (active.includes('lidarhs') && map.hasLayer(lidarHS)) {
-    const elevUrl = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/identify' +
-      '?geometry=' + e.latlng.lng + ',' + e.latlng.lat +
+   if (active.includes('lidarhs') && map.hasLayer(lidarHS)) {
+    const geom = JSON.stringify({
+      x: e.latlng.lng,
+      y: e.latlng.lat,
+      spatialReference: { wkid: 4326 }
+    });
+    const elevUrl = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/getSamples' +
+      '?geometry=' + encodeURIComponent(geom) +
       '&geometryType=esriGeometryPoint' +
-      '&sr=4326' +
-      '&returnGeometry=false' +
+      '&sampleCount=1' +
       '&f=json';
     fetch(elevUrl)
       .then(r => r.json())
       .then(data => {
-        console.log('elev response', data);   // ← temporary
-        if (data.value !== undefined && data.value !== 'NoData') {
-          const feet = Math.round(parseFloat(data.value) * 3.28084);
+        console.log('elev response', data); // temporary
+        const sample = data.samples && data.samples[0];
+        if (sample && sample.value !== undefined && sample.value !== 'NoData') {
+          const feet = Math.round(parseFloat(sample.value) * 3.28084);
           const sbNow = document.getElementById('sidebar');
           if (sbNow && sbNow.querySelector('h3')?.textContent === 'Legend') {
             const div = document.createElement('div');
