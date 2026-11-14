@@ -266,21 +266,47 @@
     maxZoom: 19,
     opacity: 0.9
   });
-     const lidarHS = L.layerGroup(); // placeholder; real requests happen on add
+  let hsSettings = {
+    type: 1,        // 1 = multidirectional, 0 = traditional
+    azimuth: 315,
+    altitude: 45,
+    zFactor: 1,
+    opacity: 0.65
+  };
 
   function refreshLidarHS() {
+    if (!map.hasLayer(lidarHS)) return;
     lidarHS.clearLayers();
     const b = map.getBounds();
     const size = map.getSize();
     const rule = encodeURIComponent(JSON.stringify({
       rasterFunction: 'Hillshade',
       rasterFunctionArguments: {
-        HillshadeType: 1,
-        Azimuth: 315,
-        Altitude: 45,
-        ZFactor: 1
+        HillshadeType: hsSettings.type,
+        Azimuth: hsSettings.azimuth,
+        Altitude: hsSettings.altitude,
+        ZFactor: hsSettings.zFactor
       }
     }));
+      function renderHSControls() {
+    const container = document.getElementById('hs-controls');
+    if (!container) return;
+    container.innerHTML = `
+      <div style="font-size:12px; margin-top:8px; padding-top:6px; border-top:1px solid #ccc;">
+        <div>Type: 
+          <select id="hs-type">
+            <option value="1" ${hsSettings.type===1?'selected':''}>Multidirectional</option>
+            <option value="0" ${hsSettings.type===0?'selected':''}>Traditional</option>
+          </select>
+        </div>
+        <div style="margin-top:4px;">Azimuth: <input id="hs-az" type="range" min="0" max="360" value="${hsSettings.azimuth}" style="width:80px"> <span id="hs-az-val">${hsSettings.azimuth}</span></div>
+        <div>Altitude: <input id="hs-alt" type="range" min="0" max="90" value="${hsSettings.altitude}" style="width:80px"> <span id="hs-alt-val">${hsSettings.altitude}</span></div>
+      </div>
+    `;
+    document.getElementById('hs-type').onchange = (e) => { hsSettings.type = +e.target.value; refreshLidarHS(); };
+    document.getElementById('hs-az').oninput = (e) => { hsSettings.azimuth = +e.target.value; document.getElementById('hs-az-val').textContent = hsSettings.azimuth; refreshLidarHS(); };
+    document.getElementById('hs-alt').oninput = (e) => { hsSettings.altitude = +e.target.value; document.getElementById('hs-alt-val').textContent = hsSettings.altitude; refreshLidarHS(); };
+  }
     const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
       '?bbox=' + b.toBBoxString() +
       '&bboxSR=4326' +
@@ -289,7 +315,7 @@
       '&format=png' +
       '&renderingRule=' + rule +
       '&f=image';
-    const img = L.imageOverlay(url, b, { opacity: 0.65, interactive: false });
+    const img = L.imageOverlay(url, b, { opacity: hsSettings.opacity, interactive: false });
     lidarHS.addLayer(img);
   }
 
@@ -418,10 +444,12 @@
             <button class="remove" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">✕</button>
             <button class="down" style="padding:0 3px; border:none; background:transparent; cursor:pointer;">↓</button>
           </div>
-        </div>`;
-    }).join('');
+        </div>
+        ${id === 'lidarhs' ? '<div id="hs-controls"></div>' : ''}
+      `;
 
     list.querySelectorAll('.layer-item').forEach(row => {
+
       const id = row.dataset.id;
       const def = layerDefs[id];
       const cb = row.querySelector('input[type=checkbox]');
@@ -432,6 +460,8 @@
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
+      
+      if (active.includes('lidarhs')) renderHSControls();
       slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
         if (!def.layer) return;
@@ -634,7 +664,30 @@ map.on('click', function (e) {
       }));
     }
   });
-
+  // Elevation (feet) when lidar hillshade is active
+  if (active.includes('lidarhs') && map.hasLayer(lidarHS)) {
+    const elevUrl = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/identify' +
+      '?geometry=' + e.latlng.lng + ',' + e.latlng.lat +
+      '&geometryType=esriGeometryPoint' +
+      '&sr=4326' +
+      '&returnGeometry=false' +
+      '&f=json';
+    fetch(elevUrl)
+      .then(r => r.json())
+      .then(data => {
+        if (data.value !== undefined && data.value !== 'NoData') {
+          const feet = Math.round(parseFloat(data.value) * 3.28084);
+          const sb = document.getElementById('sidebar');
+          if (sb && sb.querySelector('h3')?.textContent === 'Legend') {
+            const div = document.createElement('div');
+            div.style.cssText = 'margin-top:10px; padding-top:6px; border-top:1px solid #ccc; font-size:13px;';
+            div.innerHTML = `<strong>Elevation:</strong> ${feet} ft`;
+            sb.appendChild(div);
+          }
+        }
+      })
+      .catch(() => {});
+  }
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
 
