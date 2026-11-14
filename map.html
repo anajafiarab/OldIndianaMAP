@@ -447,6 +447,7 @@
         </div>
         ${id === 'lidarhs' ? '<div id="hs-controls"></div>' : ''}
       `;
+      }).join('');
 
     list.querySelectorAll('.layer-item').forEach(row => {
 
@@ -460,9 +461,9 @@
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
-      
-      if (active.includes('lidarhs')) renderHSControls();
-      slider.addEventListener('input', () => {
+
+
+        slider.addEventListener('input', () => {
         def.opacity = slider.value / 100;
         if (!def.layer) return;
 
@@ -511,6 +512,7 @@
         }
       });
     });
+    if (active.includes('lidarhs')) renderHSControls();
   }
 
   function addLayer(id) {
