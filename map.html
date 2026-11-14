@@ -761,11 +761,10 @@ map.on('click', function (e) {
     fetch(elevUrl)
       .then(r => r.json())
       .then(data => {
-        console.log('elev response', data); // temporary
+        
         const sample = data.samples && data.samples[0];
         if (sample && sample.value !== undefined && sample.value !== 'NoData') {
-            console.log('raw value', sample.value);   // ← add this temporary
-          const feet = Math.round(parseFloat(sample.value) * 3.28084);
+          const feet = Math.round(parseFloat(sample.value));
           const sbNow = document.getElementById('sidebar');
           if (sbNow && sbNow.querySelector('h3')?.textContent === 'Legend') {
             const div = document.createElement('div');
