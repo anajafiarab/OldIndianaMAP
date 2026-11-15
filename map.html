@@ -676,6 +676,13 @@ html, body {
       opacity: 0.65,
       source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
     },
+    soils: {
+  name: 'SSURGO Soil Map Units',
+  layer: null,
+  opacity: 0.6,
+  source: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer',
+  fields: ['muname', 'musym', 'mukey']   // adjust after first load if names differ
+}
     
   };
 
@@ -743,6 +750,29 @@ html, body {
     lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
   }
   map.on('zoomend', updatePLSSLabels);
+
+async function loadSoils() { //Soil Survey load function
+  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.soils.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' },
+    onEachFeature: (f, l) => {
+      // optional tooltip with map unit symbol
+      const sym = f.properties.musym || '';
+      if (sym) l.bindTooltip(sym, { permanent: false, direction: 'center', className: 'soil-label' });
+    }
+  });
+}
+loadSoils();
 
   let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
   function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
@@ -954,7 +984,7 @@ function pointInLayer(latlng, layer) {
   return true; // fallback
 }
 
-map.on('click', function (e) {
+map.on('click', function (e) {// CLICK HANDLER
   clearHighlight();
   const hits = [];
 
@@ -972,21 +1002,32 @@ map.on('click', function (e) {
     });
   }
 
-  active.forEach(id => {
-    const def = layerDefs[id];
-    if (!def || !def.layer || !map.hasLayer(def.layer)) return;
-    if (id === 'counties') {
-      checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
-    } else if (id === 'plss') {
-      checkLayer(def, 'PLSS Townships', p => ({
-        'Principal Meridian': p.meridian || '—',
-        'Township': p.twp || '—',
-        'Township Direction': (p.twpd || '').trim() || '—',
-        'Range': p.rng || '—',
-        'Range Direction': (p.rngd || '').trim() || '—'
-      }));
-    }
-  });
+active.forEach(id => {
+  const def = layerDefs[id];
+  if (!def || !def.layer || !map.hasLayer(def.layer)) return;
+
+  if (id === 'counties') {
+    checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
+  } else if (id === 'plss') {
+    checkLayer(def, 'PLSS Townships', p => ({
+      'Principal Meridian': p.meridian || '—',
+      'Township': p.twp || '—',
+      'Township Direction': (p.twpd || '').trim() || '—',
+      'Range': p.rng || '—',
+      'Range Direction': (p.rngd || '').trim() || '—'
+    }));
+  } else if (id === 'soils') {
+    checkLayer(def, 'SSURGO Soil Map Units', p => {
+      const wss = 'https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx';
+      return {
+        'Map Unit': p.muname || '—',
+        'Symbol': p.musym || '—',
+        'MUKEY': p.mukey || '—',
+        'Web Soil Survey': `<a href="${wss}" target="_blank">Open in Web Soil Survey</a>`
+      };
+    });
+  }
+});
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -1034,7 +1075,7 @@ map.on('click', function (e) {
         sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
       };
     }
-    show(0);
+    show(0); //END CLICK
   }
 
   // Elevation in feet (appended after Legend is written)
@@ -1117,6 +1158,9 @@ map.on('click', function (e) {
       <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
       <div class="basemap-item" data-add="lidarhs">Lidar Hillshade (2016-2020)</div>
       <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
+
+      <div style="font-weight:bold; margin:12px 0 4px;">Soils</div>
+        <div class="basemap-item" data-add="soils">SSURGO Soil Map Units</div>
 
       <div style="margin-top:16px; padding-top:10px; border-top:1px solid #ccc;">
         <button id="add-kmz-btn" style="width:100%; padding:6px;">Add .kmz</button>
@@ -1240,7 +1284,7 @@ map.on('click', function (e) {
   }
 
   // Map clicks for measuring
-  map.on('click', function (e) {
+  map.on('click', function (e) { 
     if (!measureMode || !measurePanel.classList.contains('open')) return;
     // ignore if clicking UI
     if (e.originalEvent.target.closest('#measure-panel, .toolbar')) return;
