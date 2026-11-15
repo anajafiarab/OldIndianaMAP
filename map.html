@@ -782,10 +782,7 @@ async function loadPLSS() {
   }
   updatePLSSLabels();
 
-  // Refresh the Active Layers panel if it is open
-  if (document.getElementById('active-list')) {
-    renderActive();
-  }
+
 }
 loadPLSS();
 
@@ -857,7 +854,7 @@ map.on('moveend', refreshSoils);
       if (!def) return '';
       return `
         <div class="layer-item" data-id="${id}" style="align-items:center;">
-          <input type="checkbox" ${def.layer && map.hasLayer(def.layer) ? 'checked' : ''}>
+          <input type="checkbox" ${active.includes(id) ? 'checked' : ''}>
           <span style="flex:1; min-width:60px; overflow:hidden; text-overflow:ellipsis;">${def.name}</span>
                     <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px; margin:0 2px 0 4px;">
           <span class="slider-val" style="font-size:9px; color:#666; min-width:16px; text-align:left;">${Math.round(def.opacity*100)}</span>
