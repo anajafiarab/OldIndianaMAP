@@ -676,12 +676,15 @@ html, body {
       opacity: 0.65,
       source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
     },
-    soils: {
+ soils: {
   name: 'SSURGO Soil Map Units',
+  group: 'Soils',
   layer: null,
   opacity: 0.6,
-  source: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer',
-  fields: ['muname', 'musym', 'mukey']   // adjust after first load if names differ
+  source: { 
+    label: 'Indiana GIO SSURGO Soil Map Units', 
+    url: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer' 
+  }
 }
     
   };
@@ -751,26 +754,29 @@ html, body {
   }
   map.on('zoomend', updatePLSSLabels);
 
-async function loadSoils() { //Soil Survey load function
+async function loadSoils() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query';
   let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
-  }
-  layerDefs.soils.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' },
-    onEachFeature: (f, l) => {
-      // optional tooltip with map unit symbol
-      const sym = f.properties.musym || '';
-      if (sym) l.bindTooltip(sym, { permanent: false, direction: 'center', className: 'soil-label' });
+  try {
+    while (more) {
+      const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += page;
+        if (data.features.length < page) more = false;
+      } else {
+        more = false;
+      }
     }
-  });
+    layerDefs.soils.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' }
+    });
+    console.log('Soils loaded:', all.length, 'features');
+  } catch (err) {
+    console.error('Soils load failed:', err);
+  }
 }
 loadSoils();
 
