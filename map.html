@@ -754,33 +754,35 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
   }
   map.on('zoomend', updateCountyLabels);
 
-  // PLSS (paged, no popup)
-  async function loadPLSS() {
-    const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
-    let all = [], offset = 0, page = 1000, more = true;
-    while (more) {
-      const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-      const data = await (await fetch(url)).json();
-      if (data.features && data.features.length) {
-        all = all.concat(data.features);
-        offset += page;
-        if (data.features.length < page) more = false;
-      } else more = false;
-    }
-layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-  style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
-  onEachFeature: (f, l) => {
-    const p = f.properties;
-    const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
-    if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
+// PLSS (paged, no popup)
+async function loadPLSS() {
+  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
+  let all = [], offset = 0, page = 1000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
   }
-});
+  layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
+    onEachFeature: (f, l) => {
+      const p = f.properties;
+      const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
+      if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
+    }
+  });
 
-// Only add to the map if it was previously checked
-if (active.includes('plss')) {
-  layerDefs.plss.layer.addTo(map);
+  // Only add to the map if it was previously checked
+  if (active.includes('plss')) {
+    layerDefs.plss.layer.addTo(map);
+  }
+  updatePLSSLabels();
 }
-  loadPLSS();
+loadPLSS();
 
 function updatePLSSLabels() {
   const lyr = layerDefs.plss.layer;
@@ -791,7 +793,7 @@ function updatePLSSLabels() {
     if (tip) show ? tip.openTooltip() : tip.closeTooltip();
   });
 }
-  map.on('zoomend', updatePLSSLabels);
+map.on('zoomend', updatePLSSLabels);
 
 const soilsLayer = L.geoJSON(null, { //Load Soils
   style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' }
