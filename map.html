@@ -977,11 +977,15 @@ map.on('moveend', refreshSoils);
 });
 
 
-     slider.addEventListener('input', () => {
+slider.addEventListener('input', () => {
   def.opacity = slider.value / 100;
-  if (id === 'lidarhs') hsSettings.opacity = def.opacity;
-  row.querySelector('.slider-val').textContent = slider.value;
-  if (def.layer) applyOpacity(def.layer, def.opacity);
+  if (def.layer && def.layer.setStyle) {
+    def.layer.setStyle({
+      fillOpacity: def.opacity * 1,  // 0.7 matches the starting look
+      opacity: def.opacity,
+      weight: 0.6
+    });
+  }
   saveActive();
 });
       
