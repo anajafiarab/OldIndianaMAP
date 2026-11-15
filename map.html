@@ -768,9 +768,9 @@ landslides: {
 //INDR Water Wells Loader
 async function loadWells() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/WaterWells_DNR_Water_IN_1/FeatureServer/0/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=dblrefno,dbldepth,dblbedrockd,dblstatic,strowner,dtmcompdate,report&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+  let all = [], offset = 0, page = 1000, more = true;
+  while (more && offset < 50000) { // safety cap so the browser doesn't choke
+    const url = `${base}?where=1%3D1&outFields=dblrefno,dbldepth,dblbedrockd,dblstatic,strowner,dtmcompdate,report&f=geojson&resultOffset=${offset}&resultRecordCount=${page}&outSR=4326`;
     const data = await (await fetch(url)).json();
     if (data.features && data.features.length) {
       all = all.concat(data.features);
@@ -1309,17 +1309,27 @@ map.on('click', function (e) { // CLICK HANDLER
         'Comments': p.comments || '—'
       }));
       } else if (id === 'wells') {
-  checkLayer(def, 'IDNR Water Wells', p => ({
-    'Ref No': p.dblrefno || '—',
-    'Depth (ft)': p.dbldepth != null ? Math.round(p.dbldepth) : '—',
-    'Depth to Bedrock (ft)': p.dblbedrockd != null ? Math.round(p.dblbedrockd) : '—',
-    'Static Level (ft)': p.dblstatic != null ? Math.round(p.dblstatic) : '—',
-    'Owner': p.strowner || '—',
-    'Completed': p.dtmcompdate ? new Date(p.dtmcompdate).toLocaleDateString() : '—',
-    'Well Record': p.report ? `<a href="${p.report}" target="_blank">Open DNR record</a>` : '—'
-  }));
-
+  if (!def.layer || !map.hasLayer(def.layer)) return;
+  def.layer.eachLayer(l => {
+    const d = map.distance(e.latlng, l.getLatLng());
+    if (d < 50) { // ~50 meters tolerance
+      hits.push({
+        layerName: 'IDNR Water Wells',
+        layer: l,
+        attrs: {
+          'Ref No': l.feature.properties.dblrefno || '—',
+          'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
+          'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
+          'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
+          'Owner': l.feature.properties.strowner || '—',
+          'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
+          'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
+        },
+        source: def.source || null
+      });
     }
+  });
+}
   }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
