@@ -1070,6 +1070,7 @@ active.forEach(id => {
     };
   });
 }
+}); // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -1117,7 +1118,7 @@ active.forEach(id => {
         sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
       };
     }
-    show(0); //END CLICK
+    show(0); //END CLICK. Closes map.on('click'...)
   }
 
   // Elevation in feet (appended after Legend is written)
