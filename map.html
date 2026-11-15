@@ -527,6 +527,9 @@ html, body {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
+function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
+
     function applyOpacity(layer, opacity) {
   if (!layer) return;
   if (typeof layer.setOpacity === 'function') {
@@ -764,28 +767,24 @@ html, body {
         if (data.features.length < page) more = false;
       } else more = false;
     }
-    layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-      style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
-      onEachFeature: (f, l) => {
-        const p = f.properties;
-        const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
-        if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
-      }
-    });
-    updatePLSSLabels();
+layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+  style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
+  onEachFeature: (f, l) => {
+    const p = f.properties;
+    const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
+    if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
   }
+});
+
+// Only add to the map if it was previously checked
+if (active.includes('plss')) {
+  layerDefs.plss.layer.addTo(map);
+}
   loadPLSS();
 
 function updatePLSSLabels() {
   const lyr = layerDefs.plss.layer;
-  if (!lyr) return;
-
-  if (map.getZoom() < 10) {
-    if (map.hasLayer(lyr)) map.removeLayer(lyr);
-  } else {
-    if (!map.hasLayer(lyr) && active.includes('plss')) lyr.addTo(map);
-  }
-
+  if (!lyr || !map.hasLayer(lyr)) return;
   const show = map.getZoom() >= 11;
   lyr.eachLayer(l => {
     const tip = l.getTooltip();
@@ -802,7 +801,7 @@ layerDefs.soils.layer = soilsLayer;
 
   function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
-  if (map.getZoom() < 14) { //change to whatever zoom level you want to show soils
+  if (map.getZoom() < 15) { //change to whatever zoom level you want to show soils
     soilsLayer.clearLayers();
     return;
   }
@@ -841,8 +840,7 @@ layerDefs.soils.layer = soilsLayer;
 
 map.on('moveend', refreshSoils);
 
-  let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
-  function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
+
 
   function renderActive() {
     const list = document.getElementById('active-list');
