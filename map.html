@@ -766,7 +766,7 @@ landslides: {
 // LOADERS
 // ──────────────────────────────────────────────
 //INDR Water Wells Loader
-let wellsLayer = L.layerGroup().addTo(map);
+let wellsLayer = L.layerGroup();
 layerDefs.wells.layer = wellsLayer;
 
 async function refreshWells() {
@@ -809,6 +809,7 @@ async function refreshWells() {
 
 map.on('moveend', refreshWells);
 map.on('zoomend', refreshWells);
+map.on('click', refreshWells);
 
 //Landslides Loader
 async function loadLandslides() {
@@ -1245,7 +1246,6 @@ function pointInLayer(latlng, layer) {
 
 // CLICK HANDLER
 map.on('click', function (e) { // CLICK HANDLER
-    refreshWells();
     clearHighlight();
   const hits = [];
 
