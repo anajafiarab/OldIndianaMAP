@@ -776,12 +776,15 @@ html, body {
   }
   loadPLSS();
 
-  function updatePLSSLabels() {
-    const lyr = layerDefs.plss.layer;
-    if (!lyr) return;
-    const show = map.getZoom() >= 10;
-    lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
-  }
+function updatePLSSLabels() {
+  const lyr = layerDefs.plss.layer;
+  if (!lyr) return;
+  const show = map.getZoom() >= 11;
+  lyr.eachLayer(l => {
+    const tip = l.getTooltip();
+    if (tip) show ? tip.openTooltip() : tip.closeTooltip();
+  });
+}
   map.on('zoomend', updatePLSSLabels);
 
 const soilsLayer = L.geoJSON(null, { //Load Soils
@@ -792,7 +795,7 @@ layerDefs.soils.layer = soilsLayer;
 
   function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
-  if (map.getZoom() < 11) { //change to whatever zoom level you want to show soils
+  if (map.getZoom() < 13) { //change to whatever zoom level you want to show soils
     soilsLayer.clearLayers();
     return;
   }
