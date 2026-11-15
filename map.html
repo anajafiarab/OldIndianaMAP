@@ -390,6 +390,15 @@ html, body {
   line-height: 1;
 }
 .layer-item input[type=checkbox]:active { background: #e0e0e0; }
+.soil-label {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: bold;
+  color: #4a3c1a;
+  text-shadow: 0 0 2px #fff, 0 0 2px #fff;
+}
   </style>
 </head>
 <body>
@@ -774,10 +783,22 @@ function refreshSoils() {
 
   fetch(url)
     .then(r => r.json())
-    .then(data => {
-      soilsLayer.clearLayers();
-      if (data.features) soilsLayer.addData(data);
-    })
+.then(data => {
+  soilsLayer.clearLayers();
+  if (data.features) {
+    soilsLayer.addData(data);
+    soilsLayer.eachLayer(l => {
+      const sym = l.feature.properties.musym || '';
+      if (sym) {
+        l.bindTooltip(sym, {
+          permanent: true,
+          direction: 'center',
+          className: 'soil-label'
+        });
+      }
+    });
+  }
+})
     .catch(err => console.error('Soils refresh failed:', err));
 }
 
@@ -820,7 +841,8 @@ map.on('moveend', refreshSoils);
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
-      cb.addEventListener('change', () => {
+
+      cb.addEventListener('change', () => {//soils refresh
   if (!def.layer) return;
   if (cb.checked) {
     def.layer.addTo(map);
@@ -1035,18 +1057,19 @@ active.forEach(id => {
       'Range': p.rng || '—',
       'Range Direction': (p.rngd || '').trim() || '—'
     }));
-  } else if (id === 'soils') {
-    checkLayer(def, 'SSURGO Soil Map Units', p => {
-      const wss = 'https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx';
-      return {
-        'Map Unit': p.muname || '—',
-        'Symbol': p.musym || '—',
-        'MUKEY': p.mukey || '—',
-        'Web Soil Survey': `<a href="${wss}" target="_blank">Open in Web Soil Survey</a>`
-      };
-    });
-  }
-});
+} else if (id === 'soils') {
+  checkLayer(def, 'SSURGO Soil Map Units', p => {
+    const lat = e.latlng.lat.toFixed(5);
+    const lon = e.latlng.lng.toFixed(5);
+    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoi=${lon},${lat}`;
+    return {
+      'Map Unit': p.muname || '—',
+      'Symbol': p.musym || '—',
+      'MUKEY': p.mukey || '—',
+      'Web Soil Survey': `<a href="${wss}" target="_blank">Open near this point</a>`
+    };
+  });
+}
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
