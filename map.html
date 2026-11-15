@@ -776,10 +776,7 @@ async function loadPLSS() {
     }
   });
 
-  // Only add to the map if it was previously checked
-  if (active.includes('plss')) {
-    layerDefs.plss.layer.addTo(map);
-  }
+
   updatePLSSLabels();
 
 
@@ -854,7 +851,7 @@ map.on('moveend', refreshSoils);
       if (!def) return '';
       return `
         <div class="layer-item" data-id="${id}" style="align-items:center;">
-          <input type="checkbox" ${active.includes(id) ? 'checked' : ''}>
+          <input type="checkbox">
           <span style="flex:1; min-width:60px; overflow:hidden; text-overflow:ellipsis;">${def.name}</span>
                     <input type="range" min="0" max="100" value="${Math.round(def.opacity*100)}" style="width:60px; margin:0 2px 0 4px;">
           <span class="slider-val" style="font-size:9px; color:#666; min-width:16px; text-align:left;">${Math.round(def.opacity*100)}</span>
