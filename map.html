@@ -594,36 +594,34 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
     opacity: 0.65
   };
 
-  function refreshLidarHS() {
-    if (!map.hasLayer(lidarHS)) return;
-    lidarHS.clearLayers();
-    const b = map.getBounds();
-    const size = map.getSize();
-    const rule = encodeURIComponent(JSON.stringify({
-      rasterFunction: 'Hillshade',
-      rasterFunctionArguments: {
-        HillshadeType: hsSettings.type,
-        Azimuth: hsSettings.azimuth,
-        Altitude: hsSettings.altitude,
-        ZFactor: hsSettings.zFactor
-      }
-    }));
-    const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
-      '?bbox=' + b.toBBoxString() +
-      '&bboxSR=4326' +
-      '&imageSR=3857' +
-      '&size=' + size.x + ',' + size.y +
-      '&format=png' +
-      '&renderingRule=' + rule +
-      '&f=image';
+function refreshLidarHS() {
+  if (!map.hasLayer(lidarHS)) return;
+  lidarHS.clearLayers();
+  const b = map.getBounds();
+  const size = map.getSize();
+  const rule = encodeURIComponent(JSON.stringify({
+    rasterFunction: 'Hillshade',
+    rasterFunctionArguments: {
+      HillshadeType: hsSettings.type,
+      Azimuth: hsSettings.azimuth,
+      Altitude: hsSettings.altitude,
+      ZFactor: hsSettings.zFactor
+    }
+  }));
+  const url = 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer/exportImage' +
+    '?bbox=' + b.toBBoxString() +
+    '&bboxSR=4326' +
+    '&imageSR=3857' +
+    '&size=' + size.x + ',' + size.y +
+    '&format=png' +
+    '&renderingRule=' + rule +
+    '&f=image';
 
-    const currentOpacity = layerDefs.lidarhs.opacity ?? 0.65;
-      ? layerDefs.lidarhs.opacity
-      : hsSettings.opacity;
+  const currentOpacity = layerDefs.lidarhs.opacity ?? 0.65;
 
-    const img = L.imageOverlay(url, b, { opacity: currentOpacity, interactive: false });
-    lidarHS.addLayer(img);
-  }
+  const img = L.imageOverlay(url, b, { opacity: currentOpacity, interactive: false });
+  lidarHS.addLayer(img);
+}
 
   map.on('moveend', () => {
     if (map.hasLayer(lidarHS)) refreshLidarHS();
