@@ -617,7 +617,7 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
       '&renderingRule=' + rule +
       '&f=image';
 
-    const currentOpacity = (layerDefs.lidarhs && layerDefs.lidarhs.opacity != null)
+    const currentOpacity = layerDefs.lidarhs.opacity ?? 0.65;
       ? layerDefs.lidarhs.opacity
       : hsSettings.opacity;
 
@@ -1008,19 +1008,16 @@ map.on('moveend', refreshSoils);
 
 slider.addEventListener('input', () => {
   def.opacity = slider.value / 100;
-  if (def.layer) {
-    if (def.layer.setOpacity) {
-      // Tile layers (lidar hillshade, etc.)
-      def.layer.setOpacity(def.opacity);
-    } else if (def.layer.setStyle) {
-      // Vector layers (bedrock, soils, etc.)
-      def.layer.setStyle({
-        fillOpacity: def.opacity,
-        opacity: def.opacity,
-        weight: 0.6
-      });
-    }
+
+  if (id === 'lidarhs') {
+    // Keep future refreshes in sync
+    hsSettings.opacity = def.opacity;
+    // Update the image currently on the map
+    applyOpacity(lidarHS, def.opacity);
+  } else if (def.layer) {
+    applyOpacity(def.layer, def.opacity);
   }
+
   saveActive();
 });
       
