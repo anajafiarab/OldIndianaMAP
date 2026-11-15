@@ -683,6 +683,7 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
  // ──────────────────────────────────────────────
 // LAYER DEFINITIONS
 // ──────────────────────────────────────────────
+
 const layerDefs = {
   // Boundaries
   counties: {
@@ -732,12 +733,72 @@ const layerDefs = {
     layer: null,
     opacity: 0.6,
     source: { label: 'Indiana GIO SSURGO Soil Map Units', url: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer' }
-  }
+  },
+  // Bedrock
+  bedrock: {
+    name: 'Bedrock Geology (MM48)',
+    group: 'Geology',
+    layer: null,
+    opacity: 0.7,
+    source: { label: 'IGS Bedrock Geology Map (MM48)', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geol_MM48_IN/MapServer' }
+},
 };
 
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+// Bedrock Geology (colored by ROCK_UNITS)
+const bedrockColors = {
+  'Coldwater Shale': '#8B7D6B',
+  'Ellsworth Shale': '#6B8E23',
+  'Antrim Shale': '#2F4F4F',
+  'Wabash Formation': '#4682B4',
+  'Muscatatuck Group': '#DAA520',
+  'New Albany Shale': '#1C1C1C',
+  'Pleasant Mills Formation': '#5F9EA0',
+  'Borden Group': '#CD853F',
+  'Raccoon Creek Group': '#8B4513',
+  'Louisville Limestone through Brassfield Limestone, or Salamonie Dolomite, Cataract Formation, and Brassfield Limestone': '#87CEEB',
+  'Ordovician rocks undifferentiated': '#9370DB',
+  'Bond Formation': '#A0522D',
+  'West Baden Group': '#B8860B',
+  'Buffalo Wallow Group': '#D2691E',
+  'Carbondale Group': '#696969',
+  'Blue River Group': '#F0E68C',
+  'Stephensport Group': '#BC8F8F',
+  'Patoka and Shelburn Formations': '#778899',
+  'Mattoon Formation': '#556B2F',
+  'Lake': '#ADD8E6'
+};
+
+function getBedrockStyle(feature) {
+  const unit = (feature.properties.ROCK_UNITS || '').trim();
+  const color = bedrockColors[unit] || '#CCCCCC';
+  return {
+    color: '#444',
+    weight: 0.6,
+    fillColor: color,
+    fillOpacity: 0.55
+  };
+}
+
+async function loadBedrock() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geol_MM48_IN/MapServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=STRATA,SYSTEM,ROCK_UNITS,ROCK_TYPE,MORE_INFO&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.bedrock.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: getBedrockStyle
+  });
+}
+loadBedrock();
 
 // Counties
 fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
@@ -1123,11 +1184,20 @@ active.forEach(id => {
         'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
       };
     });
-  } else if (id === 'thickness') {
+  } else if (id === 'thickness') {// Unconsolidated thickness contours
     checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
       'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
     }));
+    } else if (id === 'bedrock') {
+  checkLayer(def, 'Bedrock Geology', p => ({
+    'Rock Unit': p.ROCK_UNITS || '—',
+    'System': p.SYSTEM || '—',
+    'Rock Type': p.ROCK_TYPE || '—',
+    'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
+  }));
+}
   }
+  
 }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
@@ -1250,7 +1320,8 @@ active.forEach(id => {
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
 
-        <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
+        <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
+        <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
