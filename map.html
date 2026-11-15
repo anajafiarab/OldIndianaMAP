@@ -748,11 +748,36 @@ bedrock250: {
   opacity: 0.7,
   source: { label: 'IGS Regional Bedrock Geology 1:250K', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer' }
 },
+landslides: {
+  name: 'Landslide Inventory (Highways)',
+  group: 'Geology',
+  layer: null,
+  opacity: 0.7,
+  source: { label: 'IGS Landslide Inventory – Indiana Highway Data', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer' }
+},
 };
 
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+//Landslides Loader
+async function loadLandslides() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=slide_ID,roadway,county,errf,varnes,status,correction,cost,comments,location&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.landslides.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#8B0000', weight: 1.5, fillColor: '#CD5C5C', fillOpacity: 0.45 }
+  });
+}
+loadLandslides();
 // Bedrock Geology (colored by ROCK_UNITS)
 const bedrockColors = {
   'Coldwater Shale': '#8B7D6B',
@@ -1231,16 +1256,29 @@ active.forEach(id => {
       'Rock Type': p.ROCK_TYPE || '—',
       'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
     }));
-    } else if (id === 'bedrock250') {
-  checkLayer(def, '250K Bedrock Geology', p => ({
-    'Formation': p.Formations || p.Name || '—',
-    'Unit': p.Unit || '—',
-    'Ages': p.Ages || '—',
-    'Lithology': p.Lithology || '—',
-    'Group': p.Group_ || '—',
-    'Rank': p.Rank || '—'
-  }));
-}
+  } else if (id === 'bedrock250') {
+    checkLayer(def, '250K Bedrock Geology', p => ({
+      'Formation': p.Formations || p.Name || '—',
+      'Unit': p.Unit || '—',
+      'Ages': p.Ages || '—',
+      'Lithology': p.Lithology || '—',
+      'Group': p.Group_ || '—',
+      'Rank': p.Rank || '—'
+    }));
+  } else if (id === 'landslides') {
+    checkLayer(def, 'Landslide Inventory', p => ({
+      'Slide ID': p.slide_ID || '—',
+      'Roadway': p.roadway || '—',
+      'County': p.county || '—',
+      'Earliest Failure': p.errf || '—',
+      'Varnes Class': p.varnes || '—',
+      'Status': p.status || '—',
+      'Repair Type': p.correction || '—',
+      'Cost': p.cost != null ? '$' + Number(p.cost).toLocaleString() : '—',
+      'Location': p.location || '—',
+      'Comments': p.comments || '—'
+    }));
+  }
 }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
@@ -1289,8 +1327,9 @@ active.forEach(id => {
         sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
       };
     }
-    show(0); //END CLICK. Closes map.on('click'...)
+    show(0);
   }
+}); // closes map.on('click'...)
 
   // Elevation in feet (appended after Legend is written)
    if (active.includes('lidarhs') && map.hasLayer(lidarHS)) {
@@ -1366,6 +1405,7 @@ active.forEach(id => {
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
+        <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
