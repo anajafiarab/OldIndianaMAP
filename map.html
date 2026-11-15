@@ -525,7 +525,9 @@ html, body {
   </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-function applyOpacity(layer, opacity) {
+
+<script>
+    function applyOpacity(layer, opacity) {
   if (!layer) return;
   if (typeof layer.setOpacity === 'function') {
     layer.setOpacity(opacity);
@@ -545,7 +547,6 @@ function applyOpacity(layer, opacity) {
     });
   }
 }
-<script>
   const wideBounds = L.latLngBounds([25, -100], [50, -70]);
   const map = L.map('map', {
     maxBounds: wideBounds,
