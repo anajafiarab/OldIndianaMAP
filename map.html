@@ -794,8 +794,23 @@ function updatePLSSLabels() {
 }
 map.on('zoomend', updatePLSSLabels);
 
-const soilsLayer = L.geoJSON(null, { //Load Soils
-  style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' }
+function getSoilStyle(feature) {
+  const p = feature.properties || {};
+  const drain = (p.drclassdcd || p.drclasswettest || '').toLowerCase();
+  const isProblem = drain.includes('poorly') ||
+                    drain.includes('very poorly') ||
+                    (p.hydclprs && String(p.hydclprs) !== '0' && String(p.hydclprs).toLowerCase() !== 'not hydric');
+
+  return {
+    color: isProblem ? '#c45c26' : '#8B6914',
+    weight: isProblem ? 1.2 : 0.6,
+    fillColor: isProblem ? '#e8a87c' : '#D2B48C',
+    fillOpacity: isProblem ? 0.35 : 0.15
+  };
+}
+
+const soilsLayer = L.geoJSON(null, {
+  style: getSoilStyle
 });
 layerDefs.soils.layer = soilsLayer;
 
