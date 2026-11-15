@@ -1077,16 +1077,25 @@ active.forEach(id => {
       'Range': p.rng || '—',
       'Range Direction': (p.rngd || '').trim() || '—'
     }));
-} else if (id === 'soils') {
+} else if (id === 'soils') { //soils identify
   checkLayer(def, 'SSURGO Soil Map Units', p => {
-    const lat = e.latlng.lat.toFixed(5);
-    const lon = e.latlng.lng.toFixed(5);
-    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoi=${lon},${lat}`;
+    const lat = e.latlng.lat;
+    const lon = e.latlng.lng;
+    // Tiny box around the click (~200 m)
+    const d = 0.0018;
+    const coords = [
+      [lon - d, lat - d],
+      [lon + d, lat - d],
+      [lon + d, lat + d],
+      [lon - d, lat + d],
+      [lon - d, lat - d]
+    ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
+    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
     return {
       'Map Unit': p.muname || '—',
       'Symbol': p.musym || '—',
       'MUKEY': p.mukey || '—',
-      'Web Soil Survey': `<a href="${wss}" target="_blank">Open near this point</a>`
+      'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
     };
   });
 }
