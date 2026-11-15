@@ -815,7 +815,7 @@ async function loadThickness() {
     } else more = false;
   }
   layerDefs.thickness.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: { color: '#2e5a2e', weight: 1.2, opacity: 0.85 }
+    style: { color: '#555', weight: 1, opacity: 0.7 }         // gray
   });
 }
 loadThickness();
@@ -1103,28 +1103,31 @@ active.forEach(id => {
       'Range': p.rng || '—',
       'Range Direction': (p.rngd || '').trim() || '—'
     }));
-} else if (id === 'soils') { //soils identify
-  checkLayer(def, 'SSURGO Soil Map Units', p => {
-    const lat = e.latlng.lat;
-    const lon = e.latlng.lng;
-    // Tiny box around the click (~200 m)
-    const d = 0.0018;
-    const coords = [
-      [lon - d, lat - d],
-      [lon + d, lat - d],
-      [lon + d, lat + d],
-      [lon - d, lat + d],
-      [lon - d, lat - d]
-    ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
-    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
-    return {
-      'Map Unit': p.muname || '—',
-      'Symbol': p.musym || '—',
-      'MUKEY': p.mukey || '—',
-      'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
-    };
-  });
-}
+  } else if (id === 'soils') {
+    checkLayer(def, 'SSURGO Soil Map Units', p => {
+      const lat = e.latlng.lat;
+      const lon = e.latlng.lng;
+      const d = 0.0018;
+      const coords = [
+        [lon - d, lat - d],
+        [lon + d, lat - d],
+        [lon + d, lat + d],
+        [lon - d, lat + d],
+        [lon - d, lat - d]
+      ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
+      const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
+      return {
+        'Map Unit': p.muname || '—',
+        'Symbol': p.musym || '—',
+        'MUKEY': p.mukey || '—',
+        'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
+      };
+    });
+  } else if (id === 'thickness') {
+    checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
+      'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
+    }));
+  }
 }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
@@ -1247,7 +1250,7 @@ active.forEach(id => {
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
 
-        <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div> //Geology
+        <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
