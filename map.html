@@ -779,6 +779,13 @@ html, body {
 function updatePLSSLabels() {
   const lyr = layerDefs.plss.layer;
   if (!lyr) return;
+
+  if (map.getZoom() < 10) {
+    if (map.hasLayer(lyr)) map.removeLayer(lyr);
+  } else {
+    if (!map.hasLayer(lyr) && active.includes('plss')) lyr.addTo(map);
+  }
+
   const show = map.getZoom() >= 11;
   lyr.eachLayer(l => {
     const tip = l.getTooltip();
