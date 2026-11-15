@@ -781,6 +781,11 @@ async function loadPLSS() {
     layerDefs.plss.layer.addTo(map);
   }
   updatePLSSLabels();
+
+  // Refresh the Active Layers panel if it is open
+  if (document.getElementById('active-list')) {
+    renderActive();
+  }
 }
 loadPLSS();
 
