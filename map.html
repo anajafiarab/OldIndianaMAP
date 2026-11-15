@@ -364,6 +364,33 @@ html, body {
   border-radius: 0;
   cursor: pointer;
 }
+input[type=range] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: #bbb;
+  outline: none;
+  border-radius: 2px;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 10px;
+  height: 14px;
+  background: #4a6b4a;
+  border: 1px solid #2a402a;
+  border-radius: 1px;
+  cursor: pointer;
+  margin-top: -5px; /* centers it so it overlaps top and bottom */
+}
+input[type=range]::-moz-range-thumb {
+  width: 10px;
+  height: 14px;
+  background: #4a6b4a;
+  border: 1px solid #2a402a;
+  border-radius: 1px;
+  cursor: pointer;
+}
 
 /* Windows-style checkboxes */
 .layer-item input[type=checkbox] {
@@ -1404,7 +1431,7 @@ map.on('click', function (e) { // CLICK HANDLER
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
-        <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
+        <div class="basemap-item" data-add="landslides">Landslide Inventory (Highways)</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
