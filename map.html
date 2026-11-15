@@ -796,10 +796,15 @@ map.on('zoomend', updatePLSSLabels);
 
 function getSoilStyle(feature) {
   const p = feature.properties || {};
-  const drain = (p.drclassdcd || p.drclasswettest || '').toLowerCase();
-  const isProblem = drain.includes('poorly') ||
-                    drain.includes('very poorly') ||
-                    (p.hydclprs && String(p.hydclprs) !== '0' && String(p.hydclprs).toLowerCase() !== 'not hydric');
+  const name = (p.muname || '').toLowerCase();
+
+  // Organic / muck / peat soils (classic problem materials)
+  const isOrganic = /muck|peat|organic|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon/.test(name);
+
+  // Optional: add other problem series you know from experience
+  // const isLacustrine = /.../.test(name);
+
+  const isProblem = isOrganic;
 
   if (isProblem) {
     return {
