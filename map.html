@@ -680,81 +680,92 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
   currentBasemap.addTo(map);
   if (savedBasemap === 'hybrid') hybridLabels.addTo(map);
 
-  const layerDefs = {
-        hillshade: {
-      name: 'Hillshade',
-      group: 'Elevation',
-      layer: hillshade,
-      opacity: 0.8,
-      source: { label: 'Esri World Hillshade', url: 'https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer' }
-    },
-    counties: {
-      name: 'Indiana Counties',
-      group: 'Boundaries',
-      layer: null,
-      opacity: 1,
-      source: { label: 'U.S. County Boundaries (public GeoJSON)', url: 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json' }
-    },
-    plss: {
-      name: 'PLSS Townships',
-      group: 'Boundaries',
-      layer: null,
-      opacity: 1,
-      source: { label: 'Indiana GIO PLSS Townships', url: 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2' }
-    },
-        lidarhs: {
-      name: 'Lidar Hillshade (2016-2020)',
-      group: 'Elevation',
-      layer: lidarHS,
-      opacity: 0.65,
-      source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
-    },
- soils: {
-  name: 'SSURGO Soil Map Units',
-  group: 'Soils',
-  layer: null,
-  opacity: 0.6,
-  source: { 
-    label: 'Indiana GIO SSURGO Soil Map Units', 
-    url: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer' 
-  }
-}
-    
-  };
+ // ──────────────────────────────────────────────
+// LAYER DEFINITIONS
+// ──────────────────────────────────────────────
+const layerDefs = {
+  // Boundaries
+  counties: {
+    name: 'Indiana Counties',
+    group: 'Boundaries',
+    layer: null,
+    opacity: 1,
+    source: { label: 'U.S. County Boundaries (public GeoJSON)', url: 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json' }
+  },
+  plss: {
+    name: 'PLSS Townships',
+    group: 'Boundaries',
+    layer: null,
+    opacity: 1,
+    source: { label: 'Indiana GIO PLSS Townships', url: 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2' }
+  },
 
-  // Counties
-  fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
-    .then(r => r.json())
-    .then(data => {
-      const indiana = {
-        type: 'FeatureCollection',
-        features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
-      };
-      layerDefs.counties.layer = L.geoJSON(indiana, {
-        style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
-        onEachFeature: (f, l) => {
-          const name = f.properties.NAME || '';
-          if (name) {
-            l.bindTooltip(name, {
-              permanent: true,
-              direction: 'center',
-              className: 'county-label'
-            });
-          }
-        }
-      });
-      updateCountyLabels();   // run once on load
+  // Geology
+  thickness: {
+    name: 'Unconsolidated Thickness Contours',
+    group: 'Geology',
+    layer: null,
+    opacity: 1,
+    source: { label: 'IGS Surficial Unconsolidated Thickness Contours', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Surficial_Unconsolidated_Thickness_Contours/FeatureServer' }
+  },
+
+  // Elevation
+  lidarhs: {
+    name: 'Lidar Hillshade (2016-2020)',
+    group: 'Elevation',
+    layer: lidarHS,
+    opacity: 0.65,
+    source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
+  },
+  hillshade: {
+    name: 'Hillshade',
+    group: 'Elevation',
+    layer: hillshade,
+    opacity: 0.8,
+    source: { label: 'Esri World Hillshade', url: 'https://services.arcgisonline.com/arcgis/rest/services/Elevation/World_Hillshade/MapServer' }
+  },
+
+  // Soils
+  soils: {
+    name: 'SSURGO Soil Map Units',
+    group: 'Soils',
+    layer: null,
+    opacity: 0.6,
+    source: { label: 'Indiana GIO SSURGO Soil Map Units', url: 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer' }
+  }
+};
+
+// ──────────────────────────────────────────────
+// LOADERS
+// ──────────────────────────────────────────────
+
+// Counties
+fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
+  .then(r => r.json())
+  .then(data => {
+    const indiana = {
+      type: 'FeatureCollection',
+      features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
+    };
+    layerDefs.counties.layer = L.geoJSON(indiana, {
+      style: { color: '#3d5c3d', weight: 1.5, fillOpacity: 0.08 },
+      onEachFeature: (f, l) => {
+        const name = f.properties.NAME || '';
+        if (name) l.bindTooltip(name, { permanent: true, direction: 'center', className: 'county-label' });
+      }
     });
+    updateCountyLabels();
+  });
 
-  function updateCountyLabels() {
-    const lyr = layerDefs.counties.layer;
-    if (!lyr) return;
-    const show = map.getZoom() >= 8;
-    lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
-  }
-  map.on('zoomend', updateCountyLabels);
+function updateCountyLabels() {
+  const lyr = layerDefs.counties.layer;
+  if (!lyr) return;
+  const show = map.getZoom() >= 8;
+  lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
+}
+map.on('zoomend', updateCountyLabels);
 
-// PLSS (paged, no popup)
+// PLSS
 async function loadPLSS() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
   let all = [], offset = 0, page = 1000, more = true;
@@ -775,11 +786,7 @@ async function loadPLSS() {
       if (label) l.bindTooltip(label, { permanent: true, direction: 'center', className: 'plss-label' });
     }
   });
-
-
   updatePLSSLabels();
-
-
 }
 loadPLSS();
 
@@ -794,47 +801,45 @@ function updatePLSSLabels() {
 }
 map.on('zoomend', updatePLSSLabels);
 
+// Unconsolidated Thickness Contours
+async function loadThickness() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Surficial_Unconsolidated_Thickness_Contours/FeatureServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=Contour&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.thickness.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#2e5a2e', weight: 1.2, opacity: 0.85 }
+  });
+}
+loadThickness();
+
+// Soils (dynamic by extent)
 function getSoilStyle(feature) {
   const p = feature.properties || {};
   const name = (p.muname || '').toLowerCase();
-
-  // Organic / muck / peat soils (classic problem materials)
   const isOrganic = /muck|peat|organic|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon/.test(name);
-
-  // Optional: add other problem series you know from experience
-  // const isLacustrine = /.../.test(name);
-
-  const isProblem = isOrganic;
-
-  if (isProblem) {
-    return {
-      color: '#8B2500',
-      weight: 1.5,
-      fillColor: '#A0522D',
-      fillOpacity: 0.55
-    };
+  if (isOrganic) {
+    return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
-  return {
-    color: '#8B6914',
-    weight: 0.6,
-    fillColor: '#D2B48C',
-    fillOpacity: 0.18
-  };
+  return { color: '#8B6914', weight: 0.6, fillColor: '#D2B48C', fillOpacity: 0.18 };
 }
 
-const soilsLayer = L.geoJSON(null, {
-  style: getSoilStyle
-});
+const soilsLayer = L.geoJSON(null, { style: getSoilStyle });
 layerDefs.soils.layer = soilsLayer;
 
-
-  function refreshSoils() {
+function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
-  if (map.getZoom() < 14) { //change to whatever zoom level you want to show soils
+  if (map.getZoom() < 14) {
     soilsLayer.clearLayers();
     return;
   }
-   
   const b = map.getBounds();
   const url = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query' +
     '?where=1%3D1' +
@@ -848,25 +853,18 @@ layerDefs.soils.layer = soilsLayer;
 
   fetch(url)
     .then(r => r.json())
-.then(data => {
-  soilsLayer.clearLayers();
-  if (data.features) {
-    soilsLayer.addData(data);
-    soilsLayer.eachLayer(l => {
-      const sym = l.feature.properties.musym || '';
-      if (sym) {
-        l.bindTooltip(sym, {
-          permanent: true,
-          direction: 'center',
-          className: 'soil-label'
+    .then(data => {
+      soilsLayer.clearLayers();
+      if (data.features) {
+        soilsLayer.addData(data);
+        soilsLayer.eachLayer(l => {
+          const sym = l.feature.properties.musym || '';
+          if (sym) l.bindTooltip(sym, { permanent: true, direction: 'center', className: 'soil-label' });
         });
       }
-    });
-  }
-})
+    })
     .catch(err => console.error('Soils refresh failed:', err));
 }
-
 map.on('moveend', refreshSoils);
 
 
@@ -1245,12 +1243,12 @@ active.forEach(id => {
     setActiveTool('add-content-btn');
     sidebar.innerHTML = `
       <h3>Add Content</h3>
-      <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div>
+      <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div> //Boundaries
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
 
-      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div>
-      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+        <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Geology</div> //Geology
+        <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
       <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
