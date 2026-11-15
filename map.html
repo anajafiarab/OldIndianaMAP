@@ -754,31 +754,34 @@ html, body {
   }
   map.on('zoomend', updatePLSSLabels);
 
-async function loadSoils() {
-  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  try {
-    while (more) {
-      const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-      const res = await fetch(url);
-      const data = await res.json();
-      if (data.features && data.features.length) {
-        all = all.concat(data.features);
-        offset += page;
-        if (data.features.length < page) more = false;
-      } else {
-        more = false;
-      }
-    }
-    layerDefs.soils.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-      style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' }
-    });
-    console.log('Soils loaded:', all.length, 'features');
-  } catch (err) {
-    console.error('Soils load failed:', err);
-  }
+const soilsLayer = L.geoJSON(null, { //Load Soils
+  style: { color: '#8B6914', weight: 0.6, fillOpacity: 0.15, fillColor: '#D2B48C' }
+});
+layerDefs.soils.layer = soilsLayer;
+
+function refreshSoils() {
+  if (!map.hasLayer(soilsLayer)) return;
+  const b = map.getBounds();
+  const url = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query' +
+    '?where=1%3D1' +
+    '&geometry=' + encodeURIComponent(b.toBBoxString()) +
+    '&geometryType=esriGeometryEnvelope' +
+    '&inSR=4326' +
+    '&spatialRel=esriSpatialRelIntersects' +
+    '&outFields=*' +
+    '&f=geojson' +
+    '&resultRecordCount=2000';
+
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      soilsLayer.clearLayers();
+      if (data.features) soilsLayer.addData(data);
+    })
+    .catch(err => console.error('Soils refresh failed:', err));
 }
-loadSoils();
+
+map.on('moveend', refreshSoils);
 
   let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
   function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
@@ -817,6 +820,16 @@ loadSoils();
         if (!def.layer) return;
         cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
       });
+      cb.addEventListener('change', () => {
+  if (!def.layer) return;
+  if (cb.checked) {
+    def.layer.addTo(map);
+    if (id === 'soils') refreshSoils();
+  } else {
+    map.removeLayer(def.layer);
+  }
+  saveActive();
+});
 
 
         slider.addEventListener('input', () => {
