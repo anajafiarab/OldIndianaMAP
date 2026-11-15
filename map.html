@@ -1184,20 +1184,18 @@ active.forEach(id => {
         'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
       };
     });
-  } else if (id === 'thickness') {// Unconsolidated thickness contours
+  } else if (id === 'thickness') {
     checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
       'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
     }));
-    } else if (id === 'bedrock') {
-  checkLayer(def, 'Bedrock Geology', p => ({
-    'Rock Unit': p.ROCK_UNITS || '—',
-    'System': p.SYSTEM || '—',
-    'Rock Type': p.ROCK_TYPE || '—',
-    'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
-  }));
-}
+  } else if (id === 'bedrock') {
+    checkLayer(def, 'Bedrock Geology', p => ({
+      'Rock Unit': p.ROCK_UNITS || '—',
+      'System': p.SYSTEM || '—',
+      'Rock Type': p.ROCK_TYPE || '—',
+      'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
+    }));
   }
-  
 }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
