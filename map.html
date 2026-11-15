@@ -525,6 +525,26 @@ html, body {
   </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+function applyOpacity(layer, opacity) {
+  if (!layer) return;
+  if (typeof layer.setOpacity === 'function') {
+    layer.setOpacity(opacity);
+  } else if (typeof layer.setStyle === 'function') {
+    layer.setStyle({ opacity: opacity, fillOpacity: opacity * 0.08 });
+  } else if (typeof layer.eachLayer === 'function') {
+    layer.eachLayer(l => applyOpacity(l, opacity));
+  }
+  // Also fade permanent tooltips
+  if (typeof layer.eachLayer === 'function') {
+    layer.eachLayer(l => {
+      const tip = l.getTooltip && l.getTooltip();
+      if (tip && tip.getElement) {
+        const el = tip.getElement();
+        if (el) el.style.opacity = opacity;
+      }
+    });
+  }
+}
 <script>
   const wideBounds = L.latLngBounds([25, -100], [50, -70]);
   const map = L.map('map', {
@@ -769,7 +789,13 @@ const soilsLayer = L.geoJSON(null, { //Load Soils
 layerDefs.soils.layer = soilsLayer;
 
 function refreshSoils() {
+  function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
+  if (map.getZoom() < 11) { //change to whatever zoom level you want to show soils
+    soilsLayer.clearLayers();
+    return;
+  }
+   
   const b = map.getBounds();
   const url = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query' +
     '?where=1%3D1' +
@@ -854,29 +880,13 @@ map.on('moveend', refreshSoils);
 });
 
 
-        slider.addEventListener('input', () => {
-                def.opacity = slider.value / 100;
-        if (id === 'lidarhs') hsSettings.opacity = def.opacity;
-        row.querySelector('.slider-val').textContent = slider.value;
-        if (!def.layer) return;
-
-        // Tile layers (hillshade, etc.)
-        if (typeof def.layer.setOpacity === 'function') {
-          def.layer.setOpacity(def.opacity);
-        }
-        // GeoJSON / feature layers
-        else if (typeof def.layer.setStyle === 'function') {
-          def.layer.setStyle({ fillOpacity: def.opacity * 0.08, opacity: def.opacity });
-        }
-        // Layer groups (KMZ)
-        else if (typeof def.layer.eachLayer === 'function') {
-          def.layer.eachLayer(l => {
-            if (typeof l.setOpacity === 'function') l.setOpacity(def.opacity);
-            if (typeof l.setStyle === 'function') l.setStyle({ opacity: def.opacity, fillOpacity: def.opacity });
-          });
-        }
-        saveActive();
-      });
+     slider.addEventListener('input', () => {
+  def.opacity = slider.value / 100;
+  if (id === 'lidarhs') hsSettings.opacity = def.opacity;
+  row.querySelector('.slider-val').textContent = slider.value;
+  if (def.layer) applyOpacity(def.layer, def.opacity);
+  saveActive();
+});
       
       btn.addEventListener('click', () => {
         if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
