@@ -789,7 +789,7 @@ const soilsLayer = L.geoJSON(null, { //Load Soils
 });
 layerDefs.soils.layer = soilsLayer;
 
-function refreshSoils() {
+
   function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
   if (map.getZoom() < 11) { //change to whatever zoom level you want to show soils
