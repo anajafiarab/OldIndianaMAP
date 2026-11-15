@@ -680,7 +680,15 @@ function refreshLidarHS() {
 // ──────────────────────────────────────────────
 
 const layerDefs = {
-  // Boundaries
+  //IDNR Water Wells
+  wells: {
+  name: 'IDNR Water Wells',
+  group: 'Hydrology',
+  layer: null,
+  opacity: 1,
+  source: { label: 'IDNR Water Wells', url: 'https://gisdata.in.gov/server/rest/services/Hosted/WaterWells_DNR_Water_IN_1/FeatureServer' }
+},
+    // Boundaries
   counties: {
     name: 'Indiana Counties',
     group: 'Boundaries',
@@ -757,6 +765,30 @@ landslides: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+//INDR Water Wells Loader
+async function loadWells() {
+  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/WaterWells_DNR_Water_IN_1/FeatureServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=dblrefno,dbldepth,dblbedrockd,dblstatic,strowner,dtmcompdate,report&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.wells.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+      radius: 4,
+      color: '#1a5c1a',
+      weight: 1,
+      fillColor: '#3cb371',
+      fillOpacity: 0.7
+    })
+  });
+}
+loadWells();
 //Landslides Loader
 async function loadLandslides() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer/0/query';
@@ -1190,6 +1222,7 @@ function pointInLayer(latlng, layer) {
   return true; // fallback
 }
 
+// CLICK HANDLER
 map.on('click', function (e) { // CLICK HANDLER
   clearHighlight();
   const hits = [];
@@ -1275,6 +1308,17 @@ map.on('click', function (e) { // CLICK HANDLER
         'Location': p.location || '—',
         'Comments': p.comments || '—'
       }));
+      } else if (id === 'wells') {
+  checkLayer(def, 'IDNR Water Wells', p => ({
+    'Ref No': p.dblrefno || '—',
+    'Depth (ft)': p.dbldepth != null ? Math.round(p.dbldepth) : '—',
+    'Depth to Bedrock (ft)': p.dblbedrockd != null ? Math.round(p.dblbedrockd) : '—',
+    'Static Level (ft)': p.dblstatic != null ? Math.round(p.dblstatic) : '—',
+    'Owner': p.strowner || '—',
+    'Completed': p.dtmcompdate ? new Date(p.dtmcompdate).toLocaleDateString() : '—',
+    'Well Record': p.report ? `<a href="${p.report}" target="_blank">Open DNR record</a>` : '—'
+  }));
+
     }
   }); // closes active.forEach
 
@@ -1365,6 +1409,7 @@ map.on('click', function (e) { // CLICK HANDLER
     document.getElementById(id).classList.add('active');
   }
 
+  // Sidebar tool buttons
   document.getElementById('basemaps-btn').addEventListener('click', () => {
     setActiveTool('basemaps-btn');
     sidebar.innerHTML = `
@@ -1404,8 +1449,8 @@ map.on('click', function (e) { // CLICK HANDLER
         <div class="basemap-item" data-add="landslides">Landslide Inventory (Highways)</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
-      <div style="font-weight:bold; margin:12px 0 4px; color:#666;">Hydrology</div>
-      <div style="color:#999; font-size:12px; margin-left:8px;">(coming soon)</div>
+      <div style="font-weight:bold; margin:12px 0 4px;">Hydrology</div>
+      <div class="basemap-item" data-add="wells">IDNR Water Wells</div>
 
       <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
       <div class="basemap-item" data-add="lidarhs">Lidar Hillshade (2016-2020)</div>
