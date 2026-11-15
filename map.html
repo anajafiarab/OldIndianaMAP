@@ -786,7 +786,7 @@ async function refreshWells() {
     '&geometryType=esriGeometryEnvelope' +
     '&inSR=4326&outSR=4326' +
     '&spatialRel=esriSpatialRelIntersects' +
-    '&outFields=dblrefno,dbldepth,dblbedrockd,dblstatic,strowner,dtmcompdate,report' +
+    '&outFields=dblrefno,dbldepth,dblbedrockd,dblstatic,strowner,dtmcompdate,report,loc_type' +
     '&f=geojson' +
     '&resultRecordCount=2000';
 
@@ -795,13 +795,17 @@ async function refreshWells() {
     wellsLayer.clearLayers();
     if (data.features) {
       L.geoJSON(data, {
-        pointToLayer: (f, latlng) => L.circleMarker(latlng, {
-          radius: 4,
-          color: '#1a5c1a',
-          weight: 1,
-          fillColor: '#3cb371',
-          fillOpacity: 0.7
-        })
+pointToLayer: (f, latlng) => {
+  const loc = (f.properties.loc_type || '').toLowerCase();
+  const isField = loc.includes('field') || loc.includes('survey') || loc.includes('gps');
+  return L.circleMarker(latlng, {
+    radius: 4,
+    color: isField ? '#1a5c1a' : '#8b4513',
+    weight: 1,
+    fillColor: isField ? '#3cb371' : '#daa520',
+    fillOpacity: 0.75
+  });
+}
       }).addTo(wellsLayer);
     }
   } catch (e) { /* ignore */ }
@@ -1339,15 +1343,15 @@ map.on('click', function (e) { // CLICK HANDLER
         hits.push({
           layerName: 'IDNR Water Wells',
           layer: l,
-          attrs: {
-            'Ref No': l.feature.properties.dblrefno || '—',
-            'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
-            'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
-            'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
-            'Owner': l.feature.properties.strowner || '—',
-            'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
-            'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
-          },
+attrs: {
+  'Ref No': l.feature.properties.dblrefno || '—',
+  'Location Type': l.feature.properties.loc_type || '—',
+  'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
+  'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
+  'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
+  'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
+  'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
+},
           source: def.source || null
         });
       }
