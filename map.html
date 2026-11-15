@@ -1193,7 +1193,7 @@ function pointInLayer(latlng, layer) {
   return true; // fallback
 }
 
-map.on('click', function (e) {// CLICK HANDLER
+map.on('click', function (e) { // CLICK HANDLER
   clearHighlight();
   const hits = [];
 
@@ -1211,75 +1211,75 @@ map.on('click', function (e) {// CLICK HANDLER
     });
   }
 
-active.forEach(id => {
-  const def = layerDefs[id];
-  if (!def || !def.layer || !map.hasLayer(def.layer)) return;
+  active.forEach(id => {
+    const def = layerDefs[id];
+    if (!def || !def.layer || !map.hasLayer(def.layer)) return;
 
-  if (id === 'counties') {
-    checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
-  } else if (id === 'plss') {
-    checkLayer(def, 'PLSS Townships', p => ({
-      'Principal Meridian': p.meridian || '—',
-      'Township': p.twp || '—',
-      'Township Direction': (p.twpd || '').trim() || '—',
-      'Range': p.rng || '—',
-      'Range Direction': (p.rngd || '').trim() || '—'
-    }));
-  } else if (id === 'soils') {
-    checkLayer(def, 'SSURGO Soil Map Units', p => {
-      const lat = e.latlng.lat;
-      const lon = e.latlng.lng;
-      const d = 0.0018;
-      const coords = [
-        [lon - d, lat - d],
-        [lon + d, lat - d],
-        [lon + d, lat + d],
-        [lon - d, lat + d],
-        [lon - d, lat - d]
-      ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
-      const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
-      return {
-        'Map Unit': p.muname || '—',
-        'Symbol': p.musym || '—',
-        'MUKEY': p.mukey || '—',
-        'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
-      };
-    });
-  } else if (id === 'thickness') {
-    checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
-      'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
-    }));
-  } else if (id === 'bedrock') {
-    checkLayer(def, 'Bedrock Geology', p => ({
-      'Rock Unit': p.ROCK_UNITS || '—',
-      'System': p.SYSTEM || '—',
-      'Rock Type': p.ROCK_TYPE || '—',
-      'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
-    }));
-  } else if (id === 'bedrock250') {
-    checkLayer(def, '250K Bedrock Geology', p => ({
-      'Formation': p.Formations || p.Name || '—',
-      'Unit': p.Unit || '—',
-      'Ages': p.Ages || '—',
-      'Lithology': p.Lithology || '—',
-      'Group': p.Group_ || '—',
-      'Rank': p.Rank || '—'
-    }));
-  } else if (id === 'landslides') {
-    checkLayer(def, 'Landslide Inventory', p => ({
-      'Slide ID': p.slide_ID || '—',
-      'Roadway': p.roadway || '—',
-      'County': p.county || '—',
-      'Earliest Failure': p.errf || '—',
-      'Varnes Class': p.varnes || '—',
-      'Status': p.status || '—',
-      'Repair Type': p.correction || '—',
-      'Cost': p.cost != null ? '$' + Number(p.cost).toLocaleString() : '—',
-      'Location': p.location || '—',
-      'Comments': p.comments || '—'
-    }));
-  }
-}); // closes active.forEach
+    if (id === 'counties') {
+      checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
+    } else if (id === 'plss') {
+      checkLayer(def, 'PLSS Townships', p => ({
+        'Principal Meridian': p.meridian || '—',
+        'Township': p.twp || '—',
+        'Township Direction': (p.twpd || '').trim() || '—',
+        'Range': p.rng || '—',
+        'Range Direction': (p.rngd || '').trim() || '—'
+      }));
+    } else if (id === 'soils') {
+      checkLayer(def, 'SSURGO Soil Map Units', p => {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+        const d = 0.0018;
+        const coords = [
+          [lon - d, lat - d],
+          [lon + d, lat - d],
+          [lon + d, lat + d],
+          [lon - d, lat + d],
+          [lon - d, lat - d]
+        ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
+        const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
+        return {
+          'Map Unit': p.muname || '—',
+          'Symbol': p.musym || '—',
+          'MUKEY': p.mukey || '—',
+          'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
+        };
+      });
+    } else if (id === 'thickness') {
+      checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
+        'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
+      }));
+    } else if (id === 'bedrock') {
+      checkLayer(def, 'Bedrock Geology', p => ({
+        'Rock Unit': p.ROCK_UNITS || '—',
+        'System': p.SYSTEM || '—',
+        'Rock Type': p.ROCK_TYPE || '—',
+        'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
+      }));
+    } else if (id === 'bedrock250') {
+      checkLayer(def, '250K Bedrock Geology', p => ({
+        'Formation': p.Formations || p.Name || '—',
+        'Unit': p.Unit || '—',
+        'Ages': p.Ages || '—',
+        'Lithology': p.Lithology || '—',
+        'Group': p.Group_ || '—',
+        'Rank': p.Rank || '—'
+      }));
+    } else if (id === 'landslides') {
+      checkLayer(def, 'Landslide Inventory', p => ({
+        'Slide ID': p.slide_ID || '—',
+        'Roadway': p.roadway || '—',
+        'County': p.county || '—',
+        'Earliest Failure': p.errf || '—',
+        'Varnes Class': p.varnes || '—',
+        'Status': p.status || '—',
+        'Repair Type': p.correction || '—',
+        'Cost': p.cost != null ? '$' + Number(p.cost).toLocaleString() : '—',
+        'Location': p.location || '—',
+        'Comments': p.comments || '—'
+      }));
+    }
+  }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -1329,7 +1329,6 @@ active.forEach(id => {
     }
     show(0);
   }
-}); // closes map.on('click'...)
 
   // Elevation in feet (appended after Legend is written)
    if (active.includes('lidarhs') && map.hasLayer(lidarHS)) {
@@ -1361,7 +1360,7 @@ active.forEach(id => {
       })
       .catch(() => {});
   }
-});
+}); // closes map.on('click'...)
   const sidebar = document.getElementById('sidebar');
   const tools = document.querySelectorAll('.tool');
   function setActiveTool(id) {
