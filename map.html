@@ -742,6 +742,14 @@ const layerDefs = {
     opacity: 0.7,
     source: { label: 'IGS Bedrock Geology Map (MM48)', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geol_MM48_IN/MapServer' }
 },
+//250K Bedrock
+bedrock250: {
+  name: '250K Bedrock Geology',
+  group: 'Geology',
+  layer: null,
+  opacity: 0.7,
+  source: { label: 'IGS Regional Bedrock Geology 1:250K', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer' }
+},
 };
 
 // ──────────────────────────────────────────────
@@ -799,7 +807,28 @@ async function loadBedrock() {
   });
 }
 loadBedrock();
-
+// 250K Bedrock Loader
+async function loadBedrock250() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=Unit,Name,Ages,Rank,Lithology,Group_,Formations,Members&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.bedrock250.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: function (f) {
+      const unit = (f.properties.Formations || f.properties.Name || '').trim();
+      const color = bedrockColors[unit] || '#B0B0B0';
+      return { color: '#444', weight: 0.5, fillColor: color, fillOpacity: 0.55 };
+    }
+  });
+}
+loadBedrock250();
 // Counties
 fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
   .then(r => r.json())
@@ -1199,6 +1228,16 @@ active.forEach(id => {
       'Rock Type': p.ROCK_TYPE || '—',
       'More Info': p.MORE_INFO ? `<a href="${p.MORE_INFO}" target="_blank">IGS details</a>` : '—'
     }));
+    } else if (id === 'bedrock250') {
+  checkLayer(def, '250K Bedrock Geology', p => ({
+    'Formation': p.Formations || p.Name || '—',
+    'Unit': p.Unit || '—',
+    'Ages': p.Ages || '—',
+    'Lithology': p.Lithology || '—',
+    'Group': p.Group_ || '—',
+    'Rank': p.Rank || '—'
+  }));
+}
   }
 }); // closes active.forEach
 
@@ -1323,6 +1362,7 @@ active.forEach(id => {
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
 
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
+        <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
