@@ -1007,10 +1007,12 @@ map.on('moveend', refreshSoils);
 slider.addEventListener('input', () => {
   def.opacity = slider.value / 100;
 
+  // Update the number next to the slider
+  const valSpan = row.querySelector('.slider-val');
+  if (valSpan) valSpan.textContent = slider.value;
+
   if (id === 'lidarhs') {
-    // Keep future refreshes in sync
     hsSettings.opacity = def.opacity;
-    // Update the image currently on the map
     applyOpacity(lidarHS, def.opacity);
   } else if (def.layer) {
     applyOpacity(def.layer, def.opacity);
