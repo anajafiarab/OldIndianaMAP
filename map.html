@@ -1008,12 +1008,18 @@ map.on('moveend', refreshSoils);
 
 slider.addEventListener('input', () => {
   def.opacity = slider.value / 100;
-  if (def.layer && def.layer.setStyle) {
-    def.layer.setStyle({
-      fillOpacity: def.opacity * 1,  // 0.7 matches the starting look
-      opacity: def.opacity,
-      weight: 0.6
-    });
+  if (def.layer) {
+    if (def.layer.setOpacity) {
+      // Tile layers (lidar hillshade, etc.)
+      def.layer.setOpacity(def.opacity);
+    } else if (def.layer.setStyle) {
+      // Vector layers (bedrock, soils, etc.)
+      def.layer.setStyle({
+        fillOpacity: def.opacity,
+        opacity: def.opacity,
+        weight: 0.6
+      });
+    }
   }
   saveActive();
 });
