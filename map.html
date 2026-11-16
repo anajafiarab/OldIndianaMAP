@@ -1281,27 +1281,28 @@ map.on('click', function (e) { // CLICK HANDLER
         'Range': p.rng || '—',
         'Range Direction': (p.rngd || '').trim() || '—'
       }));
-    } else if (id === 'soils') {
-      checkLayer(def, 'SSURGO Soil Map Units', p => {
-        const lat = e.latlng.lat;
-        const lon = e.latlng.lng;
-        const d = 0.0018;
-        const coords = [
-          [lon - d, lat - d],
-          [lon + d, lat - d],
-          [lon + d, lat + d],
-          [lon - d, lat + d],
-          [lon - d, lat - d]
-        ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
-        const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
-        return {
-          'Map Unit': p.muname || '—',
-          'Symbol': p.musym || '—',
-          'MUKEY': p.mukey || '—',
-          'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
-        };
-      });
-    } else if (id === 'thickness') {
+} else if (id === 'soils') {
+  checkLayer(def, 'SSURGO Soil Map Units', p => {
+    const lat = e.latlng.lat;
+    const lon = e.latlng.lng;
+    const d = 0.0018; // ~200 m box
+    // Correct WSS format: ((lon lat, lon lat, ...))
+    const coords = [
+      [lon - d, lat - d],
+      [lon + d, lat - d],
+      [lon + d, lat + d],
+      [lon - d, lat + d],
+      [lon - d, lat - d]
+    ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
+    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
+    return {
+      'Map Unit': p.muname || '—',
+      'Symbol': p.musym || '—',
+      'MUKEY': p.mukey || '—',
+      'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
+    };
+  });
+} else if (id === 'thickness') {
       checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
         'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
       }));
