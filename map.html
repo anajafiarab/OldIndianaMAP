@@ -1436,19 +1436,8 @@ if (!hits.length) {
   show(0);
 }
 
-// Elevation always runs when hillshade is on (even with no other hits)
+// Elevation in feet when lidar hillshade is on
 if (map.hasLayer(lidarHS)) {
-  const sbNow = document.getElementById('sidebar');
-  if (sbNow) {
-    const old = sbNow.querySelector('.elev-line');
-    if (old) old.remove();
-    const div = document.createElement('div');
-    div.className = 'elev-line';
-    div.style.cssText = 'margin-top:10px; padding-top:6px; border-top:1px solid #ccc; font-size:13px; color:#888;';
-    div.innerHTML = '<strong>Elevation:</strong> looking…';
-    sbNow.appendChild(div);
-  }
-
   const geom = JSON.stringify({
     x: e.latlng.lng,
     y: e.latlng.lat,
@@ -1464,21 +1453,21 @@ if (map.hasLayer(lidarHS)) {
     .then(r => r.json())
     .then(data => {
       const sample = data.samples && data.samples[0];
-      const line = document.querySelector('.elev-line');
-      if (!line) return;
-      if (sample && sample.value !== undefined && sample.value !== 'NoData') {
-        const feet = Math.round(parseFloat(sample.value));
-        line.innerHTML = `<strong>Elevation:</strong> ${feet} ft`;
-        line.style.color = '#000';
-      } else {
-        line.innerHTML = '<strong>Elevation:</strong> no data';
-      }
+      if (!sample || sample.value === undefined || sample.value === 'NoData') return;
+      const feet = Math.round(parseFloat(sample.value));
+      const sbNow = document.getElementById('sidebar');
+      if (!sbNow) return;
+      const old = sbNow.querySelector('.elev-line');
+      if (old) old.remove();
+      const div = document.createElement('div');
+      div.className = 'elev-line';
+      div.style.cssText = 'margin-top:10px; padding-top:6px; border-top:1px solid #ccc; font-size:13px;';
+      div.innerHTML = `<strong>Elevation:</strong> ${feet} ft`;
+      sbNow.appendChild(div);
     })
-    .catch(() => {
-      const line = document.querySelector('.elev-line');
-      if (line) line.innerHTML = '<strong>Elevation:</strong> query failed';
-    });
+    .catch(() => {});
 }
+
 }); // closes map.on('click'...)
   const sidebar = document.getElementById('sidebar');
   const tools = document.querySelectorAll('.tool');
