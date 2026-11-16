@@ -910,6 +910,9 @@ async function loadBedrock() {
     style: getBedrockStyle
   });
   applyOpacity(layerDefs.bedrock.layer, layerDefs.bedrock.opacity);
+  if (active.includes('bedrock') && !map.hasLayer(layerDefs.bedrock.layer)) {
+  layerDefs.bedrock.layer.addTo(map);
+}
 }
 loadBedrock();
 
@@ -934,8 +937,12 @@ async function loadBedrock250() {
     }
   });
   applyOpacity(layerDefs.bedrock250.layer, layerDefs.bedrock250.opacity);
+  if (active.includes('bedrock250') && !map.hasLayer(layerDefs.bedrock250.layer)) {
+  layerDefs.bedrock250.layer.addTo(map);
+}
 }
 loadBedrock250();
+
 // Counties
 fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
   .then(r => r.json())
