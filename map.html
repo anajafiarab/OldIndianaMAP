@@ -1362,28 +1362,27 @@ map.on('click', function (e) { // CLICK HANDLER
         'Range': p.rng || '—',
         'Range Direction': (p.rngd || '').trim() || '—'
       }));
-} else if (id === 'soils') {
-  checkLayer(def, 'SSURGO Soil Map Units', p => {
-    const lat = e.latlng.lat;
-    const lon = e.latlng.lng;
-    const d = 0.0018; // ~200 m box
-    // Correct WSS format: ((lon lat, lon lat, ...))
-    const coords = [
-      [lon - d, lat - d],
-      [lon + d, lat - d],
-      [lon + d, lat + d],
-      [lon - d, lat + d],
-      [lon - d, lat - d]
-    ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
-    const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
-    return {
-      'Map Unit': p.muname || '—',
-      'Symbol': p.musym || '—',
-      'MUKEY': p.mukey || '—',
-      'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
-    };
-  });
-} else if (id === 'thickness') {
+    } else if (id === 'soils') {
+      checkLayer(def, 'SSURGO Soil Map Units', p => {
+        const lat = e.latlng.lat;
+        const lon = e.latlng.lng;
+        const d = 0.0018;
+        const coords = [
+          [lon - d, lat - d],
+          [lon + d, lat - d],
+          [lon + d, lat + d],
+          [lon - d, lat + d],
+          [lon - d, lat - d]
+        ].map(c => c[0].toFixed(6) + ' ' + c[1].toFixed(6)).join(',');
+        const wss = `https://websoilsurvey.sc.egov.usda.gov/App/WebSoilSurvey.aspx?aoicoords=((${coords}))`;
+        return {
+          'Map Unit': p.muname || '—',
+          'Symbol': p.musym || '—',
+          'MUKEY': p.mukey || '—',
+          'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
+        };
+      });
+    } else if (id === 'thickness') {
       checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
         'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
       }));
@@ -1416,45 +1415,79 @@ map.on('click', function (e) { // CLICK HANDLER
         'Location': p.location || '—',
         'Comments': p.comments || '—'
       }));
-} else if (id === 'wells') {
-  if (!map.hasLayer(wellsLayer)) return;
-  wellsLayer.eachLayer(group => {
-    group.eachLayer(l => {
-      const d = map.distance(e.latlng, l.getLatLng());
-      if (d < 50) {
-        hits.push({
-          layerName: 'IDNR Water Wells',
-          layer: l,
-          attrs: {
-            'Ref No': l.feature.properties.dblrefno || '—',
-            'Location Type': l.feature.properties.loc_type || '—',
-            'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
-            'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
-            'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
-            'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
-            'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
-          },
-          source: def.source || null
+    } else if (id === 'wells') {
+      if (!map.hasLayer(wellsLayer)) return;
+      wellsLayer.eachLayer(group => {
+        group.eachLayer(l => {
+          const d = map.distance(e.latlng, l.getLatLng());
+          if (d < 50) {
+            hits.push({
+              layerName: 'IDNR Water Wells',
+              layer: l,
+              attrs: {
+                'Ref No': l.feature.properties.dblrefno || '—',
+                'Location Type': l.feature.properties.loc_type || '—',
+                'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
+                'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
+                'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
+                'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
+                'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
+              },
+              source: def.source || null
+            });
+          }
         });
-      }
-    });
-  });
-} else if (id === 'landslides') {
-  checkLayer(def, 'Landslide Inventory', p => ({
-    'County': p.county || '—',
-    'Roadway': p.roadway || '—',
-    'Slope Type': p.slope || '—',
-    'Earliest Report': p.errf || '—',
-    'Cause': p.cause || '—',
-    'Varnes Class': p.varnes || '—',
-    'Status': p.status || '—',
-    'Avg Slope (°)': p.avg_slope_degree != null ? Math.round(p.avg_slope_degree) : '—',
-    'Area (km²)': p.area_sq_km != null ? p.area_sq_km.toFixed(3) : '—',
-    'Source': p.source || '—',
-    'Confidence': p.confidence_level || '—'
-  }));
-}
-}); // closes active.forEach
+      });
+    } else if (id === 'piletests') {
+      if (!def.layer || !map.hasLayer(def.layer)) return;
+      def.layer.eachLayer(l => {
+        if (pointInLayer(e.latlng, l)) {
+          const p = l.feature.properties;
+          const oid = p.OBJECTID;
+          const hit = {
+            layerName: 'PDA & Static Test Data',
+            layer: l,
+            attrs: {
+              'Year': p.YEAR || '—',
+              'Contract': p.CONTRACT || '—',
+              'Road': p.ROAD || '—',
+              'Test Type': p.ITEM_TYPE || '—',
+              'Pile Type': p.PILE_TYPE || '—',
+              'Report': 'Loading…'
+            },
+            source: def.source || null
+          };
+          hits.push(hit);
+
+          if (oid) {
+            const attUrl = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments?f=json`;
+            fetch(attUrl)
+              .then(r => r.json())
+              .then(data => {
+                const atts = data.attachmentInfos || [];
+                if (atts.length) {
+                  hit.attrs['Report'] = atts.map(a => {
+                    const href = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments/${a.id}`;
+                    return `<a href="${href}" target="_blank" style="color:#1a4a8a;">${a.name}</a>`;
+                  }).join('<br>');
+                } else {
+                  hit.attrs['Report'] = 'No attachment';
+                }
+                // If the Legend is currently showing this hit, re-render it
+                const strong = document.querySelector('#sidebar strong');
+                if (strong && strong.textContent === 'PDA & Static Test Data') {
+                  strong.closest('#sidebar').innerHTML = strong.closest('#sidebar').innerHTML; // force refresh by re-calling show if available
+                  if (typeof window._showHit === 'function') window._showHit();
+                }
+              })
+              .catch(() => {
+                hit.attrs['Report'] = 'Attachment unavailable';
+              });
+          }
+        }
+      });
+    }
+  }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -1605,8 +1638,15 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div> 
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
+
+          <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
+      <div class="basemap-item" data-add="lidarhs">Lidar Hillshade (2016-2020)</div>
+      <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
+
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
+
+
 
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
@@ -1618,9 +1658,7 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:12px 0 4px;">Hydrology</div>
       <div class="basemap-item" data-add="wells">IDNR Water Wells</div>
 
-      <div style="font-weight:bold; margin:12px 0 4px;">Elevation</div>
-      <div class="basemap-item" data-add="lidarhs">Lidar Hillshade (2016-2020)</div>
-      <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
+
 
       <div style="font-weight:bold; margin:12px 0 4px;">Soils</div>
         <div class="basemap-item" data-add="soils">SSURGO Soil Map Units</div>
