@@ -686,6 +686,16 @@ function refreshLidarHS() {
 // ──────────────────────────────────────────────
 
 const layerDefs = {
+// Pile Testing Reports
+piletests: {
+  name: 'PDA & Static Test Data',
+  group: 'Engineering',
+  layer: null,
+  opacity: 1,
+  source: { label: 'INDOT Pile Driving (PDA & Static)', url: 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6' }
+},
+
+    //All Slides
   landslides: {
   name: 'Landslide Inventory',
   opacity: 1,
@@ -778,6 +788,38 @@ bedrock250: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+//Pile Testing Loader
+async function loadPileTests() {
+  const base = 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/query';
+  let all = [], offset = 0, page = 1000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=OBJECTID,YEAR,CONTRACT,ROAD,NAME,ITEM_TYPE,PILE_TYPE,HYPERLINK&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.piletests.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    pointToLayer: (f, latlng) => {
+      const pt = (f.properties.PILE_TYPE || '').toLowerCase();
+      let color = '#666'; // Other / Drilled Shaft
+      if (pt.includes('h pile')) color = '#1a5c1a';
+      else if (pt.includes('pipe')) color = '#1a4a8a';
+      return L.circleMarker(latlng, {
+        radius: 5,
+        color: '#222',
+        weight: 1,
+        fillColor: color,
+        fillOpacity: 0.85
+      });
+    }
+  });
+}
+loadPileTests();
+
 //INDR Water Wells Loader
 let wellsLayer = L.layerGroup();
 layerDefs.wells.layer = wellsLayer;
@@ -1554,6 +1596,8 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:8px 0 4px;">Boundaries</div> 
       <div class="basemap-item" data-add="counties">Indiana Counties</div>
       <div class="basemap-item" data-add="plss">PLSS Townships</div>
+      <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
+        <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
 
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
