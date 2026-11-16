@@ -1582,6 +1582,25 @@ if (!hits.length) {
       html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
     }
     html += `</div>`;
+    
+        // Cross-section images for hydrogeologic units
+    const unitCode = (h.attrs['SETTING'] || h.attrs['Unit'] || '').trim();
+    if (unitCode && hydrogeoUnits[unitCode]) {
+      html += `<div style="margin-top:12px; border-top:1px solid #ccc; padding-top:8px;">`;
+      html += `<strong>Cross-sections</strong>`;
+      hydrogeoUnits[unitCode].forEach(sec => {
+        const src = `images/Hydrogeo/${sec.image}`;
+        html += `
+          <div style="margin:8px 0;">
+            <div style="font-size:12px; color:#555; margin-bottom:2px;">${sec.title}</div>
+            <img src="${src}" 
+                 style="max-width:100%; height:auto; border:1px solid #999; cursor:pointer; border-radius:2px;"
+                 title="Click to open full size"
+                 onclick="window.open(this.src, '_blank')">
+          </div>`;
+      });
+      html += `</div>`;
+    }
     if (h.source) {
       html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
       html += `Source: <a href="${h.source.url}" target="_blank" style="color:#3d5c3d;">${h.source.label}</a>`;
