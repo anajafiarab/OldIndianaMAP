@@ -701,7 +701,15 @@ fetch('data/hydrogeo-units.json')
   .catch(() => console.log('Hydrogeo lookup not loaded'));
 
   const layerDefs = {
-    
+
+    // Unconsolidated Potentiometric Surface   
+unconsolidatedPSM: {
+  name: 'Unconsolidated Potentiometric Surface',
+  layer: null,
+  opacity: 0.8,
+  source: 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0',
+  unitField: 'static_e'
+},
  // Hydrogeologic Settings   
 hydrogeo: {
   name: 'Hydrogeologic Settings',
@@ -813,6 +821,24 @@ bedrock250: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+// Unconsolidated Potentiometric Surface lines
+async function loadUnconsolidatedPSM() {
+  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.unconsolidatedPSM.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#1a5276', weight: 1.5, opacity: 0.85 }
+  });
+}
+loadUnconsolidatedPSM();
 
 // Hydrogeologic Settings Loader
 async function loadHydrogeo() {
@@ -1529,6 +1555,22 @@ map.on('click', function (e) { // CLICK HANDLER
     'SETTING': p.SETTING || '—',
     'TERRAIN': p.TERRAIN || '—'
   }));
+} else if (id === 'unconsolidatedPSM') {
+  if (!def.layer || !map.hasLayer(def.layer)) return;
+  const buf = L.latLng(e.latlng.lat, e.latlng.lng).toBounds(80);
+  def.layer.eachLayer(l => {
+    if (l.getBounds && l.getBounds().intersects(buf)) {
+      const p = l.feature.properties;
+      hits.push({
+        layerName: 'Unconsolidated Potentiometric Surface',
+        layer: l,
+        attrs: {
+          'Elevation (ft)': p.static_e || '—'
+        },
+        source: def.source || null
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -1726,6 +1768,7 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:12px 0 4px;">Hydrogeology</div>
       <div class="basemap-item" data-add="hydrogeo">Hydrogeologic Settings</div>
       <div class="basemap-item" data-add="wells">IDNR Water Wells</div>
+      <div class="basemap-item" data-add="unconsolidatedPSM">Unconsolidated Potentiometric Surface</div>
 
 
 
