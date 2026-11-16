@@ -308,58 +308,79 @@ html, body {
   font-size: 16px;
 }
 
-/* Analog sliders */
+/* Analog sliders — mixing board style */
 .layer-item input[type=range],
 #hs-controls input[type=range] {
   -webkit-appearance: none;
   appearance: none;
-  width: 60px;
-  height: 18px;
+  width: 68px;          /* a little wider so the overhang has room */
+  height: 22px;
   background: transparent;
   margin: 0 2px;
   cursor: pointer;
+  padding: 0 5px;       /* insets the track so thumb can hang off the ends */
+  box-sizing: border-box;
+
+  /* ticks above and below */
   background-image:
+    /* above */
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    linear-gradient(#404040, #404040),
+    /* below */
     linear-gradient(#404040, #404040),
     linear-gradient(#404040, #404040),
     linear-gradient(#404040, #404040),
     linear-gradient(#404040, #404040),
     linear-gradient(#404040, #404040);
   background-size: 1px 5px;
-  background-position: 0% 2px, 25% 2px, 50% 2px, 75% 2px, 100% 2px;
+  background-position:
+    0% 1px, 25% 1px, 50% 1px, 75% 1px, 100% 1px,
+    0% 16px, 25% 16px, 50% 16px, 75% 16px, 100% 16px;
   background-repeat: no-repeat;
 }
+
 .layer-item input[type=range]::-webkit-slider-runnable-track,
 #hs-controls input[type=range]::-webkit-slider-runnable-track {
   height: 3px;
   background: #b0b0b0;
   border: 1px solid #606060;
+  border-radius: 1px;
 }
+
 .layer-item input[type=range]::-moz-range-track,
 #hs-controls input[type=range]::-moz-range-track {
   height: 3px;
   background: #b0b0b0;
   border: 1px solid #606060;
+  border-radius: 1px;
 }
+
 .layer-item input[type=range]::-webkit-slider-thumb,
 #hs-controls input[type=range]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
   width: 10px;
-  height: 14px;
+  height: 16px;
   background: #505050;
   border: 1px solid #333;
   border-radius: 1px;
   cursor: pointer;
-  margin-top: -6px;
+  margin-top: -7px;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
+
 .layer-item input[type=range]::-moz-range-thumb,
 #hs-controls input[type=range]::-moz-range-thumb {
   width: 10px;
-  height: 14px;
+  height: 16px;
   background: #505050;
   border: 1px solid #333;
   border-radius: 1px;
   cursor: pointer;
+  box-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
 
 /* Windows-style checkboxes */
