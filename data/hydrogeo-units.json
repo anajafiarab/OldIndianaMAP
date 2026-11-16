@@ -1,705 +1,698 @@
-{\rtf1\ansi\ansicpg1252\cocoartf2639
-\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
-{\colortbl;\red255\green255\blue255;}
-{\*\expandedcolortbl;;}
-\margl1440\margr1440\vieww11520\viewh8400\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
-
-\f0\fs24 \cf0 \{\
-  "O2K": [\
-    \{ "image": "Section001.jpg", "title": "Kankakee River Floodplain" \}\
-  ],\
-  "K1": [\
-    \{ "image": "Section002.jpg", "title": "Southern Valley Fringe" \}\
-  ],\
-  "K2": [\
-    \{ "image": "Section003.jpg", "title": "Rensselaer Sand Plain" \}\
-  ],\
-  "K3": [\
-    \{ "image": "Section004.jpg", "title": "Winemac Channeled Fringe" \}\
-  ],\
-  "Vm": [\
-    \{ "image": "Section005.jpg", "title": "Till Capped Moraine Core / Tunnel Valleys" \}\
-  ],\
-  "tx": [\
-    \{ "image": "Section005.jpg", "title": "Till Capped Moraine Core / Tunnel Valleys" \}\
-  ],\
-  "F1Vc": [\
-    \{ "image": "Section006.jpg", "title": "Inner Collapsed Fan Head" \}\
-  ],\
-  "F2Vc": [\
-    \{ "image": "Section006.jpg", "title": "Inner Collapsed Fan Head" \}\
-  ],\
-  "F1V": [\
-    \{ "image": "Section007.jpg", "title": "Inner Fan Fringe" \}\
-  ],\
-  "F2V": [\
-    \{ "image": "Section008.jpg", "title": "Exposed Outer Fan" \}\
-  ],\
-  "F2Vt": [\
-    \{ "image": "Section008.jpg", "title": "Exposed Outer Fan" \}\
-  ],\
-  "b1": [\
-    \{ "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" \}\
-  ],\
-  "b2": [\
-    \{ "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" \}\
-  ],\
-  "b2a": [\
-    \{ "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" \}\
-  ],\
-  "F1P": [\
-    \{ "image": "Section010.jpg", "title": "Till-Capped Fan" \}\
-  ],\
-  "FxP": [\
-    \{ "image": "Section011.jpg", "title": "Collapsed Fan Complex" \}\
-  ],\
-  "F2P": [\
-    \{ "image": "Section012.jpg", "title": "Plymouth Fan" \}\
-  ],\
-  "Pm": [\
-    \{ "image": "Section013.jpg", "title": "Miami Highway Ridge" \}\
-  ],\
-  "F2Z": [\
-    \{ "image": "Section014.jpg", "title": "Exposed Outwash Fan" \},\
-    \{ "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" \}\
-  ],\
-  "F1Z": [\
-    \{ "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" \}\
-  ],\
-  "FxZ": [\
-    \{ "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" \}\
-  ],\
-  "BrW": [\
-    \{ "image": "Section016.jpg", "title": "Central Basin / Outwash Channels" \}\
-  ],\
-  "BrO": [\
-    \{ "image": "Section016.jpg", "title": "Central Basin / Outwash Channels" \}\
-  ],\
-  "Tb": [\
-    \{ "image": "Section017.jpg", "title": "Hummocky Upland / Morainal Upland" \}\
-  ],\
-  "Tbm": [\
-    \{ "image": "Section017.jpg", "title": "Hummocky Upland / Morainal Upland" \}\
-  ],\
-  "F2E": [\
-    \{ "image": "Section018.jpg", "title": "Etna Green Fan" \}\
-  ],\
-  "FxE": [\
-    \{ "image": "Section018.jpg", "title": "Etna Green Fan" \}\
-  ],\
-  "N": [\
-    \{ "image": "Section019.jpg", "title": "Till-Cored Rolling Upland / Till-Capped Fan" \}\
-  ],\
-  "F1N": [\
-    \{ "image": "Section019.jpg", "title": "Till-Cored Rolling Upland / Till-Capped Fan" \}\
-  ],\
-  "Nm": [\
-    \{ "image": "Section020.jpg", "title": "Till-Cored Morainal Ridges / Foraker Kame-Fan Complex" \}\
-  ],\
-  "FxF": [\
-    \{ "image": "Section020.jpg", "title": "Till-Cored Morainal Ridges / Foraker Kame-Fan Complex" \}\
-  ],\
-  "F1M": [\
-    \{ "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" \}\
-  ],\
-  "F2M": [\
-    \{ "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" \}\
-  ],\
-  "F3M": [\
-    \{ "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" \}\
-  ],\
-  "NmS": [\
-    \{ "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" \}\
-  ],\
-  "F2S": [\
-    \{ "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" \}\
-  ],\
-  "FxS": [\
-    \{ "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" \}\
-  ],\
-  "F2": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \}\
-  ],\
-  "Fx": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \}\
-  ],\
-  "O1Tu": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \},\
-    \{ "image": "Section032.jpg", "title": "Upper Tippecanoe River Valley" \}\
-  ],\
-  "Tmk": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \}\
-  ],\
-  "Ttv": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \},\
-    \{ "image": "Section026.jpg", "title": "Tunnel Valleys" \}\
-  ],\
-  "OxW": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \}\
-  ],\
-  "Lmu": [\
-    \{ "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" \},\
-    \{ "image": "Section031.jpg", "title": "Morainal Highlands / Troughs" \}\
-  ],\
-  "Tkm": [\
-    \{ "image": "Section024.jpg", "title": "Morainal Ridges" \}\
-  ],\
-  "Tk": [\
-    \{ "image": "Section025.jpg", "title": "Till Capped Lowlands" \}\
-  ],\
-  "Oxw": [\
-    \{ "image": "Section027.jpg", "title": "Warsaw-Wawasee Outwash Complex" \}\
-  ],\
-  "F2L": [\
-    \{ "image": "Section028.jpg", "title": "Exposed Fan and Outwash Plain / Collapsed Fan Head" \}\
-  ],\
-  "FxL": [\
-    \{ "image": "Section028.jpg", "title": "Exposed Fan and Outwash Plain / Collapsed Fan Head" \}\
-  ],\
-  "F2R": [\
-    \{ "image": "Section029.jpg", "title": "Exposed Fan / Outwash Complex" \}\
-  ],\
-  "OxR": [\
-    \{ "image": "Section029.jpg", "title": "Exposed Fan / Outwash Complex" \}\
-  ],\
-  "F1T": [\
-    \{ "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" \}\
-  ],\
-  "F2T": [\
-    \{ "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" \}\
-  ],\
-  "FxT": [\
-    \{ "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" \}\
-  ],\
-  "t": [\
-    \{ "image": "Section031.jpg", "title": "Morainal Highlands / Troughs" \},\
-    \{ "image": "Section041.jpg", "title": "Undifferentiated Troughs / Morainal Highlands" \}\
-  ],\
-  "H": [\
-    \{ "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" \}\
-  ],\
-  "Hx": [\
-    \{ "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" \}\
-  ],\
-  "OxH": [\
-    \{ "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" \}\
-  ],\
-  "FxH": [\
-    \{ "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" \}\
-  ],\
-  "F1H": [\
-    \{ "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" \}\
-  ],\
-  "F2H": [\
-    \{ "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" \},\
-    \{ "image": "Section035.jpg", "title": "Pitted Outwash Fan / Pitted Fan Atop Buried Dead Ice Topography" \}\
-  ],\
-  "F3H": [\
-    \{ "image": "Section035.jpg", "title": "Pitted Outwash Fan / Pitted Fan Atop Buried Dead Ice Topography" \}\
-  ],\
-  "O1P": [\
-    \{ "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" \}\
-  ],\
-  "F2B": [\
-    \{ "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" \}\
-  ],\
-  "O1F": [\
-    \{ "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" \}\
-  ],\
-  "F2ST": [\
-    \{ "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" \}\
-  ],\
-  "FxA": [\
-    \{ "image": "Section037.jpg", "title": "Angola Fan" \}\
-  ],\
-  "Lm/FxA": [\
-    \{ "image": "Section037.jpg", "title": "Angola Fan" \}\
-  ],\
-  "F2C": [\
-    \{ "image": "Section038.jpg", "title": "Clear Lake Window" \}\
-  ],\
-  "F2Cl": [\
-    \{ "image": "Section038.jpg", "title": "Clear Lake Window" \}\
-  ],\
-  "F2PL": [\
-    \{ "image": "Section039.jpg", "title": "Pleasant Lake Fan" \}\
-  ],\
-  "tj": [\
-    \{ "image": "Section040.jpg", "title": "Lake James Trough System" \}\
-  ],\
-  "LmH": [\
-    \{ "image": "Section041.jpg", "title": "Undifferentiated Troughs / Morainal Highlands" \}\
-  ],\
-  "LH": [\
-    \{ "image": "Section042.jpg", "title": "Huntertown Interlobate Area" \}\
-  ],\
-  "Ml": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \},\
-    \{ "image": "Section052.jpg", "title": "Lake Plain / Beach Complex" \}\
-  ],\
-  "Mb": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \},\
-    \{ "image": "Section052.jpg", "title": "Lake Plain / Beach Complex" \}\
-  ],\
-  "L": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \}\
-  ],\
-  "L/b": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \},\
-    \{ "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" \}\
-  ],\
-  "Lc": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \},\
-    \{ "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" \}\
-  ],\
-  "Lm": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \}\
-  ],\
-  "a": [\
-    \{ "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" \},\
-    \{ "image": "Section101.jpg", "title": "Alluvial River Valleys" \},\
-    \{ "image": "Section128.jpg", "title": "Alluvial Valleys" \}\
-  ],\
-  "LwL": [\
-    \{ "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" \}\
-  ],\
-  "LmS": [\
-    \{ "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" \}\
-  ],\
-  "LcM": [\
-    \{ "image": "Section045.jpg", "title": "Muncie Esker / Outer Fringe" \}\
-  ],\
-  "Lf": [\
-    \{ "image": "Section045.jpg", "title": "Muncie Esker / Outer Fringe" \}\
-  ],\
-  "LmM": [\
-    \{ "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" \}\
-  ],\
-  "O1M": [\
-    \{ "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" \}\
-  ],\
-  "F3N": [\
-    \{ "image": "Section047.jpg", "title": "North Manchester Fan / Eel River Segment" \}\
-  ],\
-  "O1E": [\
-    \{ "image": "Section047.jpg", "title": "North Manchester Fan / Eel River Segment" \},\
-    \{ "image": "Section091.jpg", "title": "Eel River Segment" \}\
-  ],\
-  "LmW": [\
-    \{ "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" \}\
-  ],\
-  "LmWx": [\
-    \{ "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" \}\
-  ],\
-  "LmWH": [\
-    \{ "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" \}\
-  ],\
-  "Ltv": [\
-    \{ "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" \}\
-  ],\
-  "F2FC": [\
-    \{ "image": "Section049.jpg", "title": "Fish Creek Fan" \}\
-  ],\
-  "F2FW": [\
-    \{ "image": "Section050.jpg", "title": "Fort Wayne Fan / Fort Wayne Moraine" \}\
-  ],\
-  "LmFW": [\
-    \{ "image": "Section050.jpg", "title": "Fort Wayne Fan / Fort Wayne Moraine" \}\
-  ],\
-  "O1SJ": [\
-    \{ "image": "Section051.jpg", "title": "St. Joseph River Valley" \}\
-  ],\
-  "Im": [\
-    \{ "image": "Section053.jpg", "title": "Till Ridges" \}\
-  ],\
-  "Ims": [\
-    \{ "image": "Section053.jpg", "title": "Till Ridges" \}\
-  ],\
-  "I": [\
-    \{ "image": "Section054.jpg", "title": "Till Plains" \}\
-  ],\
-  "Is": [\
-    \{ "image": "Section054.jpg", "title": "Till Plains" \}\
-  ],\
-  "FxTP": [\
-    \{ "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" \}\
-  ],\
-  "F2TP": [\
-    \{ "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" \}\
-  ],\
-  "O1Tl": [\
-    \{ "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" \},\
-    \{ "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" \}\
-  ],\
-  "T3": [\
-    \{ "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" \}\
-  ],\
-  "Td": [\
-    \{ "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" \}\
-  ],\
-  "TF": [\
-    \{ "image": "Section057.jpg", "title": "Thick Till Plain / Scircleville Fan" \}\
-  ],\
-  "F1S": [\
-    \{ "image": "Section057.jpg", "title": "Thick Till Plain / Scircleville Fan" \}\
-  ],\
-  "Tt": [\
-    \{ "image": "Section058.jpg", "title": "Tunnel Valleys" \}\
-  ],\
-  "TKK": [\
-    \{ "image": "Section059.jpg", "title": "Patterned Till Plain" \}\
-  ],\
-  "TKK/b": [\
-    \{ "image": "Section060.jpg", "title": "Kokomo Bedrock High" \}\
-  ],\
-  "a/b": [\
-    \{ "image": "Section060.jpg", "title": "Kokomo Bedrock High" \}\
-  ],\
-  "OcD": [\
-    \{ "image": "Section061.jpg", "title": "Deer Creek Channel / Fringing Channel Complex" \}\
-  ],\
-  "TcD": [\
-    \{ "image": "Section061.jpg", "title": "Deer Creek Channel / Fringing Channel Complex" \}\
-  ],\
-  "OcW": [\
-    \{ "image": "Section062.jpg", "title": "Wildcat Creek Channel / Fringing Channel Complex" \}\
-  ],\
-  "TcW": [\
-    \{ "image": "Section062.jpg", "title": "Wildcat Creek Channel / Fringing Channel Complex" \}\
-  ],\
-  "F1WC": [\
-    \{ "image": "Section063.jpg", "title": "Wea Creek Fan" \}\
-  ],\
-  "FxWC": [\
-    \{ "image": "Section063.jpg", "title": "Wea Creek Fan" \}\
-  ],\
-  "F2WC": [\
-    \{ "image": "Section063.jpg", "title": "Wea Creek Fan" \}\
-  ],\
-  "O1WW": [\
-    \{ "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" \}\
-  ],\
-  "TWW": [\
-    \{ "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" \}\
-  ],\
-  "TcWW": [\
-    \{ "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" \}\
-  ],\
-  "O2WW": [\
-    \{ "image": "Section065.jpg", "title": "West Fork Outwash Plain" \}\
-  ],\
-  "F2GV": [\
-    \{ "image": "Section066.jpg", "title": "Glenns Valley Fan / Greenwood Moraine" \}\
-  ],\
-  "TmGW": [\
-    \{ "image": "Section066.jpg", "title": "Glenns Valley Fan / Greenwood Moraine" \}\
-  ],\
-  "Ttn": [\
-    \{ "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" \}\
-  ],\
-  "Otn": [\
-    \{ "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" \}\
-  ],\
-  "TmKn": [\
-    \{ "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" \}\
-  ],\
-  "TEW": [\
-    \{ "image": "Section068.jpg", "title": "Eastern Till Plain" \}\
-  ],\
-  "TEW/b": [\
-    \{ "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" \}\
-  ],\
-  "TcEW": [\
-    \{ "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" \}\
-  ],\
-  "O1EW": [\
-    \{ "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" \}\
-  ],\
-  "ab": [\
-    \{ "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" \},\
-    \{ "image": "Section101.jpg", "title": "Alluvial River Valleys" \},\
-    \{ "image": "Section128.jpg", "title": "Alluvial Valleys" \}\
-  ],\
-  "TmG": [\
-    \{ "image": "Section070.jpg", "title": "Greensburg Morainal System / Whitewater River Upper Sluiceway" \},\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" \}\
-  ],\
-  "O1WH": [\
-    \{ "image": "Section070.jpg", "title": "Greensburg Morainal System / Whitewater River Upper Sluiceway" \}\
-  ],\
-  "Wl": [\
-    \{ "image": "Section071.jpg", "title": "Western Till Plain" \}\
-  ],\
-  "WmA": [\
-    \{ "image": "Section072.jpg", "title": "Atherton Island Moraine" \}\
-  ],\
-  "TSC": [\
-    \{ "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" \}\
-  ],\
-  "TmC": [\
-    \{ "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" \}\
-  ],\
-  "ics": [\
-    \{ "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" \},\
-    \{ "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" \}\
-  ],\
-  "TR": [\
-    \{ "image": "Section074.jpg", "title": "Rolling Till Plain" \}\
-  ],\
-  "Tma": [\
-    \{ "image": "Section075.jpg", "title": "Alamo Ridge and Other Morainal Areas" \}\
-  ],\
-  "TP": [\
-    \{ "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" \}\
-  ],\
-  "TmD": [\
-    \{ "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" \}\
-  ],\
-  "O1WL": [\
-    \{ "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" \}\
-  ],\
-  "O1SC": [\
-    \{ "image": "Section077.jpg", "title": "Upper Sluiceway / Fringing Fans" \}\
-  ],\
-  "FxSC": [\
-    \{ "image": "Section077.jpg", "title": "Upper Sluiceway / Fringing Fans" \}\
-  ],\
-  "ObSC": [\
-    \{ "image": "Section078.jpg", "title": "Lower Rock Walled Sluiceway" \}\
-  ],\
-  "O1CV": [\
-    \{ "image": "Section079.jpg", "title": "Veedersburg Segment" \}\
-  ],\
-  "O1CG": [\
-    \{ "image": "Section080.jpg", "title": "Graham Creek Segment" \}\
-  ],\
-  "aORC": [\
-    \{ "image": "Section081.jpg", "title": "Upper Alluvial Segment" \}\
-  ],\
-  "Obrc": [\
-    \{ "image": "Section082.jpg", "title": "Bedrock Walled Portions" \}\
-  ],\
-  "O1RC": [\
-    \{ "image": "Section083.jpg", "title": "Lower Sluiceway" \}\
-  ],\
-  "O1RM": [\
-    \{ "image": "Section084.jpg", "title": "Mecca Segment" \}\
-  ],\
-  "O2S": [\
-    \{ "image": "Section085.jpg", "title": "St. Joseph River Outwash Plain \'96 Eastern Segment" \},\
-    \{ "image": "Section086.jpg", "title": "St. Joseph River Outwash Plain \'96 Western Segment" \}\
-  ],\
-  "O2E": [\
-    \{ "image": "Section087.jpg", "title": "Elkhart River Outwash System" \}\
-  ],\
-  "O2H": [\
-    \{ "image": "Section088.jpg", "title": "Howe Outwash Plain" \}\
-  ],\
-  "O1C": [\
-    \{ "image": "Section089.jpg", "title": "Cedar Creek Segment" \}\
-  ],\
-  "O1CH": [\
-    \{ "image": "Section090.jpg", "title": "Huntertown Segment" \}\
-  ],\
-  "Wa1": [\
-    \{ "image": "Section092.jpg", "title": "Wabash Erie Channel" \}\
-  ],\
-  "Wa1x": [\
-    \{ "image": "Section092.jpg", "title": "Wabash Erie Channel" \}\
-  ],\
-  "Wa2": [\
-    \{ "image": "Section093.jpg", "title": "Rock Sills" \}\
-  ],\
-  "Wa3": [\
-    \{ "image": "Section094.jpg", "title": "Peru Segment" \}\
-  ],\
-  "Wa4": [\
-    \{ "image": "Section095.jpg", "title": "Battleground Segment / High Level Channels" \}\
-  ],\
-  "Wac": [\
-    \{ "image": "Section095.jpg", "title": "Battleground Segment / High Level Channels" \},\
-    \{ "image": "Section096.jpg", "title": "Attica Segment / High-Level Channels" \}\
-  ],\
-  "Wa5": [\
-    \{ "image": "Section096.jpg", "title": "Attica Segment / High-Level Channels" \}\
-  ],\
-  "Wa6": [\
-    \{ "image": "Section097.jpg", "title": "Covington Segment" \}\
-  ],\
-  "w": [\
-    \{ "image": "Section098.jpg", "title": "Abandoned Meltwater Channels" \},\
-    \{ "image": "Section099.jpg", "title": "Abandoned Meltwater Channels / Washed Surfaces / Ice Contact Stratified Deposits" \},\
-    \{ "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" \}\
-  ],\
-  "icx": [\
-    \{ "image": "Section099.jpg", "title": "Abandoned Meltwater Channels / Washed Surfaces / Ice Contact Stratified Deposits" \},\
-    \{ "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" \}\
-  ],\
-  "JB": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \}\
-  ],\
-  "JL": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \},\
-    \{ "image": "Section110.jpg", "title": "Linton Segment" \},\
-    \{ "image": "Section139.jpg", "title": "Eel River Flats" \}\
-  ],\
-  "JC": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \},\
-    \{ "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" \},\
-    \{ "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" \}\
-  ],\
-  "EF": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \},\
-    \{ "image": "Section139.jpg", "title": "Eel River Flats" \}\
-  ],\
-  "Obww": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \}\
-  ],\
-  "aIF": [\
-    \{ "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" \}\
-  ],\
-  "JBI": [\
-    \{ "image": "Section105.jpg", "title": "Brazil Segment" \}\
-  ],\
-  "JBw": [\
-    \{ "image": "Section105.jpg", "title": "Brazil Segment" \},\
-    \{ "image": "Section139.jpg", "title": "Eel River Flats" \}\
-  ],\
-  "OxC": [\
-    \{ "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" \},\
-    \{ "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" \}\
-  ],\
-  "aIE": [\
-    \{ "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" \},\
-    \{ "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" \}\
-  ],\
-  "aIW": [\
-    \{ "image": "Section110.jpg", "title": "Linton Segment" \},\
-    \{ "image": "Section112.jpg", "title": "Washington Segment" \},\
-    \{ "image": "Section129.jpg", "title": "Slackwater Lake Basins" \},\
-    \{ "image": "Section131.jpg", "title": "Ohio River Valley \'96 Southwestern Indiana" \},\
-    \{ "image": "Section135.jpg", "title": "Bedrock Walled Sluiceway / Slackwater Lakes" \},\
-    \{ "image": "Section137.jpg", "title": "Main Trunk Valley / Slackwater Lake Basins" \}\
-  ],\
-  "JA": [\
-    \{ "image": "Section111.jpg", "title": "American Bottoms Segment" \}\
-  ],\
-  "aIA": [\
-    \{ "image": "Section111.jpg", "title": "American Bottoms Segment" \}\
-  ],\
-  "JW": [\
-    \{ "image": "Section112.jpg", "title": "Washington Segment" \}\
-  ],\
-  "aIPC": [\
-    \{ "image": "Section112.jpg", "title": "Washington Segment" \}\
-  ],\
-  "OaWW": [\
-    \{ "image": "Section112.jpg", "title": "Washington Segment" \},\
-    \{ "image": "Section137.jpg", "title": "Main Trunk Valley / Slackwater Lake Basins" \}\
-  ],\
-  "JPu": [\
-    \{ "image": "Section113.jpg", "title": "Princeton Segment" \}\
-  ],\
-  "Pb": [\
-    \{ "image": "Section113.jpg", "title": "Princeton Segment" \}\
-  ],\
-  "Pu": [\
-    \{ "image": "Section113.jpg", "title": "Princeton Segment" \}\
-  ],\
-  "JK": [\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" \},\
-    \{ "image": "Section120.jpg", "title": "Knobstone Segment" \},\
-    \{ "image": "Section134.jpg", "title": "East Fork Outwash Plain" \}\
-  ],\
-  "O2EW": [\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section134.jpg", "title": "East Fork Outwash Plain" \}\
-  ],\
-  "JN": [\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section117.jpg", "title": "Newpoint Plain / Ohio-Whitewater Dissected Fringe" \},\
-    \{ "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" \}\
-  ],\
-  "JO": [\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" \},\
-    \{ "image": "Section117.jpg", "title": "Newpoint Plain / Ohio-Whitewater Dissected Fringe" \},\
-    \{ "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" \}\
-  ],\
-  "ObWH": [\
-    \{ "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" \},\
-    \{ "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" \},\
-    \{ "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" \}\
-  ],\
-  "aIM": [\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section118.jpg", "title": "Vernon Segment / Muscatatuck Lowland" \},\
-    \{ "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" \}\
-  ],\
-  "JV": [\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section118.jpg", "title": "Vernon Segment / Muscatatuck Lowland" \}\
-  ],\
-  "O1OH": [\
-    \{ "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" \},\
-    \{ "image": "Section130.jpg", "title": "Ohio River Valley \'96 Southeastern Indiana" \},\
-    \{ "image": "Section131.jpg", "title": "Ohio River Valley \'96 Southwestern Indiana" \}\
-  ],\
-  "JSM": [\
-    \{ "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" \}\
-  ],\
-  "OxCh": [\
-    \{ "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" \}\
-  ],\
-  "aIBB": [\
-    \{ "image": "Section120.jpg", "title": "Knobstone Segment" \}\
-  ],\
-  "FxM": [\
-    \{ "image": "Section121.jpg", "title": "Martinsville Fan Delta" \}\
-  ],\
-  "TP/FxM": [\
-    \{ "image": "Section121.jpg", "title": "Martinsville Fan Delta" \}\
-  ],\
-  "RN": [\
-    \{ "image": "Section122.jpg", "title": "Norman Upland" \}\
-  ],\
-  "RNk": [\
-    \{ "image": "Section122.jpg", "title": "Norman Upland" \}\
-  ],\
-  "RNM": [\
-    \{ "image": "Section123.jpg", "title": "Norman Upland \'96 Mitchell Plain Transition" \}\
-  ],\
-  "RM": [\
-    \{ "image": "Section124.jpg", "title": "Mitchell Plain" \}\
-  ],\
-  "RCM": [\
-    \{ "image": "Section125.jpg", "title": "Chester Escarpment (Mitchell Plain\'96Crawford Upland Transition)" \}\
-  ],\
-  "RC": [\
-    \{ "image": "Section126.jpg", "title": "Crawford Upland" \}\
-  ],\
-  "RW": [\
-    \{ "image": "Section127.jpg", "title": "Wabash Lowland" \}\
-  ],\
-  "Wa7": [\
-    \{ "image": "Section132.jpg", "title": "New Harmony Segment" \}\
-  ],\
-  "Wa7d": [\
-    \{ "image": "Section132.jpg", "title": "New Harmony Segment" \}\
-  ],\
-  "ObEW": [\
-    \{ "image": "Section135.jpg", "title": "Bedrock Walled Sluiceway / Slackwater Lakes" \}\
-  ],\
-  "ObWW": [\
-    \{ "image": "Section136.jpg", "title": "Bedrock Walled Sluiceway (West Fork)" \}\
-  ],\
-  "O1BW": [\
-    \{ "image": "Section138.jpg", "title": "Big Walnut Segment" \}\
-  ]\
-\}}
+{
+  "O2K": [
+    { "image": "Section001.jpg", "title": "Kankakee River Floodplain" }
+  ],
+  "K1": [
+    { "image": "Section002.jpg", "title": "Southern Valley Fringe" }
+  ],
+  "K2": [
+    { "image": "Section003.jpg", "title": "Rensselaer Sand Plain" }
+  ],
+  "K3": [
+    { "image": "Section004.jpg", "title": "Winemac Channeled Fringe" }
+  ],
+  "Vm": [
+    { "image": "Section005.jpg", "title": "Till Capped Moraine Core / Tunnel Valleys" }
+  ],
+  "tx": [
+    { "image": "Section005.jpg", "title": "Till Capped Moraine Core / Tunnel Valleys" }
+  ],
+  "F1Vc": [
+    { "image": "Section006.jpg", "title": "Inner Collapsed Fan Head" }
+  ],
+  "F2Vc": [
+    { "image": "Section006.jpg", "title": "Inner Collapsed Fan Head" }
+  ],
+  "F1V": [
+    { "image": "Section007.jpg", "title": "Inner Fan Fringe" }
+  ],
+  "F2V": [
+    { "image": "Section008.jpg", "title": "Exposed Outer Fan" }
+  ],
+  "F2Vt": [
+    { "image": "Section008.jpg", "title": "Exposed Outer Fan" }
+  ],
+  "b1": [
+    { "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" }
+  ],
+  "b2": [
+    { "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" }
+  ],
+  "b2a": [
+    { "image": "Section009.jpg", "title": "Coastal Fringe / Lake Plain / Till-Cored Upland" }
+  ],
+  "F1P": [
+    { "image": "Section010.jpg", "title": "Till-Capped Fan" }
+  ],
+  "FxP": [
+    { "image": "Section011.jpg", "title": "Collapsed Fan Complex" }
+  ],
+  "F2P": [
+    { "image": "Section012.jpg", "title": "Plymouth Fan" }
+  ],
+  "Pm": [
+    { "image": "Section013.jpg", "title": "Miami Highway Ridge" }
+  ],
+  "F2Z": [
+    { "image": "Section014.jpg", "title": "Exposed Outwash Fan" },
+    { "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" }
+  ],
+  "F1Z": [
+    { "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" }
+  ],
+  "FxZ": [
+    { "image": "Section015.jpg", "title": "Till-Capped Fan / Exposed Outwash Fan / Fan-Head Complex" }
+  ],
+  "BrW": [
+    { "image": "Section016.jpg", "title": "Central Basin / Outwash Channels" }
+  ],
+  "BrO": [
+    { "image": "Section016.jpg", "title": "Central Basin / Outwash Channels" }
+  ],
+  "Tb": [
+    { "image": "Section017.jpg", "title": "Hummocky Upland / Morainal Upland" }
+  ],
+  "Tbm": [
+    { "image": "Section017.jpg", "title": "Hummocky Upland / Morainal Upland" }
+  ],
+  "F2E": [
+    { "image": "Section018.jpg", "title": "Etna Green Fan" }
+  ],
+  "FxE": [
+    { "image": "Section018.jpg", "title": "Etna Green Fan" }
+  ],
+  "N": [
+    { "image": "Section019.jpg", "title": "Till-Cored Rolling Upland / Till-Capped Fan" }
+  ],
+  "F1N": [
+    { "image": "Section019.jpg", "title": "Till-Cored Rolling Upland / Till-Capped Fan" }
+  ],
+  "Nm": [
+    { "image": "Section020.jpg", "title": "Till-Cored Morainal Ridges / Foraker Kame-Fan Complex" }
+  ],
+  "FxF": [
+    { "image": "Section020.jpg", "title": "Till-Cored Morainal Ridges / Foraker Kame-Fan Complex" }
+  ],
+  "F1M": [
+    { "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" }
+  ],
+  "F2M": [
+    { "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" }
+  ],
+  "F3M": [
+    { "image": "Section021.jpg", "title": "Hummocky Till-Capped Fan / Exposed Fan, Pitted / Pitted Fan Atop Till-Cored Morainal Topography" }
+  ],
+  "NmS": [
+    { "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" }
+  ],
+  "F2S": [
+    { "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" }
+  ],
+  "FxS": [
+    { "image": "Section022.jpg", "title": "Morainal Ridge / Fringing Outwash Fan, Exposed Inner Ramp" }
+  ],
+  "F2": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" }
+  ],
+  "Fx": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" }
+  ],
+  "O1Tu": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" },
+    { "image": "Section032.jpg", "title": "Upper Tippecanoe River Valley" }
+  ],
+  "Tmk": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" }
+  ],
+  "Ttv": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" },
+    { "image": "Section026.jpg", "title": "Tunnel Valleys" }
+  ],
+  "OxW": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" }
+  ],
+  "Lmu": [
+    { "image": "Section023.jpg", "title": "Outwash Fans / Upper Tippecanoe River Valley / Kosciusko Morainal Region / Packerton Upland" },
+    { "image": "Section031.jpg", "title": "Morainal Highlands / Troughs" }
+  ],
+  "Tkm": [
+    { "image": "Section024.jpg", "title": "Morainal Ridges" }
+  ],
+  "Tk": [
+    { "image": "Section025.jpg", "title": "Till Capped Lowlands" }
+  ],
+  "Oxw": [
+    { "image": "Section027.jpg", "title": "Warsaw-Wawasee Outwash Complex" }
+  ],
+  "F2L": [
+    { "image": "Section028.jpg", "title": "Exposed Fan and Outwash Plain / Collapsed Fan Head" }
+  ],
+  "FxL": [
+    { "image": "Section028.jpg", "title": "Exposed Fan and Outwash Plain / Collapsed Fan Head" }
+  ],
+  "F2R": [
+    { "image": "Section029.jpg", "title": "Exposed Fan / Outwash Complex" }
+  ],
+  "OxR": [
+    { "image": "Section029.jpg", "title": "Exposed Fan / Outwash Complex" }
+  ],
+  "F1T": [
+    { "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" }
+  ],
+  "F2T": [
+    { "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" }
+  ],
+  "FxT": [
+    { "image": "Section030.jpg", "title": "Till-Capped Fan / Exposed Fan / Fan Head Complex" }
+  ],
+  "t": [
+    { "image": "Section031.jpg", "title": "Morainal Highlands / Troughs" },
+    { "image": "Section041.jpg", "title": "Undifferentiated Troughs / Morainal Highlands" }
+  ],
+  "H": [
+    { "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" }
+  ],
+  "Hx": [
+    { "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" }
+  ],
+  "OxH": [
+    { "image": "Section033.jpg", "title": "Undifferentiated Ablation Sequences / Ice Contact Stratified Complex / Wolf Lake Outwash Complex" }
+  ],
+  "FxH": [
+    { "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" }
+  ],
+  "F1H": [
+    { "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" }
+  ],
+  "F2H": [
+    { "image": "Section034.jpg", "title": "Collapsed Fan Head Complex / Hummocky Till Capped Fan / Pitted Outwash Fan" },
+    { "image": "Section035.jpg", "title": "Pitted Outwash Fan / Pitted Fan Atop Buried Dead Ice Topography" }
+  ],
+  "F3H": [
+    { "image": "Section035.jpg", "title": "Pitted Outwash Fan / Pitted Fan Atop Buried Dead Ice Topography" }
+  ],
+  "O1P": [
+    { "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" }
+  ],
+  "F2B": [
+    { "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" }
+  ],
+  "O1F": [
+    { "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" }
+  ],
+  "F2ST": [
+    { "image": "Section036.jpg", "title": "Pigeon River Sluiceway / Brighton Fan / Fawn River Sluiceway / Sturgis Fan" }
+  ],
+  "FxA": [
+    { "image": "Section037.jpg", "title": "Angola Fan" }
+  ],
+  "Lm/FxA": [
+    { "image": "Section037.jpg", "title": "Angola Fan" }
+  ],
+  "F2C": [
+    { "image": "Section038.jpg", "title": "Clear Lake Window" }
+  ],
+  "F2Cl": [
+    { "image": "Section038.jpg", "title": "Clear Lake Window" }
+  ],
+  "F2PL": [
+    { "image": "Section039.jpg", "title": "Pleasant Lake Fan" }
+  ],
+  "tj": [
+    { "image": "Section040.jpg", "title": "Lake James Trough System" }
+  ],
+  "LmH": [
+    { "image": "Section041.jpg", "title": "Undifferentiated Troughs / Morainal Highlands" }
+  ],
+  "LH": [
+    { "image": "Section042.jpg", "title": "Huntertown Interlobate Area" }
+  ],
+  "Ml": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" },
+    { "image": "Section052.jpg", "title": "Lake Plain / Beach Complex" }
+  ],
+  "Mb": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" },
+    { "image": "Section052.jpg", "title": "Lake Plain / Beach Complex" }
+  ],
+  "L": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" }
+  ],
+  "L/b": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" },
+    { "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" }
+  ],
+  "Lc": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" },
+    { "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" }
+  ],
+  "Lm": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" }
+  ],
+  "a": [
+    { "image": "Section043.jpg", "title": "Lagro Till Plain / Ridged End Moraines / Alluvial River Valleys / Maumee Lacustrine Plain" },
+    { "image": "Section101.jpg", "title": "Alluvial River Valleys" },
+    { "image": "Section128.jpg", "title": "Alluvial Valleys" }
+  ],
+  "LwL": [
+    { "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" }
+  ],
+  "LmS": [
+    { "image": "Section044.jpg", "title": "Lagro Till Plain / Loblolly Trend / Salamonie Moraine" }
+  ],
+  "LcM": [
+    { "image": "Section045.jpg", "title": "Muncie Esker / Outer Fringe" }
+  ],
+  "Lf": [
+    { "image": "Section045.jpg", "title": "Muncie Esker / Outer Fringe" }
+  ],
+  "LmM": [
+    { "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" }
+  ],
+  "O1M": [
+    { "image": "Section046.jpg", "title": "Mississinewa Moraine / Mississinewa River Valley / Channel Complex" }
+  ],
+  "F3N": [
+    { "image": "Section047.jpg", "title": "North Manchester Fan / Eel River Segment" }
+  ],
+  "O1E": [
+    { "image": "Section047.jpg", "title": "North Manchester Fan / Eel River Segment" },
+    { "image": "Section091.jpg", "title": "Eel River Segment" }
+  ],
+  "LmW": [
+    { "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" }
+  ],
+  "LmWx": [
+    { "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" }
+  ],
+  "LmWH": [
+    { "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" }
+  ],
+  "Ltv": [
+    { "image": "Section048.jpg", "title": "Wabash Moraine - North Limb / Cedar Creek Canyon" }
+  ],
+  "F2FC": [
+    { "image": "Section049.jpg", "title": "Fish Creek Fan" }
+  ],
+  "F2FW": [
+    { "image": "Section050.jpg", "title": "Fort Wayne Fan / Fort Wayne Moraine" }
+  ],
+  "LmFW": [
+    { "image": "Section050.jpg", "title": "Fort Wayne Fan / Fort Wayne Moraine" }
+  ],
+  "O1SJ": [
+    { "image": "Section051.jpg", "title": "St. Joseph River Valley" }
+  ],
+  "Im": [
+    { "image": "Section053.jpg", "title": "Till Ridges" }
+  ],
+  "Ims": [
+    { "image": "Section053.jpg", "title": "Till Ridges" }
+  ],
+  "I": [
+    { "image": "Section054.jpg", "title": "Till Plains" }
+  ],
+  "Is": [
+    { "image": "Section054.jpg", "title": "Till Plains" }
+  ],
+  "FxTP": [
+    { "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" }
+  ],
+  "F2TP": [
+    { "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" }
+  ],
+  "O1Tl": [
+    { "image": "Section055.jpg", "title": "Tippecanoe Fan / Lower Tippecanoe River Valley" },
+    { "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" }
+  ],
+  "T3": [
+    { "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" }
+  ],
+  "Td": [
+    { "image": "Section056.jpg", "title": "Washed Ablation Complex / Lower Tippecanoe River Valley" }
+  ],
+  "TF": [
+    { "image": "Section057.jpg", "title": "Thick Till Plain / Scircleville Fan" }
+  ],
+  "F1S": [
+    { "image": "Section057.jpg", "title": "Thick Till Plain / Scircleville Fan" }
+  ],
+  "Tt": [
+    { "image": "Section058.jpg", "title": "Tunnel Valleys" }
+  ],
+  "TKK": [
+    { "image": "Section059.jpg", "title": "Patterned Till Plain" }
+  ],
+  "TKK/b": [
+    { "image": "Section060.jpg", "title": "Kokomo Bedrock High" }
+  ],
+  "a/b": [
+    { "image": "Section060.jpg", "title": "Kokomo Bedrock High" }
+  ],
+  "OcD": [
+    { "image": "Section061.jpg", "title": "Deer Creek Channel / Fringing Channel Complex" }
+  ],
+  "TcD": [
+    { "image": "Section061.jpg", "title": "Deer Creek Channel / Fringing Channel Complex" }
+  ],
+  "OcW": [
+    { "image": "Section062.jpg", "title": "Wildcat Creek Channel / Fringing Channel Complex" }
+  ],
+  "TcW": [
+    { "image": "Section062.jpg", "title": "Wildcat Creek Channel / Fringing Channel Complex" }
+  ],
+  "F1WC": [
+    { "image": "Section063.jpg", "title": "Wea Creek Fan" }
+  ],
+  "FxWC": [
+    { "image": "Section063.jpg", "title": "Wea Creek Fan" }
+  ],
+  "F2WC": [
+    { "image": "Section063.jpg", "title": "Wea Creek Fan" }
+  ],
+  "O1WW": [
+    { "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" }
+  ],
+  "TWW": [
+    { "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" }
+  ],
+  "TcWW": [
+    { "image": "Section064.jpg", "title": "White River Outwash System / Fringing Till Plain / Tributary Meltwater Channels" }
+  ],
+  "O2WW": [
+    { "image": "Section065.jpg", "title": "West Fork Outwash Plain" }
+  ],
+  "F2GV": [
+    { "image": "Section066.jpg", "title": "Glenns Valley Fan / Greenwood Moraine" }
+  ],
+  "TmGW": [
+    { "image": "Section066.jpg", "title": "Glenns Valley Fan / Greenwood Moraine" }
+  ],
+  "Ttn": [
+    { "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" }
+  ],
+  "Otn": [
+    { "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" }
+  ],
+  "TmKn": [
+    { "image": "Section067.jpg", "title": "New Castle Tunnel Valley System / Outwash-Floored Channels / Knightstown Morainal Region" }
+  ],
+  "TEW": [
+    { "image": "Section068.jpg", "title": "Eastern Till Plain" }
+  ],
+  "TEW/b": [
+    { "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" }
+  ],
+  "TcEW": [
+    { "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" }
+  ],
+  "O1EW": [
+    { "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" }
+  ],
+  "ab": [
+    { "image": "Section069.jpg", "title": "Eastern Till Plain / Tributary Meltwater Channels / Upper Sluiceway System" },
+    { "image": "Section101.jpg", "title": "Alluvial River Valleys" },
+    { "image": "Section128.jpg", "title": "Alluvial Valleys" }
+  ],
+  "TmG": [
+    { "image": "Section070.jpg", "title": "Greensburg Morainal System / Whitewater River Upper Sluiceway" },
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" }
+  ],
+  "O1WH": [
+    { "image": "Section070.jpg", "title": "Greensburg Morainal System / Whitewater River Upper Sluiceway" }
+  ],
+  "Wl": [
+    { "image": "Section071.jpg", "title": "Western Till Plain" }
+  ],
+  "WmA": [
+    { "image": "Section072.jpg", "title": "Atherton Island Moraine" }
+  ],
+  "TSC": [
+    { "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" }
+  ],
+  "TmC": [
+    { "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" }
+  ],
+  "ics": [
+    { "image": "Section073.jpg", "title": "Washed Till Plain / Crawfordsville Morainal System / Ice-Contact Stratified Deposits" },
+    { "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" }
+  ],
+  "TR": [
+    { "image": "Section074.jpg", "title": "Rolling Till Plain" }
+  ],
+  "Tma": [
+    { "image": "Section075.jpg", "title": "Alamo Ridge and Other Morainal Areas" }
+  ],
+  "TP": [
+    { "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" }
+  ],
+  "TmD": [
+    { "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" }
+  ],
+  "O1WL": [
+    { "image": "Section076.jpg", "title": "Rolling Till Plain / Danville Ridge / White Lick Sluiceway" }
+  ],
+  "O1SC": [
+    { "image": "Section077.jpg", "title": "Upper Sluiceway / Fringing Fans" }
+  ],
+  "FxSC": [
+    { "image": "Section077.jpg", "title": "Upper Sluiceway / Fringing Fans" }
+  ],
+  "ObSC": [
+    { "image": "Section078.jpg", "title": "Lower Rock Walled Sluiceway" }
+  ],
+  "O1CV": [
+    { "image": "Section079.jpg", "title": "Veedersburg Segment" }
+  ],
+  "O1CG": [
+    { "image": "Section080.jpg", "title": "Graham Creek Segment" }
+  ],
+  "aORC": [
+    { "image": "Section081.jpg", "title": "Upper Alluvial Segment" }
+  ],
+  "Obrc": [
+    { "image": "Section082.jpg", "title": "Bedrock Walled Portions" }
+  ],
+  "O1RC": [
+    { "image": "Section083.jpg", "title": "Lower Sluiceway" }
+  ],
+  "O1RM": [
+    { "image": "Section084.jpg", "title": "Mecca Segment" }
+  ],
+  "O2S": [
+    { "image": "Section085.jpg", "title": "St. Joseph River Outwash Plain – Eastern Segment" },
+    { "image": "Section086.jpg", "title": "St. Joseph River Outwash Plain – Western Segment" }
+  ],
+  "O2E": [
+    { "image": "Section087.jpg", "title": "Elkhart River Outwash System" }
+  ],
+  "O2H": [
+    { "image": "Section088.jpg", "title": "Howe Outwash Plain" }
+  ],
+  "O1C": [
+    { "image": "Section089.jpg", "title": "Cedar Creek Segment" }
+  ],
+  "O1CH": [
+    { "image": "Section090.jpg", "title": "Huntertown Segment" }
+  ],
+  "Wa1": [
+    { "image": "Section092.jpg", "title": "Wabash Erie Channel" }
+  ],
+  "Wa1x": [
+    { "image": "Section092.jpg", "title": "Wabash Erie Channel" }
+  ],
+  "Wa2": [
+    { "image": "Section093.jpg", "title": "Rock Sills" }
+  ],
+  "Wa3": [
+    { "image": "Section094.jpg", "title": "Peru Segment" }
+  ],
+  "Wa4": [
+    { "image": "Section095.jpg", "title": "Battleground Segment / High Level Channels" }
+  ],
+  "Wac": [
+    { "image": "Section095.jpg", "title": "Battleground Segment / High Level Channels" },
+    { "image": "Section096.jpg", "title": "Attica Segment / High-Level Channels" }
+  ],
+  "Wa5": [
+    { "image": "Section096.jpg", "title": "Attica Segment / High-Level Channels" }
+  ],
+  "Wa6": [
+    { "image": "Section097.jpg", "title": "Covington Segment" }
+  ],
+  "w": [
+    { "image": "Section098.jpg", "title": "Abandoned Meltwater Channels" },
+    { "image": "Section099.jpg", "title": "Abandoned Meltwater Channels / Washed Surfaces / Ice Contact Stratified Deposits" },
+    { "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" }
+  ],
+  "icx": [
+    { "image": "Section099.jpg", "title": "Abandoned Meltwater Channels / Washed Surfaces / Ice Contact Stratified Deposits" },
+    { "image": "Section100.jpg", "title": "Ice Contact Stratified Deposits / Abandoned Meltwater Channels" }
+  ],
+  "JB": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" }
+  ],
+  "JL": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" },
+    { "image": "Section110.jpg", "title": "Linton Segment" },
+    { "image": "Section139.jpg", "title": "Eel River Flats" }
+  ],
+  "JC": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" },
+    { "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" },
+    { "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" }
+  ],
+  "EF": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" },
+    { "image": "Section139.jpg", "title": "Eel River Flats" }
+  ],
+  "Obww": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" }
+  ],
+  "aIF": [
+    { "image": "Section102.jpg", "title": "Brazil / Linton / Cloverdale Segments / Eel River / White River / Glacial Lake Flatwoods" }
+  ],
+  "JBI": [
+    { "image": "Section105.jpg", "title": "Brazil Segment" }
+  ],
+  "JBw": [
+    { "image": "Section105.jpg", "title": "Brazil Segment" },
+    { "image": "Section139.jpg", "title": "Eel River Flats" }
+  ],
+  "OxC": [
+    { "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" },
+    { "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" }
+  ],
+  "aIE": [
+    { "image": "Section108.jpg", "title": "Cloverdale Segment / Cataract Complex" },
+    { "image": "Section109.jpg", "title": "Spencer Complex / Glacial Lake Flatwoods" }
+  ],
+  "aIW": [
+    { "image": "Section110.jpg", "title": "Linton Segment" },
+    { "image": "Section112.jpg", "title": "Washington Segment" },
+    { "image": "Section129.jpg", "title": "Slackwater Lake Basins" },
+    { "image": "Section131.jpg", "title": "Ohio River Valley – Southwestern Indiana" },
+    { "image": "Section135.jpg", "title": "Bedrock Walled Sluiceway / Slackwater Lakes" },
+    { "image": "Section137.jpg", "title": "Main Trunk Valley / Slackwater Lake Basins" }
+  ],
+  "JA": [
+    { "image": "Section111.jpg", "title": "American Bottoms Segment" }
+  ],
+  "aIA": [
+    { "image": "Section111.jpg", "title": "American Bottoms Segment" }
+  ],
+  "JW": [
+    { "image": "Section112.jpg", "title": "Washington Segment" }
+  ],
+  "aIPC": [
+    { "image": "Section112.jpg", "title": "Washington Segment" }
+  ],
+  "OaWW": [
+    { "image": "Section112.jpg", "title": "Washington Segment" },
+    { "image": "Section137.jpg", "title": "Main Trunk Valley / Slackwater Lake Basins" }
+  ],
+  "JPu": [
+    { "image": "Section113.jpg", "title": "Princeton Segment" }
+  ],
+  "Pb": [
+    { "image": "Section113.jpg", "title": "Princeton Segment" }
+  ],
+  "Pu": [
+    { "image": "Section113.jpg", "title": "Princeton Segment" }
+  ],
+  "JK": [
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" },
+    { "image": "Section120.jpg", "title": "Knobstone Segment" },
+    { "image": "Section134.jpg", "title": "East Fork Outwash Plain" }
+  ],
+  "O2EW": [
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section134.jpg", "title": "East Fork Outwash Plain" }
+  ],
+  "JN": [
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section117.jpg", "title": "Newpoint Plain / Ohio-Whitewater Dissected Fringe" },
+    { "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" }
+  ],
+  "JO": [
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" },
+    { "image": "Section117.jpg", "title": "Newpoint Plain / Ohio-Whitewater Dissected Fringe" },
+    { "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" }
+  ],
+  "ObWH": [
+    { "image": "Section114.jpg", "title": "Knobstone Segment / East Fork Outwash Plain / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Whitewater River Valley / Greensburg Moraine" },
+    { "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" },
+    { "image": "Section133.jpg", "title": "Rock-Walled Sluiceway / Dissected Fringe" }
+  ],
+  "aIM": [
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section118.jpg", "title": "Vernon Segment / Muscatatuck Lowland" },
+    { "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" }
+  ],
+  "JV": [
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section118.jpg", "title": "Vernon Segment / Muscatatuck Lowland" }
+  ],
+  "O1OH": [
+    { "image": "Section115.jpg", "title": "Knobstone Segment (southern) / Muscatatuck Lowland / Vernon Segment / Newpoint Plain / Ohio-Whitewater Dissected Fringe / Ohio River Valley" },
+    { "image": "Section130.jpg", "title": "Ohio River Valley – Southeastern Indiana" },
+    { "image": "Section131.jpg", "title": "Ohio River Valley – Southwestern Indiana" }
+  ],
+  "JSM": [
+    { "image": "Section116.jpg", "title": "St. Maurice Upland / Dissected Fringe / Whitewater River Valley" }
+  ],
+  "OxCh": [
+    { "image": "Section119.jpg", "title": "Muscatatuck Lowland / Chestnut Ridge / Knobstone Segment" }
+  ],
+  "aIBB": [
+    { "image": "Section120.jpg", "title": "Knobstone Segment" }
+  ],
+  "FxM": [
+    { "image": "Section121.jpg", "title": "Martinsville Fan Delta" }
+  ],
+  "TP/FxM": [
+    { "image": "Section121.jpg", "title": "Martinsville Fan Delta" }
+  ],
+  "RN": [
+    { "image": "Section122.jpg", "title": "Norman Upland" }
+  ],
+  "RNk": [
+    { "image": "Section122.jpg", "title": "Norman Upland" }
+  ],
+  "RNM": [
+    { "image": "Section123.jpg", "title": "Norman Upland – Mitchell Plain Transition" }
+  ],
+  "RM": [
+    { "image": "Section124.jpg", "title": "Mitchell Plain" }
+  ],
+  "RCM": [
+    { "image": "Section125.jpg", "title": "Chester Escarpment (Mitchell Plain–Crawford Upland Transition)" }
+  ],
+  "RC": [
+    { "image": "Section126.jpg", "title": "Crawford Upland" }
+  ],
+  "RW": [
+    { "image": "Section127.jpg", "title": "Wabash Lowland" }
+  ],
+  "Wa7": [
+    { "image": "Section132.jpg", "title": "New Harmony Segment" }
+  ],
+  "Wa7d": [
+    { "image": "Section132.jpg", "title": "New Harmony Segment" }
+  ],
+  "ObEW": [
+    { "image": "Section135.jpg", "title": "Bedrock Walled Sluiceway / Slackwater Lakes" }
+  ],
+  "ObWW": [
+    { "image": "Section136.jpg", "title": "Bedrock Walled Sluiceway (West Fork)" }
+  ],
+  "O1BW": [
+    { "image": "Section138.jpg", "title": "Big Walnut Segment" }
+  ]
+}
