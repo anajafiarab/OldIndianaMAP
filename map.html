@@ -1496,11 +1496,23 @@ map.on('click', function (e) { // CLICK HANDLER
           'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
         };
       });
-    } else if (id === 'thickness') {
-      checkLayer(def, 'Unconsolidated Thickness Contours', p => ({
-        'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
-      }));
-    } else if (id === 'bedrock') {
+} else if (id === 'thickness') {
+  if (!def.layer || !map.hasLayer(def.layer)) return;
+  const buf = L.latLng(e.latlng.lat, e.latlng.lng).toBounds(40);  // small but generous
+  def.layer.eachLayer(l => {
+    if (l.getBounds && l.getBounds().intersects(buf)) {
+      const p = l.feature.properties;
+      hits.push({
+        layerName: 'Unconsolidated Thickness Contours',
+        layer: l,
+        attrs: {
+          'Thickness (ft)': p.Contour != null ? Math.round(p.Contour) : '—'
+        },
+        source: def.source || null
+      });
+    }
+  });
+}else if (id === 'bedrock') {
       checkLayer(def, 'Bedrock Geology', p => ({
         'Rock Unit': p.ROCK_UNITS || '—',
         'System': p.SYSTEM || '—',
@@ -1607,7 +1619,7 @@ map.on('click', function (e) { // CLICK HANDLER
   }));
 } else if (id === 'unconsolidatedPSM') {
   if (!def.layer || !map.hasLayer(def.layer)) return;
-  const buf = L.latLng(e.latlng.lat, e.latlng.lng).toBounds(80);
+  const buf = L.latLng(e.latlng.lat, e.latlng.lng).toBounds(40);
   def.layer.eachLayer(l => {
     if (l.getBounds && l.getBounds().intersects(buf)) {
       const p = l.feature.properties;
