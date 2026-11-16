@@ -693,8 +693,24 @@ function refreshLidarHS() {
  // ──────────────────────────────────────────────
 // LAYER DEFINITIONS
 // ──────────────────────────────────────────────
+// Hydrogeologic cross-section lookup
+let hydrogeoUnits = {};
+fetch('data/hydrogeo-units.json')
+  .then(r => r.json())
+  .then(data => { hydrogeoUnits = data; })
+  .catch(() => console.log('Hydrogeo lookup not loaded'));
 
-const layerDefs = {
+  const layerDefs = {
+    
+ // Hydrogeologic Settings   
+hydrogeo: {
+  name: 'Hydrogeologic Settings',
+  layer: null,
+  opacity: 0.6,
+  source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer',
+  unitField: 'SETTING'   // this is the key that matches the JSON
+}
+
 // Pile Testing Reports
 piletests: {
   name: 'PDA & Static Test Data',
@@ -797,6 +813,28 @@ bedrock250: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+// Hydrogeologic Settings Loader
+async function loadHydrogeo() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer/0/query';
+  let all = [], offset = 0, page = 1000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=SETTING,TERRAIN&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.hydrogeo.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#2e5a8c', weight: 1, fillOpacity: 0.25 },
+    onEachFeature: (f, l) => {
+      // no permanent labels for now — the identify will handle it
+    }
+  });
+}
+loadHydrogeo();
 
 //Pile Testing Loader
 async function loadPileTests() {
@@ -1656,7 +1694,8 @@ if (map.hasLayer(lidarHS)) {
         <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
-      <div style="font-weight:bold; margin:12px 0 4px;">Hydrology</div>
+      <div style="font-weight:bold; margin:12px 0 4px;">Hydrogeology</div>
+      <div class="basemap-item" data-add="hydrogeo">Hydrogeologic Settings</div>
       <div class="basemap-item" data-add="wells">IDNR Water Wells</div>
 
 
