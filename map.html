@@ -531,12 +531,12 @@ function applyOpacity(layer, opacity) {
   if (!layer) return;
 
   // Point layers (circle markers) need direct fillOpacity
-  if (layer === layerDefs.piletests?.layer) {
-    layer.eachLayer(l => {
-      if (l.setStyle) l.setStyle({ fillOpacity: opacity, opacity: 1 });
-    });
-    return;
-  }
+if (layer === layerDefs.piletests?.layer) {
+  layer.eachLayer(l => {
+    if (l.setStyle) l.setStyle({ fillOpacity: opacity, opacity: opacity });
+  });
+  return;
+}
 
   if (typeof layer.setOpacity === 'function') {
     layer.setOpacity(opacity);
