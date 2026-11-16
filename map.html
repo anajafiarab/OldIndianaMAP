@@ -1481,7 +1481,7 @@ map.on('click', function (e) { // CLICK HANDLER
   def.layer.eachLayer(l => {
     if (!l.getLatLng) return;
     const d = map.distance(e.latlng, l.getLatLng());
-    if (d < 80) {   // ~80 m tolerance
+    if (d < 80) {
       const p = l.feature.properties;
       const oid = p.OBJECTID;
       const hit = {
@@ -1521,16 +1521,16 @@ map.on('click', function (e) { // CLICK HANDLER
           .catch(() => {
             hit.attrs['Report'] = 'Attachment unavailable';
           });
-      } else if (id === 'hydrogeo') {
+      }
+    }
+  });
+} else if (id === 'hydrogeo') {
   checkLayer(def, 'Hydrogeologic Settings', p => ({
     'SETTING': p.SETTING || '—',
     'TERRAIN': p.TERRAIN || '—'
   }));
 }
-    }
-  });
-}
-  }); // closes active.forEach
+}); // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
