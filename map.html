@@ -307,7 +307,21 @@ html, body {
   cursor: pointer;
   font-size: 16px;
 }
+/*Analog padding
+/* smaller layer name so the wider slider still fits */
+.layer-item span {
+  font-size: 12px;
+  line-height: 1.2;
+}
 
+/* tuck the percentage value right against the slider */
+.layer-item input[type=range] + span,
+.layer-item .opacity-val {
+  margin-left: 2px;
+  font-size: 11px;
+  min-width: 28px;
+  text-align: right;
+}
 /* Analog sliders — consistent overhang for both sets */
 .layer-item input[type=range],
 #hs-controls input[type=range] {
