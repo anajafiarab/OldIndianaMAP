@@ -1438,55 +1438,55 @@ map.on('click', function (e) { // CLICK HANDLER
           }
         });
       });
-    } else if (id === 'piletests') {
-      if (!def.layer || !map.hasLayer(def.layer)) return;
-      def.layer.eachLayer(l => {
-        if (pointInLayer(e.latlng, l)) {
-          const p = l.feature.properties;
-          const oid = p.OBJECTID;
-          const hit = {
-            layerName: 'PDA & Static Test Data',
-            layer: l,
-            attrs: {
-              'Year': p.YEAR || '—',
-              'Contract': p.CONTRACT || '—',
-              'Road': p.ROAD || '—',
-              'Test Type': p.ITEM_TYPE || '—',
-              'Pile Type': p.PILE_TYPE || '—',
-              'Report': 'Loading…'
-            },
-            source: def.source || null
-          };
-          hits.push(hit);
+} else if (id === 'piletests') {
+  if (!def.layer || !map.hasLayer(def.layer)) return;
+  def.layer.eachLayer(l => {
+    if (!l.getLatLng) return;
+    const d = map.distance(e.latlng, l.getLatLng());
+    if (d < 80) {   // ~80 m tolerance
+      const p = l.feature.properties;
+      const oid = p.OBJECTID;
+      const hit = {
+        layerName: 'PDA & Static Test Data',
+        layer: l,
+        attrs: {
+          'Year': p.YEAR || '—',
+          'Contract': p.CONTRACT || '—',
+          'Road': p.ROAD || '—',
+          'Test Type': p.ITEM_TYPE || '—',
+          'Pile Type': p.PILE_TYPE || '—',
+          'Report': 'Loading…'
+        },
+        source: def.source || null
+      };
+      hits.push(hit);
 
-          if (oid) {
-            const attUrl = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments?f=json`;
-            fetch(attUrl)
-              .then(r => r.json())
-              .then(data => {
-                const atts = data.attachmentInfos || [];
-                if (atts.length) {
-                  hit.attrs['Report'] = atts.map(a => {
-                    const href = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments/${a.id}`;
-                    return `<a href="${href}" target="_blank" style="color:#1a4a8a;">${a.name}</a>`;
-                  }).join('<br>');
-                } else {
-                  hit.attrs['Report'] = 'No attachment';
-                }
-                // If the Legend is currently showing this hit, re-render it
-                const strong = document.querySelector('#sidebar strong');
-                if (strong && strong.textContent === 'PDA & Static Test Data') {
-                  strong.closest('#sidebar').innerHTML = strong.closest('#sidebar').innerHTML; // force refresh by re-calling show if available
-                  if (typeof window._showHit === 'function') window._showHit();
-                }
-              })
-              .catch(() => {
-                hit.attrs['Report'] = 'Attachment unavailable';
-              });
-          }
-        }
-      });
+      if (oid) {
+        const attUrl = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments?f=json`;
+        fetch(attUrl)
+          .then(r => r.json())
+          .then(data => {
+            const atts = data.attachmentInfos || [];
+            if (atts.length) {
+              hit.attrs['Report'] = atts.map(a => {
+                const href = `https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/${oid}/attachments/${a.id}`;
+                return `<a href="${href}" target="_blank" style="color:#1a4a8a;">${a.name}</a>`;
+              }).join('<br>');
+            } else {
+              hit.attrs['Report'] = 'No attachment';
+            }
+            const strong = document.querySelector('#sidebar strong');
+            if (strong && strong.textContent === 'PDA & Static Test Data' && typeof window._showHit === 'function') {
+              window._showHit();
+            }
+          })
+          .catch(() => {
+            hit.attrs['Report'] = 'Attachment unavailable';
+          });
+      }
     }
+  });
+}
   }); // closes active.forEach
 
   document.getElementById('legend-btn').click();
