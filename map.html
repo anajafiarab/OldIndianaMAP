@@ -527,16 +527,21 @@ html, body {
 let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
 function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
 
-    function applyOpacity(layer, opacity) {
+function applyOpacity(layer, opacity) {
   if (!layer) return;
   if (typeof layer.setOpacity === 'function') {
     layer.setOpacity(opacity);
   } else if (typeof layer.setStyle === 'function') {
-    layer.setStyle({ opacity: opacity, fillOpacity: opacity * 0.08 });
+    // Full range for bedrock layers
+    const isBedrock = layer === layerDefs.bedrock?.layer || layer === layerDefs.bedrock250?.layer;
+    layer.setStyle({ 
+      opacity: opacity, 
+      fillOpacity: isBedrock ? opacity : opacity * 0.08 
+    });
   } else if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => applyOpacity(l, opacity));
   }
-  // Also fade permanent tooltips
+  // tooltip fade stays the same
   if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => {
       const tip = l.getTooltip && l.getTooltip();
@@ -547,6 +552,7 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
     });
   }
 }
+
   const wideBounds = L.latLngBounds([25, -100], [50, -70]);
   const map = L.map('map', {
     maxBounds: wideBounds,
