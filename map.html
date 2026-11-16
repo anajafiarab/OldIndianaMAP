@@ -629,7 +629,7 @@ function refreshLidarHS() {
     if (!container) return;
     const showAz = hsSettings.type === 0;
     container.innerHTML = `
-      <div style="font-size:12px; margin-top:8px; padding-top:6px; border-top:1px solid #ccc;">
+      <div style="font-size:12px; margin-top:4px; padding-bottom:6px; border-bottom:1px solid #ccc;">
         <div>Type: 
           <select id="hs-type">
             <option value="1" ${hsSettings.type===1?'selected':''}>Multidirectional</option>
