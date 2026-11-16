@@ -1521,7 +1521,12 @@ map.on('click', function (e) { // CLICK HANDLER
           .catch(() => {
             hit.attrs['Report'] = 'Attachment unavailable';
           });
-      }
+      } else if (id === 'hydrogeo') {
+  checkLayer(def, 'Hydrogeologic Settings', p => ({
+    'SETTING': p.SETTING || '—',
+    'TERRAIN': p.TERRAIN || '—'
+  }));
+}
     }
   });
 }
