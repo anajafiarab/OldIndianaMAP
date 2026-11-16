@@ -1,0 +1,2 @@
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://unpkg.com; style-src 'self' https://unpkg.com 'unsafe-inline'; img-src 'self' data: https://*.tile.openstreetmap.org https://server.arcgisonline.com https://*.tile.opentopomap.org https://basemap.nationalmap.gov https://*.igs.indiana.edu blob:; connect-src 'self' https://gisdata.in.gov https://portal.igs.indiana.edu https://nominatim.openstreetmap.org https://raw.githubusercontent.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'
