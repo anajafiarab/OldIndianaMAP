@@ -680,6 +680,12 @@ function refreshLidarHS() {
 // ──────────────────────────────────────────────
 
 const layerDefs = {
+  landslides: {
+  name: 'Landslide Inventory',
+  opacity: 1,
+  source: { label: 'IGWS Landslide Inventory', url: 'https://portal.igs.indiana.edu/portal/home/item.html?id=e8914605d3954ea18ef0da9282532297' },
+  layer: null
+},
   //IDNR Water Wells
   wells: {
   name: 'IDNR Water Wells',
@@ -753,6 +759,7 @@ bedrock250: {
   opacity: 0.7,
   source: { label: 'IGS Regional Bedrock Geology 1:250K', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer' }
 },
+// Landslides (Highways)
 landslides: {
   name: 'Landslide Inventory (Highways)',
   group: 'Geology',
@@ -814,6 +821,18 @@ pointToLayer: (f, latlng) => {
 map.on('moveend', refreshWells);
 map.on('zoomend', refreshWells);
 map.on('click', refreshWells);
+
+// Landslide Inventory
+fetch('https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=8000')
+  .then(r => r.json())
+  .then(data => {
+    layerDefs.landslides.layer = L.geoJSON(data, {
+      style: { color: '#c45c26', weight: 1, fillColor: '#e07a3d', fillOpacity: 0.35 },
+      onEachFeature: (f, l) => {
+        // no permanent labels — polygons can be dense
+      }
+    });
+  });
 
 //Landslides Loader
 async function loadLandslides() {
@@ -1344,22 +1363,36 @@ map.on('click', function (e) { // CLICK HANDLER
         hits.push({
           layerName: 'IDNR Water Wells',
           layer: l,
-attrs: {
-  'Ref No': l.feature.properties.dblrefno || '—',
-  'Location Type': l.feature.properties.loc_type || '—',
-  'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
-  'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
-  'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
-  'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
-  'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
-},
+          attrs: {
+            'Ref No': l.feature.properties.dblrefno || '—',
+            'Location Type': l.feature.properties.loc_type || '—',
+            'Depth (ft)': l.feature.properties.dbldepth != null ? Math.round(l.feature.properties.dbldepth) : '—',
+            'Depth to Bedrock (ft)': l.feature.properties.dblbedrockd != null ? Math.round(l.feature.properties.dblbedrockd) : '—',
+            'Static Level (ft)': l.feature.properties.dblstatic != null ? Math.round(l.feature.properties.dblstatic) : '—',
+            'Completed': l.feature.properties.dtmcompdate ? new Date(l.feature.properties.dtmcompdate).toLocaleDateString() : '—',
+            'Well Record': l.feature.properties.report ? `<a href="${l.feature.properties.report}" target="_blank">Open DNR record</a>` : '—'
+          },
           source: def.source || null
         });
       }
     });
   });
+} else if (id === 'landslides') {
+  checkLayer(def, 'Landslide Inventory', p => ({
+    'County': p.county || '—',
+    'Roadway': p.roadway || '—',
+    'Slope Type': p.slope || '—',
+    'Earliest Report': p.errf || '—',
+    'Cause': p.cause || '—',
+    'Varnes Class': p.varnes || '—',
+    'Status': p.status || '—',
+    'Avg Slope (°)': p.avg_slope_degree != null ? Math.round(p.avg_slope_degree) : '—',
+    'Area (km²)': p.area_sq_km != null ? p.area_sq_km.toFixed(3) : '—',
+    'Source': p.source || '—',
+    'Confidence': p.confidence_level || '—'
+  }));
 }
-  }); // closes active.forEach
+}); // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
@@ -1514,6 +1547,7 @@ if (map.hasLayer(lidarHS)) {
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
         <div class="basemap-item" data-add="landslides">Landslide Inventory (Highways)</div>
+        <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px;">Hydrology</div>
