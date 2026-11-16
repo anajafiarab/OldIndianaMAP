@@ -1606,10 +1606,15 @@ if (!hits.length) {
       });
       html += `</div>`;
     }
+    // Displays Source Link
     if (h.source) {
-    html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
-    html += `Source: <a href="${h.source}" target="_blank" style="color:#3d5c3d;">Link</a>`;
-    html += `</div>`;
+    const url = typeof h.source === 'string' ? h.source : h.source.url;
+    const label = typeof h.source === 'string' ? 'Link' : (h.source.label || 'Link');
+    if (url) {
+        html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
+        html += `Source: <a href="${url}" target="_blank" style="color:#3d5c3d;">${label}</a>`;
+        html += `</div>`;
+    }
     }
     sb.innerHTML = html;
 
