@@ -308,23 +308,24 @@ html, body {
   font-size: 16px;
 }
 
-/* Analog sliders — thumb overhangs the track */
+/* Analog sliders — consistent overhang for both sets */
 .layer-item input[type=range],
 #hs-controls input[type=range] {
   -webkit-appearance: none;
   appearance: none;
   width: 70px;
+  min-width: 70px;       /* prevents the flex row from crushing them */
   height: 22px;
   background: transparent;
   margin: 0 2px;
   cursor: pointer;
   box-sizing: border-box;
+  flex-shrink: 0;        /* do not shrink inside .layer-item */
 
-  /* inset visual track + ticks above and below, closer and fainter */
   background-image:
-    /* track (inset) */
+    /* inset track */
     linear-gradient(#b0b0b0, #b0b0b0),
-    /* ticks above */
+    /* ticks above — positions relative to the 70 px box */
     linear-gradient(#606060, #606060),
     linear-gradient(#606060, #606060),
     linear-gradient(#606060, #606060),
@@ -337,13 +338,13 @@ html, body {
     linear-gradient(#606060, #606060),
     linear-gradient(#606060, #606060);
   background-size:
-    60px 3px,          /* track */
-    1px 4px, 1px 4px, 1px 4px, 1px 4px, 1px 4px,  /* above */
-    1px 4px, 1px 4px, 1px 4px, 1px 4px, 1px 4px;  /* below */
+    60px 3px,
+    1px 4px, 1px 4px, 1px 4px, 1px 4px, 1px 4px,
+    1px 4px, 1px 4px, 1px 4px, 1px 4px, 1px 4px;
   background-position:
-    center center,     /* track centered */
-    5px 4px, 20px 4px, 35px 4px, 50px 4px, 65px 4px,   /* above, closer */
-    5px 14px, 20px 14px, 35px 14px, 50px 14px, 65px 14px; /* below, closer */
+    center center,
+    5px 4px, 20px 4px, 35px 4px, 50px 4px, 65px 4px,
+    5px 14px, 20px 14px, 35px 14px, 50px 14px, 65px 14px;
   background-repeat: no-repeat;
 }
 
