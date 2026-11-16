@@ -529,10 +529,18 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
 
 function applyOpacity(layer, opacity) {
   if (!layer) return;
+
+  // Point layers (circle markers) need direct fillOpacity
+  if (layer === layerDefs.piletests?.layer) {
+    layer.eachLayer(l => {
+      if (l.setStyle) l.setStyle({ fillOpacity: opacity, opacity: 1 });
+    });
+    return;
+  }
+
   if (typeof layer.setOpacity === 'function') {
     layer.setOpacity(opacity);
   } else if (typeof layer.setStyle === 'function') {
-    // Full range for bedrock layers
     const isBedrock = layer === layerDefs.bedrock?.layer || layer === layerDefs.bedrock250?.layer;
     layer.setStyle({ 
       opacity: opacity, 
@@ -541,7 +549,8 @@ function applyOpacity(layer, opacity) {
   } else if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => applyOpacity(l, opacity));
   }
-  // tooltip fade stays the same
+
+  // tooltip fade (unchanged)
   if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => {
       const tip = l.getTooltip && l.getTooltip();
@@ -803,19 +812,19 @@ async function loadPileTests() {
     } else more = false;
   }
   layerDefs.piletests.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    pointToLayer: (f, latlng) => {
-      const pt = (f.properties.PILE_TYPE || '').toLowerCase();
-      let color = '#666'; // Other / Drilled Shaft
-      if (pt.includes('h pile')) color = '#1a5c1a';
-      else if (pt.includes('pipe')) color = '#1a4a8a';
-      return L.circleMarker(latlng, {
-        radius: 5,
-        color: '#222',
-        weight: 1,
-        fillColor: color,
-        fillOpacity: 0.85
-      });
-    }
+pointToLayer: (f, latlng) => {
+  const pt = (f.properties.PILE_TYPE || '').toLowerCase();
+  let color = '#c45c26'; // Other / Drilled Shaft (orange)
+  if (pt.includes('h pile')) color = '#2e8b57'; // brighter green
+  else if (pt.includes('pipe')) color = '#1e90ff'; // brighter blue
+  return L.circleMarker(latlng, {
+    radius: 5,
+    color: '#222',
+    weight: 1,
+    fillColor: color,
+    fillOpacity: 0.9
+  });
+}
   });
 }
 loadPileTests();
