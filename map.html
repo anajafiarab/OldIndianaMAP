@@ -1365,80 +1365,77 @@ attrs: {
 
 if (!hits.length) {
   sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
-  return;
-}
+} else {
+  let idx = 0;
+  function show(i) {
+    idx = (i + hits.length) % hits.length;
+    const h = hits[idx];
 
-let idx = 0;
-function show(i) {
-  idx = (i + hits.length) % hits.length;
-  const h = hits[idx];
-
-  clearHighlight();
-  if (h.layer.getLatLng) {
-    // point (wells, etc.)
-    const pinIcon = L.divIcon({
-      className: 'old-marker',
-      html: `
-        <div style="position:relative; width:20px; height:36px;">
-          <div style="
-            width:16px; height:16px;
-            background:#ffcc00;
-            border:2px solid #333;
-            border-radius:50%;
-            position:absolute; top:0; left:2px;
-            box-shadow:1px 1px 2px rgba(0,0,0,0.4);
-          "></div>
-          <div style="
-            width:2px; height:20px;
-            background:#333;
-            position:absolute; top:14px; left:9px;
-          "></div>
-        </div>`,
-      iconSize: [20, 36],
-      iconAnchor: [10, 36]
-    });
-    highlight = L.marker(h.layer.getLatLng(), { icon: pinIcon, zIndexOffset: 1000 }).addTo(map);
-  } else {
-    // polygon / line
-    highlight = L.geoJSON(h.layer.toGeoJSON(), {
-      style: { color: '#ff7800', weight: 3, fillOpacity: 0.25 }
-    }).addTo(map);
-  }
-
-  let html = `<h3>Legend</h3>`;
-  html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
-  html += `<button id="prev-hit">‹</button>`;
-  html += `<span>${idx + 1} of ${hits.length}</span>`;
-  html += `<button id="next-hit">›</button>`;
-  html += `<button id="clear-hit" style="margin-left:8px;">Clear</button>`;
-  html += `</div>`;
-  html += `<strong>${h.layerName}</strong>`;
-  html += `<div style="margin-top:6px; font-size:13px;">`;
-  for (let k in h.attrs) {
-    html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
-  }
-  html += `</div>`;
-  if (h.source) {
-    html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
-    html += `Source: <a href="${h.source.url}" target="_blank" style="color:#3d5c3d;">${h.source.label}</a>`;
-    html += `</div>`;
-  }
-  sb.innerHTML = html;
-
-  document.getElementById('prev-hit').onclick = () => show(idx - 1);
-  document.getElementById('next-hit').onclick = () => show(idx + 1);
-  document.getElementById('clear-hit').onclick = () => {
     clearHighlight();
-    if (searchMarker) {
-      map.removeLayer(searchMarker);
-      searchMarker = null;
+    if (h.layer.getLatLng) {
+      const pinIcon = L.divIcon({
+        className: 'old-marker',
+        html: `
+          <div style="position:relative; width:20px; height:36px;">
+            <div style="
+              width:16px; height:16px;
+              background:#ffcc00;
+              border:2px solid #333;
+              border-radius:50%;
+              position:absolute; top:0; left:2px;
+              box-shadow:1px 1px 2px rgba(0,0,0,0.4);
+            "></div>
+            <div style="
+              width:2px; height:20px;
+              background:#333;
+              position:absolute; top:14px; left:9px;
+            "></div>
+          </div>`,
+        iconSize: [20, 36],
+        iconAnchor: [10, 36]
+      });
+      highlight = L.marker(h.layer.getLatLng(), { icon: pinIcon, zIndexOffset: 1000 }).addTo(map);
+    } else {
+      highlight = L.geoJSON(h.layer.toGeoJSON(), {
+        style: { color: '#ff7800', weight: 3, fillOpacity: 0.25 }
+      }).addTo(map);
     }
-    sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
-  };
-}
-show(0);
 
-// Elevation in feet when lidar hillshade is on
+    let html = `<h3>Legend</h3>`;
+    html += `<div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">`;
+    html += `<button id="prev-hit">‹</button>`;
+    html += `<span>${idx + 1} of ${hits.length}</span>`;
+    html += `<button id="next-hit">›</button>`;
+    html += `<button id="clear-hit" style="margin-left:8px;">Clear</button>`;
+    html += `</div>`;
+    html += `<strong>${h.layerName}</strong>`;
+    html += `<div style="margin-top:6px; font-size:13px;">`;
+    for (let k in h.attrs) {
+      html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
+    }
+    html += `</div>`;
+    if (h.source) {
+      html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
+      html += `Source: <a href="${h.source.url}" target="_blank" style="color:#3d5c3d;">${h.source.label}</a>`;
+      html += `</div>`;
+    }
+    sb.innerHTML = html;
+
+    document.getElementById('prev-hit').onclick = () => show(idx - 1);
+    document.getElementById('next-hit').onclick = () => show(idx + 1);
+    document.getElementById('clear-hit').onclick = () => {
+      clearHighlight();
+      if (searchMarker) {
+        map.removeLayer(searchMarker);
+        searchMarker = null;
+      }
+      sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
+    };
+  }
+  show(0);
+}
+
+// Elevation always runs when hillshade is on (even with no other hits)
 if (map.hasLayer(lidarHS)) {
   const sbNow = document.getElementById('sidebar');
   if (sbNow) {
