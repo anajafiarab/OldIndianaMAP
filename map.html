@@ -751,7 +751,14 @@ fetch('data/hydrogeo-units.json')
   .catch(() => console.log('Hydrogeo lookup not loaded'));
 
   const layerDefs = {
-
+// Legacy Boreholes Definition
+    boreholes: {
+  name: 'Legacy Boreholes',
+  layer: null,
+  opacity: 1,
+  source: 'Legacy INDOT borehole data',
+  sourceUrl: 'https://gisdata.in.gov/server/rest/services'  // or whatever you want to cite
+}
     // Unconsolidated Potentiometric Surface   
 unconsolidatedPSM: {
   name: 'Unconsolidated Potentiometric Surface',
@@ -871,6 +878,26 @@ bedrock250: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+// Legacy Boreholes Loader
+fetch('data/legacy_boreholes.geojson')
+  .then(r => r.json())
+  .then(data => {
+    layerDefs.boreholes.layer = L.geoJSON(data, {
+      pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+        radius: 4,
+        color: '#8B4513',
+        weight: 1,
+        fillColor: '#DAA520',
+        fillOpacity: 0.7
+      }),
+      onEachFeature: (f, l) => {
+        if (f.properties.POINTID) {
+          l.bindTooltip(f.properties.POINTID, { direction: 'top' });
+        }
+      }
+    });
+  });
+
 // Unconsolidated Potentiometric Surface lines
 async function loadUnconsolidatedPSM() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0/query';
@@ -1609,6 +1636,35 @@ map.on('click', function (e) { // CLICK HANDLER
   checkLayer(def, 'Unconsolidated Potentiometric Surface', p => ({
     'Elevation (ft)': p.static_e || '—'
   }));
+} else if (id === 'boreholes') {
+  if (!def.layer || !map.hasLayer(def.layer)) return;
+  def.layer.eachLayer(l => {
+    if (!l.getLatLng) return;
+    const d = map.distance(e.latlng, l.getLatLng());
+    if (d < 40) {
+      const p = l.feature.properties;
+      hits.push({
+        layerName: 'Legacy Boreholes',
+        layer: l,
+        attrs: {
+          'Point ID': p.POINTID || '—',
+          'Hole Depth (ft)': p.HOLEDEPTH || '—',
+          'DES Number': p.DES_NUMBER || '—',
+          'County': p.COUNTY || '—',
+          'Elevation': p.ELEVATION || '—',
+          'Station': p.STATION || '—',
+          'Offset': p.OFFSET || '—',
+          'Method': p.BORING_METHOD || '—',
+          'GW Encountered': p.GW_DEPTH_ENCOUNTERED || '—',
+          'GW at Completion': p.GW_DEPTH_AT_COMPLETION || '—',
+          'Date Started': (p.DATE_STARTED || '').slice(0,10) || '—',
+          'Driller': p.DRILLER || '—'
+        },
+        source: def.source || null,
+        erms: p.DES_NUMBER ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(p.DES_NUMBER)}` : null
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -1667,6 +1723,13 @@ if (!hits.length) {
       html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
     }
     html += `</div>`;
+    // ERMS link for Legacy Boreholes
+if (h.erms) {
+  html += `<div style="margin-top:10px;"><a href="${h.erms}" target="_blank" style="color:#113d43; font-weight:bold;">Open ERMS Report</a></div>`;
+}
+if (h.sourceUrl) {
+  html += `<div style="margin-top:8px; font-size:11px; color:#666;">Source: <a href="${h.sourceUrl}" target="_blank">${h.source || 'Data source'}</a></div>`;
+}
     
         // Cross-section images for hydrogeologic units
     const unitCode = (h.attrs['SETTING'] || h.attrs['Unit'] || '').trim();
@@ -1752,7 +1815,7 @@ if (map.hasLayer(lidarHS)) {
     document.getElementById(id).classList.add('active');
   }
 
-  // Sidebar tool buttons
+  // Sidebar Menu Buttons
   document.getElementById('basemaps-btn').addEventListener('click', () => {
     setActiveTool('basemaps-btn');
     sidebar.innerHTML = `
@@ -1792,6 +1855,7 @@ if (map.hasLayer(lidarHS)) {
       <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
 
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
+      <div class="basemap-item" data-add="boreholes">Legacy Boreholes</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
 
 
