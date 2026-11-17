@@ -455,14 +455,15 @@ html, body {
   white-space: nowrap;
 }
 #map {
-  position: relative;   /* Leaflet already does this, but make it explicit */
+  position: relative;
+  z-index: 1;
 }
 #map-quote {
   position: absolute;
   bottom: 8px;
   left: 8px;
-  z-index: 400;
-  background: rgba(255, 255, 255, 0.85);
+  z-index: 1000;                 /* higher than Leaflet’s panes */
+  background: rgba(255, 255, 255, 0.92);
   border: 1px solid #808080;
   border-radius: 3px;
   padding: 4px 8px;
@@ -471,7 +472,7 @@ html, body {
   color: #333;
   max-width: 220px;
   pointer-events: none;
-  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.25);
 }
 #map-quote .author {
   display: block;
