@@ -929,6 +929,7 @@ bedrock250: {
 // LOADERS
 // ──────────────────────────────────────────────
 // Legacy Boreholes Loader
+startLoad('Legacy Boreholes');
 fetch('data/legacy_boreholes.geojson')
   .then(r => r.json())
   .then(data => {
@@ -946,9 +947,11 @@ fetch('data/legacy_boreholes.geojson')
         }
       }
     });
-  });
+  })
+.finally(finishLoad);   // <-- runs after success or error
 
 // Unconsolidated Potentiometric Surface lines
+startLoad('Unconsolidated Potentiometric Surface');
 async function loadUnconsolidatedPSM() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
@@ -965,9 +968,11 @@ async function loadUnconsolidatedPSM() {
     style: { color: '#1a5276', weight: 1.5, opacity: 0.85 }
   });
 }
-loadUnconsolidatedPSM();
+loadUnconsolidatedPSM()
+.finally(finishLoad);   // <-- runs after success or error
 
 // Hydrogeologic Settings Loader
+startLoad('Hydrogeologic Settings');
 async function loadHydrogeo() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer/0/query';
   let all = [], offset = 0, page = 1000, more = true;
@@ -987,9 +992,11 @@ async function loadHydrogeo() {
     }
   });
 }
-loadHydrogeo();
+loadHydrogeo()
+.finally(finishLoad);   // <-- runs after success or error
 
 //Pile Testing Loader
+startLoad('Pile Testing Reports');
 async function loadPileTests() {
   const base = 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/query';
   let all = [], offset = 0, page = 1000, more = true;
@@ -1018,9 +1025,10 @@ pointToLayer: (f, latlng) => {
 }
   });
 }
-loadPileTests();
+loadPileTests()
+.finally(finishLoad);   // <-- runs after success or error
 
-//INDR Water Wells Loader
+// INDR Water Wells Loader
 let wellsLayer = L.layerGroup();
 layerDefs.wells.layer = wellsLayer;
 
@@ -1029,6 +1037,9 @@ async function refreshWells() {
     wellsLayer.clearLayers();
     return;
   }
+
+  startLoad('IDNR Water Wells');
+
   const b = map.getBounds();
   const geom = JSON.stringify({
     xmin: b.getWest(), ymin: b.getSouth(),
@@ -1050,20 +1061,23 @@ async function refreshWells() {
     wellsLayer.clearLayers();
     if (data.features) {
       L.geoJSON(data, {
-pointToLayer: (f, latlng) => {
-  const loc = (f.properties.loc_type || '').toLowerCase();
-  const isField = loc.includes('field') || loc.includes('survey') || loc.includes('gps');
-  return L.circleMarker(latlng, {
-    radius: 4,
-    color: isField ? '#1a5c1a' : '#8b4513',
-    weight: 1,
-    fillColor: isField ? '#3cb371' : '#daa520',
-    fillOpacity: 0.75
-  });
-}
+        pointToLayer: (f, latlng) => {
+          const loc = (f.properties.loc_type || '').toLowerCase();
+          const isField = loc.includes('field') || loc.includes('survey') || loc.includes('gps');
+          return L.circleMarker(latlng, {
+            radius: 4,
+            color: isField ? '#1a5c1a' : '#8b4513',
+            weight: 1,
+            fillColor: isField ? '#3cb371' : '#daa520',
+            fillOpacity: 0.75
+          });
+        }
       }).addTo(wellsLayer);
     }
   } catch (e) { /* ignore */ }
+  finally {
+    finishLoad();
+  }
 }
 
 map.on('moveend', refreshWells);
@@ -1071,6 +1085,7 @@ map.on('zoomend', refreshWells);
 map.on('click', refreshWells);
 
 // Landslide Inventory
+startLoad('Landslide Inventory');
 fetch('https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=8000')
   .then(r => r.json())
   .then(data => {
@@ -1080,9 +1095,11 @@ fetch('https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/F
         // no permanent labels — polygons can be dense
       }
     });
-  });
+  })
+.finally(finishLoad);   // <-- runs after success or error
 
 //Landslides Loader (Highways)
+startLoad('Landslides (Highways)');
 async function loadLandslides() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
@@ -1099,9 +1116,11 @@ layerDefs['landslides-hw'].layer = L.geoJSON({ type: 'FeatureCollection', featur
   style: { color: '#8B0000', weight: 1.5, fillColor: '#CD5C5C', fillOpacity: 0.45 }
 });
 }
-loadLandslides();
+loadLandslides()
+.finally(finishLoad);   // <-- runs after success or error
 
 // Bedrock Geology (colored by ROCK_UNITS)
+StartLoad('Bedrock Geology (MM48)');
 const bedrockColors = {
   'Coldwater Shale': '#8B7D6B',
   'Ellsworth Shale': '#6B8E23',
@@ -1153,9 +1172,11 @@ async function loadBedrock() {
   });
   applyOpacity(layerDefs.bedrock.layer, layerDefs.bedrock.opacity);
 }
-loadBedrock();
+loadBedrock()
+.finally(finishLoad);   // <-- runs after success or error
 
 // 250K Bedrock Loader
+startLoad('250K Bedrock Geology');
 async function loadBedrock250() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
@@ -1177,9 +1198,11 @@ async function loadBedrock250() {
   });
   applyOpacity(layerDefs.bedrock250.layer, layerDefs.bedrock250.opacity);
 }
-loadBedrock250();
+loadBedrock250()
+.finally(finishLoad);   // <-- runs after success or error
 
 // Counties
+startLoad('Indiana Counties');
 fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
   .then(r => r.json())
   .then(data => {
@@ -1195,7 +1218,8 @@ fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties
       }
     });
     updateCountyLabels();
-  });
+  })
+  .finally(finishLoad);
 
 function updateCountyLabels() {
   const lyr = layerDefs.counties.layer;
@@ -1245,6 +1269,7 @@ function updatePLSSLabels() {
 map.on('zoomend', updatePLSSLabels);
 
 // Unconsolidated Thickness Contours
+startLoad('Unconsolidated Thickness Contours');
 async function loadThickness() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Surficial_Unconsolidated_Thickness_Contours/FeatureServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
@@ -1261,7 +1286,8 @@ async function loadThickness() {
     style: { color: '#555', weight: 1, opacity: 0.7 }         // gray
   });
 }
-loadThickness();
+loadThickness()
+.finally(finishLoad);   // <-- runs after success or error
 
 // Soils (dynamic by extent)
 function getSoilStyle(feature) {
@@ -1283,6 +1309,9 @@ function refreshSoils() {
     soilsLayer.clearLayers();
     return;
   }
+
+  startLoad('Soils');
+
   const b = map.getBounds();
   const url = 'https://gisdata.in.gov/server/rest/services/Hosted/Soil_Map_Units_SSURGO/FeatureServer/4/query' +
     '?where=1%3D1' +
@@ -1306,8 +1335,10 @@ function refreshSoils() {
         });
       }
     })
-    .catch(err => console.error('Soils refresh failed:', err));
+    .catch(err => console.error('Soils refresh failed:', err))
+    .finally(finishLoad);
 }
+
 map.on('moveend', refreshSoils);
 
 
