@@ -1024,7 +1024,7 @@ async function loadLiq() {
       offset += page;
       if (data.features.length < page) more = false;
     } else more = false;
-  }
+  console.log([...new Set(all.map(f => f.properties.DESCRIPTIO))]);}
   const colors = {
     'Low': '#4a90d9',
     'Moderate': '#f5a623',
