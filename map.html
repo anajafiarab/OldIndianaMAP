@@ -454,6 +454,33 @@ html, body {
   gap: 6px;
   white-space: nowrap;
 }
+#map {
+  position: relative;   /* Leaflet already does this, but make it explicit */
+}
+#map-quote {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  z-index: 400;
+  background: rgba(255, 255, 255, 0.85);
+  border: 1px solid #808080;
+  border-radius: 3px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-style: italic;
+  color: #333;
+  max-width: 220px;
+  pointer-events: none;
+  box-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+}
+#map-quote .author {
+  display: block;
+  font-style: normal;
+  font-size: 11px;
+  text-align: right;
+  margin-top: 2px;
+  color: #555;
+}
   </style>
 </head>
 <body>
@@ -584,7 +611,11 @@ html, body {
       </div>
     </div>
     <div id="map"></div>
-  </div>
+    <div id="map-quote">
+      “You have to see it to solve it.”
+      <span class="author">— J.C. Lommler</span>
+    </div>
+  </div>   <!-- end of .main -->
 
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
