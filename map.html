@@ -982,7 +982,7 @@ async function loadKarst() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Karst_Sinkhole_Inventory_IN_KY_2011/FeatureServer/118/query';
   let all = [], offset = 0, page = 2000, more = true;
   while (more) {
-    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
     const data = await (await fetch(url)).json();
     if (data.features && data.features.length) {
       all = all.concat(data.features);
@@ -992,6 +992,7 @@ async function loadKarst() {
   }
   // Keep only Indiana (north of the Ohio River)
   all = all.filter(f => f.geometry && f.geometry.coordinates[1] > 37.85);
+
   layerDefs.karst.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
     pointToLayer: (f, ll) => L.circleMarker(ll, {
       radius: 3,
@@ -1001,7 +1002,6 @@ async function loadKarst() {
       weight: 1
     }),
     onEachFeature: (f, l) => {
-      // identify attributes
       l.feature = f;
     }
   });
