@@ -991,7 +991,7 @@ async function loadKarst() {
     } else more = false;
   }
   // Keep only Indiana (north of the Ohio River)
-  all = all.filter(f => f.geometry && f.geometry.coordinates[1] > 37.85);
+  all = all.filter(f => f.geometry && f.geometry.coordinates[1] > 37.73);
 
   layerDefs.karst.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
     pointToLayer: (f, ll) => L.circleMarker(ll, {
