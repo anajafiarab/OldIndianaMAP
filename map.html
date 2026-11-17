@@ -1648,6 +1648,10 @@ slider.addEventListener('input', () => {
     renderActive();
   }
   async function loadKMZ(file) {
+    if (file.size > 15 * 1024 * 1024) {   // 15 MB
+    alert('File too large (max 15 MB)');
+    return;
+  }
     const name = file.name.replace(/\.(kmz|kml)$/i, '');
     let kmlText = '';
 
