@@ -752,13 +752,16 @@ fetch('data/hydrogeo-units.json')
 
   const layerDefs = {
 // Legacy Boreholes Definition
-    boreholes: {
+boreholes: {
   name: 'Legacy Boreholes',
   layer: null,
   opacity: 1,
-  source: 'Legacy INDOT borehole data',
-  sourceUrl: 'https://www.in.gov/indot/engineering/geotechnical-engineering-division/'  // or whatever you want to cite
+  source: {
+    url: 'https://www.in.gov/indot/engineering/geotechnical-engineering-division/',
+    label: 'INDOT Geotechnical Engineering Division'
+  }
 },
+
     // Unconsolidated Potentiometric Surface   
 unconsolidatedPSM: {
   name: 'Unconsolidated Potentiometric Surface',
