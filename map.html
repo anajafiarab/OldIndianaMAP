@@ -1813,23 +1813,13 @@ map.on('click', function (e) { // CLICK HANDLER
       });
     }
   });
-} if (layerDefs.glacial.layer && map.hasLayer(layerDefs.glacial.layer)) {
-  layerDefs.glacial.layer.eachLayer(l => {
-    if (l.getBounds && l.getBounds().contains(e.latlng)) {  // or your point-in-polygon check
-      const p = l.feature.properties;
-      hits.push({
-        layerName: 'Glacial Quaternary Geology',
-        layer: l,
-        attrs: {
-          'Symbol': p.SYMBOL || '—',
-          'Description': p.DESCRIPTIO || '—',
-          'Geologic Age': p.GEOLOGIC_A || '—',
-          'Deposition': p.DEPOSITION || '—'
-        },
-        source: layerDefs.glacial.source
-      });
-    }
-  });
+} else if (id === 'glacial') {
+  checkLayer(def, 'Glacial Quaternary Geology', p => ({
+    'Symbol': p.SYMBOL || '—',
+    'Description': p.DESCRIPTIO || '—',
+    'Geologic Age': p.GEOLOGIC_A || '—',
+    'Deposition': p.DEPOSITION || '—'
+  }));
 }
 }); // closes active.forEach
 
@@ -1969,7 +1959,7 @@ if (map.hasLayer(lidarHS)) {
       sbNow.appendChild(div);
     })
     .catch(() => {});
-}
+}// Click Handler end
 
 }); // closes map.on('click'...)
   const sidebar = document.getElementById('sidebar');
