@@ -1877,7 +1877,9 @@ map.on('click', function (e) { // CLICK HANDLER
         layerName: 'Karst Sinkhole',
         layer: l,
         attrs: {
-          'Source': p.SOURCE || '—',
+          'Source': p.SOURCE
+            ? `<a href="https://pubs.usgs.gov/ds/339/pdf/ds339_web.pdf" target="_blank" style="color:#1a4a8a;">${p.SOURCE}</a>`
+            : '—',
           'OBJECTID': p.OBJECTID || '—'
         },
         source: def.source || null
