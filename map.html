@@ -1372,14 +1372,34 @@ async function loadBedrock250() {
       if (data.features.length < page) more = false;
     } else more = false;
   }
+  function bedrockColor(props) {
+    const age = (props.Ages || '').toLowerCase();
+    if (age.includes('quaternary')) return '#f4e04d';
+    if (age.includes('tertiary') || age.includes('paleogene') || age.includes('neogene')) return '#f5d76e';
+    if (age.includes('cretaceous')) return '#7dcea0';
+    if (age.includes('jurassic')) return '#5dade2';
+    if (age.includes('triassic')) return '#af7ac5';
+    if (age.includes('permian')) return '#e74c3c';
+    if (age.includes('pennsylvanian')) return '#922b21';
+    if (age.includes('mississippian')) return '#e67e22';
+    if (age.includes('devonian')) return '#d4a017';
+    if (age.includes('silurian')) return '#1abc9c';
+    if (age.includes('ordovician')) return '#3498db';
+    if (age.includes('cambrian')) return '#8e44ad';
+    if (age.includes('precambrian')) return '#5d6d7e';
+    return '#B0B0B0';
+  }
+
   layerDefs.bedrock250.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
     style: function (f) {
-      const unit = (f.properties.Formations || f.properties.Name || '').trim();
-      const color = bedrockColors[unit] || '#B0B0B0';
-      return { color: '#444', weight: 0.5, fillColor: color, fillOpacity: 1 };
+      return {
+        color: '#444',
+        weight: 0.5,
+        fillColor: bedrockColor(f.properties),
+        fillOpacity: 0.85
+      };
     }
   });
-  applyOpacity(layerDefs.bedrock250.layer, layerDefs.bedrock250.opacity);
 }
 loadBedrock250()
 .finally(finishLoad);   // <-- runs after success or error
