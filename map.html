@@ -969,12 +969,49 @@ karst: {
     url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Karst_Sinkhole_Inventory_IN_KY_2011/FeatureServer'
   }
 },
+liq: {
+  name: 'Liquefaction Potential',
+  opacity: 0.5,
+  layer: null,
+  source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer',
+  sourceLabel: 'IGWS Earthquake Liquefaction Potential (MM81)'
+},
 
 };
 
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+//Liquefaction Loader
+startLoad('Liquefaction Potential');
+async function loadLiq() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer/0/query';
+  let all = [], offset = 0, page = 1000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  const colors = {
+    'Low': '#4a90d9',
+    'Moderate': '#f5a623',
+    'High': '#d0021b'
+  };
+  layerDefs.liq.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: f => ({
+      color: '#333',
+      weight: 0.5,
+      fillColor: colors[f.properties.DESCRIPTIO] || '#999',
+      fillOpacity: 0.4
+    })
+  });
+}
+loadLiq().finally(finishLoad);
 
 // Karst Sinkhole Inventory
 startLoad('Karst Sinkholes');
@@ -1886,6 +1923,22 @@ map.on('click', function (e) { // CLICK HANDLER
       });
     }
   });
+} else if (layerDefs.liq.layer && map.hasLayer(layerDefs.liq.layer)) {
+  layerDefs.liq.layer.eachLayer(l => {
+    if (l.feature && l.getBounds && l.getBounds().contains(latlng)) {
+      const p = l.feature.properties;
+      hits.push({
+        layer: l,
+        layerName: 'Liquefaction Potential',
+        source: layerDefs.liq.source,
+        sourceLabel: layerDefs.liq.sourceLabel,
+        attrs: {
+          'Potential': p.DESCRIPTIO || '—',
+          'OBJECTID': p.OBJECTID || '—'
+        }
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -2075,7 +2128,8 @@ if (map.hasLayer(lidarHS)) {
       <div class="basemap-item" data-add="hillshade">World Hillshade (Esri)</div>
 
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
-      <div class="basemap-item" data-add="boreholes">Legacy Boreholes</div>
+      <div class="basemap-item" data-add="boreholes">Boreholes</div>
+      <div class="basemap-item" data-add="liq">Liquefaction Potential</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
 
 
