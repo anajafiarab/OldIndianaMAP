@@ -1823,6 +1823,19 @@ map.on('click', function (e) { // CLICK HANDLER
         'Location': p.location || '—',
         'Comments': p.comments || '—'
       }));
+          } else if (id === 'landslides-hw') {
+      checkLayer(def, 'Landslides (Highways)', p => ({
+        'Slide ID': p.slide_ID || '—',
+        'Roadway': p.roadway || '—',
+        'County': p.county || '—',
+        'Earliest Failure': p.errf || '—',
+        'Varnes Class': p.varnes || '—',
+        'Status': p.status || '—',
+        'Repair Type': p.correction || '—',
+        'Cost': p.cost != null ? '$' + Number(p.cost).toLocaleString() : '—',
+        'Location': p.location || '—',
+        'Comments': p.comments || '—'
+      }));
     } else if (id === 'wells') {
       if (!map.hasLayer(wellsLayer)) return;
       wellsLayer.eachLayer(group => {
