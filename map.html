@@ -656,27 +656,24 @@ function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(acti
 function applyOpacity(layer, opacity) {
   if (!layer) return;
 
-  // Point layers (circle markers) need direct fillOpacity
-if (layer === layerDefs.piletests?.layer) {
-  layer.eachLayer(l => {
-    if (l.setStyle) l.setStyle({ fillOpacity: opacity, opacity: opacity });
-  });
-  return;
-}
-
-  if (typeof layer.setOpacity === 'function') {
-    layer.setOpacity(opacity);
-  } else if (typeof layer.setStyle === 'function') {
-    const isBedrock = layer === layerDefs.bedrock?.layer || layer === layerDefs.bedrock250?.layer;
-    layer.setStyle({ 
-      opacity: opacity, 
-      fillOpacity: isBedrock ? opacity : opacity * 0.08 
-    });
-  } else if (typeof layer.eachLayer === 'function') {
+  // GeoJSON / FeatureGroup / LayerGroup — walk children
+  if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => applyOpacity(l, opacity));
   }
 
-  // tooltip fade (unchanged)
+  // Individual vector layers (polygons, circles, paths)
+  if (typeof layer.setStyle === 'function') {
+    layer.setStyle({
+      opacity: opacity,
+      fillOpacity: opacity   // full range for all fills
+    });
+  }
+  // Tile layers or anything that only has setOpacity
+  else if (typeof layer.setOpacity === 'function') {
+    layer.setOpacity(opacity);
+  }
+
+  // Fade tooltips with the layer
   if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => {
       const tip = l.getTooltip && l.getTooltip();
