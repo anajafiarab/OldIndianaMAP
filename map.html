@@ -990,7 +990,7 @@ async function loadGlacial() {
     style: f => {
       const sym = (f.properties.SYMBOL || '').toLowerCase();
       const color = layerDefs.glacial.colors[sym] || layerDefs.glacial.colors.default;
-      return { color: color, weight: 1, fillColor: color, fillOpacity: 0.45 };
+      return { color: color, weight: 1, fillColor: color, fillOpacity: 1 };
     }
     // no onEachFeature labels
   });
