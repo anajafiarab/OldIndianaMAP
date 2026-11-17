@@ -447,28 +447,7 @@ html, body {
   color: #4a3c1a;
   text-shadow: 0 0 2px #fff, 0 0 2px #fff;
 }
-#loading-bar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  height: 4px;
-  background: #8BA6AA;
-  width: 0%;
-  z-index: 9999;
-  transition: width 0.3s;
-}
-#loading-status {
-  position: fixed;
-  top: 8px;
-  right: 12px;
-  background: #113d43;
-  color: #fff;
-  padding: 4px 10px;
-  font-size: 12px;
-  border-radius: 2px;
-  z-index: 9999;
-  display: none;
-}
+
 #loader {
   display: none;
   align-items: center;
@@ -489,21 +468,18 @@ html, body {
       <button id="search-btn">Go</button>
     </div>
   </div>
-<div id="loader" style="
-  margin-left: auto;
-  display: none;
-  align-items: center;
-  gap: 8px;
-  padding-right: 16px;
-  flex: 0 0 auto;          /* do not grow */
-  white-space: nowrap;
-  background: transparent; /* no big background */
-">
-  <span id="loader-text" style="color:#fff; font-size:13px;"></span>
-  <div style="width:80px; height:6px; background:rgba(255,255,255,0.3); border-radius:3px; overflow:hidden; flex:0 0 auto;">
-    <div id="loading-bar" style="width:0%; height:100%; background:#8BA6AA; transition:width 0.3s;"></div>
+
+  <div class="tabs">
+    <div class="tab active">Map Viewer</div>
+    <div class="tab">Map Gallery</div>
+    <div class="tab">Layer Gallery</div>
+    <div id="loader" style="margin-left:auto; display:none; align-items:center; gap:8px; padding-right:16px; flex:0 0 auto; white-space:nowrap; background:transparent;">
+      <span id="loader-text" style="color:#fff; font-size:13px;"></span>
+      <div style="width:80px; height:6px; background:rgba(255,255,255,0.3); border-radius:3px; overflow:hidden; flex:0 0 auto;">
+        <div id="loading-bar" style="width:0%; height:100%; background:#8BA6AA; transition:width 0.3s;"></div>
+      </div>
+    </div>
   </div>
-</div>
 
   <div class="tool-wrap">
 
