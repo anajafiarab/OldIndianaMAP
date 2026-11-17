@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Old Indiana Map</title>
+  <title>About – Old Indiana Map</title>
   <style>
     * { box-sizing: border-box; }
     html, body {
@@ -12,96 +12,81 @@
     }
     body {
       background: #d4d0c8;
-      display: flex;
-      align-items: center;
-      justify-content: center;
     }
     .bg {
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
       background: url('old-map.png') center center / contain no-repeat;
-      opacity: 0.35;
+      opacity: 0.4;
       z-index: 0;
     }
-    .coming {
+    .about-panel {
       position: relative;
       z-index: 1;
-      text-align: center;
-      background: rgba(255,255,255,0.94);
+      max-width: 680px;
+      max-height: 85vh;
+      margin: 40px auto;
+      overflow-y: auto;
+      background: rgba(255, 255, 255, 0.88);
       border: 1px solid #808080;
-      padding: 28px 36px;
-      box-shadow: 2px 2px 10px rgba(0,0,0,0.2);
-      max-width: 90%;
+      border-radius: 6px;
+      padding: 28px 32px;
+      box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
+      font-size: 15px;
+      line-height: 1.5;
+      color: #222;
     }
-    .coming h1 {
-      margin: 0 0 8px 0;
+    .about-panel h1 {
+      margin-top: 0;
       font-size: 22px;
-      color: #4a6b4a;
+      color: #113d43;
     }
-    .coming p {
-      margin: 0;
-      font-size: 14px;
-      color: #333;
+    .about-panel h3 {
+      margin: 20px 0 8px 0;
+      font-size: 16px;
+      color: #113d43;
     }
-    .about-panel {
-  max-width: 680px;
-  margin: 40px auto;
-  background: rgba(255, 255, 255, 0.92);
-  border: 1px solid #808080;
-  border-radius: 6px;
-  padding: 28px 32px;
-  box-shadow: 2px 2px 8px rgba(0,0,0,0.2);
-  font-size: 15px;
-  line-height: 1.5;
-  color: #222;
-}
-.about-panel h1 {
-  margin-top: 0;
-  font-size: 22px;
-  color: #113d43;
-}
-.about-panel h3 {
-  margin: 20px 0 8px 0;
-  font-size: 16px;
-  color: #113d43;
-}
-.about-panel ul {
-  margin: 6px 0 16px 20px;
-}
-.about-panel a {
-  color: #113d43;
-}
+    .about-panel ul {
+      margin: 6px 0 16px 20px;
+    }
+    .about-panel a {
+      color: #113d43;
+    }
   </style>
 </head>
 <body>
-<div class="about-panel">
-  <h1>About OldIndianaMAP</h1>
+  <div class="bg"></div>
 
-  <p>IndianaMAP began in the late 1990s as a collaborative effort led by the Indiana Geographic Information Council. The Indiana Geological and Water Survey (IGWS) built and hosted the interactive viewer, first to support planning for Interstate 69 in southwestern Indiana. Over the next two decades it grew into a statewide collection of hundreds of layers contributed by federal, state, and local partners.</p>
+  <div class="about-panel">
+    <h1>About OldIndianaMAP</h1>
 
-  <p>By the late 2000s the IGWS was maintaining custom code to import and serve the data. Staffing and funding for that work became increasingly difficult. In May 2022 the IGWS and the Indiana Geographic Information Office (IGIO) agreed to transfer management of IndianaMAP to the IGIO. Layers began moving off the old maps.indiana.edu site in 2023; the migration was completed in 2024. The familiar custom viewer was replaced by Esri-based tools on indianamap.org.</p>
+    <p>IndianaMAP began in the late 1990s as a collaborative effort led by the Indiana Geographic Information Council. The Indiana Geological and Water Survey (IGWS) built and hosted the interactive viewer, first to support planning for Interstate 69 in southwestern Indiana. Over the next two decades it grew into a statewide collection of hundreds of layers contributed by federal, state, and local partners.</p>
 
-  <p>Moving the data to a commercial platform reduced the maintenance burden and let the IGWS concentrate on geologic work. What disappeared with the old viewer was a simple, no-account tool that remembered the layers you had turned on and let you click anywhere for immediate results.</p>
+    <p>By the late 2000s the IGWS was maintaining custom code to import and serve the data. Staffing and funding for that work became increasingly difficult. In May 2022 the IGWS and the Indiana Geographic Information Office (IGIO) agreed to transfer management of IndianaMAP to the IGIO. Layers began moving off the old maps.indiana.edu site in 2023; the migration was completed in 2024. The familiar custom viewer was replaced by Esri-based tools on indianamap.org.</p>
 
-  <p>OldIndianaMAP is an independent project that recreates that experience. It is a straightforward map viewer for public Indiana data. There is no login. Layers you turn on stay on when you return. Clicking the map shows the attributes of every active layer at that point. The interface is deliberately close to the original so the tool feels familiar.</p>
+    <p>Moving the data to a commercial platform reduced the maintenance burden and let the IGWS concentrate on geologic work. What disappeared with the old viewer was a simple, no-account tool that remembered the layers you had turned on and let you click anywhere for immediate results.</p>
 
-  <p>This site has no affiliation with the Indiana Geological and Water Survey or the Indiana Geographic Information Office. It simply displays publicly available layers.</p>
+    <p>OldIndianaMAP is an independent project that recreates that experience. It is a straightforward map viewer for public Indiana data. There is no login. Layers you turn on stay on when you return. Clicking the map shows the attributes of every active layer at that point. The interface is deliberately close to the original so the tool feels familiar.</p>
 
-  <h3>Old IndianaMAP Features</h3>
-  <ul>
-    <li>No account required</li>
-    <li>Layers and basemap remembered in your browser</li>
-    <li>Click-to-identify for every active layer</li>
-    <li>Transparency, reorder, and remove controls</li>
-    <li>Address and lat/lon search</li>
-    <li>Bonus: Ability to add your own .kmz</li>
-  </ul>
+    <p>This site has no affiliation with the Indiana Geological and Water Survey or the Indiana Geographic Information Office. It simply displays publicly available layers.</p>
 
-  <h3>Disclaimers</h3>
-  <p>The layers shown here are public data. This project does not claim ownership of any dataset and does not reproduce copyrighted material. Data accuracy is not guaranteed; always verify critical information with the original source. Official IndianaMAP data and services remain available at <a href="https://www.indianamap.org" target="_blank">indianamap.org</a>.</p>
+    <h3>Old IndianaMAP Features</h3>
+    <ul>
+      <li>No account required</li>
+      <li>Layers and basemap remembered in your browser</li>
+      <li>Click-to-identify for every active layer</li>
+      <li>Transparency, reorder, and remove controls</li>
+      <li>Address and lat/lon search</li>
+      <li>Bonus: Ability to add your own .kmz</li>
+    </ul>
 
-  <p style="margin-top:24px;">
-    <a href="map.html">Open the map</a> &nbsp;·&nbsp;
-    <a href="index.html">Back to home</a>
-  </p>
-</div>
+    <h3>Disclaimers</h3>
+    <p>The layers shown here are public data. This project does not claim ownership of any dataset and does not reproduce copyrighted material. Data accuracy is not guaranteed; always verify critical information with the original source. Official IndianaMAP data and services remain available at <a href="https://www.indianamap.org" target="_blank">indianamap.org</a>.</p>
+
+    <p style="margin-top:24px;">
+      <a href="map.html">Open the map</a> &nbsp;·&nbsp;
+      <a href="index.html">Back to home</a>
+    </p>
+  </div>
+</body>
+</html>
