@@ -827,6 +827,20 @@ fetch('data/hydrogeo-units.json')
   .catch(() => console.log('Hydrogeo lookup not loaded'));
 
   const layerDefs = {
+
+  // Glacial Quaternary Geology
+  glacial: {
+  name: 'Glacial Quaternary Geology',
+  opacity: 0.6,
+  layer: null,
+  source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer',
+  // simple color map by SYMBOL — expand as needed
+  colors: {
+    tg: '#c4a484',
+    // add more symbols as you discover them
+    default: '#d4c4a8'
+  }
+},
 // Legacy Boreholes Definition
 boreholes: {
   name: 'Legacy Boreholes',
@@ -957,6 +971,33 @@ bedrock250: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+// Glacial Quaternary Geology Loader
+startLoad('Glacial Quaternary Geology');
+async function loadGlacial() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer/70/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=1%3D1&outFields=SYMBOL,DESCRIPTIO,GEOLOGIC_A,DEPOSITION&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.glacial.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: f => {
+      const sym = (f.properties.SYMBOL || '').toLowerCase();
+      const color = layerDefs.glacial.colors[sym] || layerDefs.glacial.colors.default;
+      return { color: color, weight: 1, fillColor: color, fillOpacity: 0.45 };
+    }
+    // no onEachFeature labels
+  });
+}
+loadGlacial()
+.finally(finishLoad);   // <-- runs after success or error
+
 // Legacy Boreholes Loader
 startLoad('Legacy Boreholes');
 fetch('data/legacy_boreholes.geojson')
@@ -1778,6 +1819,23 @@ map.on('click', function (e) { // CLICK HANDLER
       });
     }
   });
+} if (layerDefs.glacial.layer && map.hasLayer(layerDefs.glacial.layer)) {
+  layerDefs.glacial.layer.eachLayer(l => {
+    if (l.getBounds && l.getBounds().contains(e.latlng)) {  // or your point-in-polygon check
+      const p = l.feature.properties;
+      hits.push({
+        layerName: 'Glacial Quaternary Geology',
+        layer: l,
+        attrs: {
+          'Symbol': p.SYMBOL || '—',
+          'Description': p.DESCRIPTIO || '—',
+          'Geologic Age': p.GEOLOGIC_A || '—',
+          'Deposition': p.DEPOSITION || '—'
+        },
+        source: layerDefs.glacial.source
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -1975,6 +2033,7 @@ if (map.hasLayer(lidarHS)) {
         <div style="font-weight:bold; margin:12px 0 4px;">Geology</div>
         <div class="basemap-item" data-add="bedrock250">250K Bedrock Geology</div>
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
+        <div class="basemap-item" data-add="glacial">Glacial Quaternary Geology</div>
         <div class="basemap-item" data-add="landslides-hw">Landslide Inventory (Highways)</div>
         <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
