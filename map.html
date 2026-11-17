@@ -481,6 +481,9 @@ html, body {
       <input id="search-input" type="text" placeholder="100 N. Senate 46204">
       <button id="search-btn">Go</button>
     </div>
+    <div id="loader" style="margin-left:auto; color:#fff; font-size:13px; padding-right:16px; display:none;">
+      <span id="loader-text"></span>
+    </div>
   </div>
   <div class="tabs">
     <div class="tab active">Map Viewer</div>
@@ -592,32 +595,29 @@ html, body {
     </div>
     <div id="map"></div>
   </div>
-  <div id="loading-bar"></div>
-<div id="loading-status">Loading layers…</div>
+
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
-  // Loader Helper
-  let pendingLoads = 0;
+// Loader Helper
+let pendingLoads = 0;
 
 function startLoad(label) {
   pendingLoads++;
-  document.getElementById('loading-status').style.display = 'block';
-  document.getElementById('loading-status').textContent = 'Loading ' + label + '…';
-  // rough progress (just visual)
-  const pct = Math.min(90, 20 + pendingLoads * 15);
-  document.getElementById('loading-bar').style.width = pct + '%';
+  const status = document.getElementById('loader-text');
+  const loader = document.getElementById('loader');
+  if (status && loader) {
+    status.textContent = 'Loading ' + label + '…';
+    loader.style.display = 'block';
+  }
 }
 
 function finishLoad() {
   pendingLoads = Math.max(0, pendingLoads - 1);
   if (pendingLoads === 0) {
-    document.getElementById('loading-bar').style.width = '100%';
-    setTimeout(() => {
-      document.getElementById('loading-bar').style.display = 'none';
-      document.getElementById('loading-status').style.display = 'none';
-    }, 400);
+    const loader = document.getElementById('loader');
+    if (loader) loader.style.display = 'none';
   }
 }
 
