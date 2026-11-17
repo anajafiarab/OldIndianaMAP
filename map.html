@@ -1492,6 +1492,12 @@ async function loadThickness() {
   });
 }
 loadThickness()
+  .then(() => console.log('thickness finished'))
+  .catch(err => console.error('thickness error', err))
+  .finally(() => {
+    console.log('finally called');
+    finishLoad();
+  });
 .finally(finishLoad);   // <-- runs after success or error
 
 // Soils (dynamic by extent)
