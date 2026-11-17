@@ -623,21 +623,32 @@ html, body {
 
 <script>
   // Point-in-polygon test for Leaflet layers
-  function pointInPoly(point, layer) {
+function pointInPoly(point, layer) {
   if (!layer.getLatLngs) return false;
-  const rings = layer.getLatLngs();
   const lat = point.lat, lng = point.lng;
-  // simple ray-cast on the outer ring
-  const ring = rings[0];
-  let inside = false;
-  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
-    const xi = ring[i].lng, yi = ring[i].lat;
-    const xj = ring[j].lng, yj = ring[j].lat;
-    const intersect = ((yi > lat) !== (yj > lat)) &&
-                      (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
-    if (intersect) inside = !inside;
+
+  function rayCast(ring) {
+    let inside = false;
+    for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+      const xi = ring[i].lng, yi = ring[i].lat;
+      const xj = ring[j].lng, yj = ring[j].lat;
+      const intersect = ((yi > lat) !== (yj > lat)) &&
+                        (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+      if (intersect) inside = !inside;
+    }
+    return inside;
   }
-  return inside;
+
+  const latlngs = layer.getLatLngs();
+  // MultiPolygon: array of polygons, each an array of rings
+  if (latlngs[0] && latlngs[0][0] && latlngs[0][0].lat === undefined) {
+    for (const poly of latlngs) {
+      if (rayCast(poly[0])) return true;   // outer ring only
+    }
+    return false;
+  }
+  // simple Polygon
+  return rayCast(latlngs[0]);
 }
 // Loader Helper
 let pendingLoads = 0;
