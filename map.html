@@ -826,13 +826,14 @@ fetch('data/hydrogeo-units.json')
   const layerDefs = {
 
   // Glacial Quaternary Geology
-  glacial: {
+glacial: {
   name: 'Glacial Quaternary Geology',
   opacity: 1,
   layer: null,
-  source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer',
-  // simple color map by SYMBOL — expand as needed
-
+  source: {
+    url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer',
+    label: 'IGS Glacial Quaternary Geology'
+  }
 },
 // Legacy Boreholes Definition
 boreholes: {
