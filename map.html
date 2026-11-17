@@ -1727,8 +1727,16 @@ if (!hits.length) {
 if (h.erms) {
   html += `<div style="margin-top:10px;"><a href="${h.erms}" target="_blank" style="color:#113d43; font-weight:bold;">Open ERMS Report</a></div>`;
 }
-if (h.sourceUrl) {
-  html += `<div style="margin-top:8px; font-size:11px; color:#666;">Source: <a href="${h.sourceUrl}" target="_blank">${h.source || 'Data source'}</a></div>`;
+
+// Source link
+if (h.source) {
+  const url = typeof h.source === 'string' ? h.source : h.source.url;
+  const label = typeof h.source === 'string' ? 'Source' : (h.source.label || 'Source');
+  if (url) {
+    html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
+    html += `Source: <a href="${url}" target="_blank" style="color:#3d5c3d;">${label}</a>`;
+    html += `</div>`;
+  }
 }
     
         // Cross-section images for hydrogeologic units
@@ -1749,16 +1757,7 @@ if (h.sourceUrl) {
       });
       html += `</div>`;
     }
-    // Displays Source Link
-    if (h.source) {
-    const url = typeof h.source === 'string' ? h.source : h.source.url;
-    const label = typeof h.source === 'string' ? 'IGS Hydrogeology Settings' : (h.source.label || 'Source');
-    if (url) {
-        html += `<div style="margin-top:14px; padding-top:8px; border-top:1px solid #ccc; font-size:11px; color:#666;">`;
-        html += `Source: <a href="${url}" target="_blank" style="color:#3d5c3d;">${label}</a>`;
-        html += `</div>`;
-    }
-    }
+
     sb.innerHTML = html;
 
     document.getElementById('prev-hit').onclick = () => show(idx - 1);
