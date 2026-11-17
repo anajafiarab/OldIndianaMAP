@@ -1011,7 +1011,7 @@ liq: {
 // LOADERS
 // ──────────────────────────────────────────────
 
-//Liquefaction Loader
+// Liquefaction Loader
 startLoad('Liquefaction Potential');
 async function loadLiq() {
   const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer/0/query';
@@ -1023,18 +1023,26 @@ async function loadLiq() {
       all = all.concat(data.features);
       offset += page;
       if (data.features.length < page) more = false;
-    } else more = false;
-  console.log([...new Set(all.map(f => f.properties.DESCRIPTIO))]);}
-  const colors = {
-    'Low': '#4a90d9',
-    'Moderate': '#f5a623',
-    'High': '#d0021b'
-  };
+    } else {
+      more = false;
+    }
+  }
+
+  function liqColor(desc) {
+    if (!desc) return '#999';
+    const d = desc.toLowerCase();
+    if (d.includes('high'))     return '#d0021b';
+    if (d.includes('moderate')) return '#f5a623';
+    if (d.includes('low'))      return '#4a90d9';
+    if (d.includes('lake'))     return '#7ed321';
+    return '#999';
+  }
+
   layerDefs.liq.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
     style: f => ({
       color: '#333',
       weight: 0.5,
-      fillColor: colors[f.properties.DESCRIPTIO] || '#999',
+      fillColor: liqColor(f.properties.DESCRIPTIO),
       fillOpacity: 0.4
     })
   });
