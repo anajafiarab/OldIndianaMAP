@@ -622,6 +622,23 @@ html, body {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+  // Point-in-polygon test for Leaflet layers
+  function pointInPoly(point, layer) {
+  if (!layer.getLatLngs) return false;
+  const rings = layer.getLatLngs();
+  const lat = point.lat, lng = point.lng;
+  // simple ray-cast on the outer ring
+  const ring = rings[0];
+  let inside = false;
+  for (let i = 0, j = ring.length - 1; i < ring.length; j = i++) {
+    const xi = ring[i].lng, yi = ring[i].lat;
+    const xj = ring[j].lng, yj = ring[j].lat;
+    const intersect = ((yi > lat) !== (yj > lat)) &&
+                      (lng < (xj - xi) * (lat - yi) / (yj - yi) + xi);
+    if (intersect) inside = !inside;
+  }
+  return inside;
+}
 // Loader Helper
 let pendingLoads = 0;
 
@@ -1925,7 +1942,7 @@ map.on('click', function (e) { // CLICK HANDLER
   });
 } else if (layerDefs.liq.layer && map.hasLayer(layerDefs.liq.layer)) {
   layerDefs.liq.layer.eachLayer(l => {
-    if (l.feature && l.getBounds && l.getBounds().contains(e.latlng)) {
+    if (l.feature && pointInPoly(e.latlng, l)) {
       const p = l.feature.properties;
       hits.push({
         layer: l,
