@@ -828,15 +828,11 @@ fetch('data/hydrogeo-units.json')
   // Glacial Quaternary Geology
   glacial: {
   name: 'Glacial Quaternary Geology',
-  opacity: 0.6,
+  opacity: 1,
   layer: null,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer',
   // simple color map by SYMBOL — expand as needed
-  colors: {
-    tg: '#c4a484',
-    // add more symbols as you discover them
-    default: '#d4c4a8'
-  }
+
 },
 // Legacy Boreholes Definition
 boreholes: {
@@ -969,6 +965,7 @@ bedrock250: {
 // LOADERS
 // ──────────────────────────────────────────────
 
+
 // Glacial Quaternary Geology Loader
 startLoad('Glacial Quaternary Geology');
 async function loadGlacial() {
@@ -984,16 +981,16 @@ async function loadGlacial() {
     } else more = false;
   }
   layerDefs.glacial.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: f => {
-      const sym = (f.properties.SYMBOL || '').toLowerCase();
-      const color = layerDefs.glacial.colors[sym] || layerDefs.glacial.colors.default;
-      return { color: color, weight: 1, fillColor: color, fillOpacity: 1 };
+    style: {
+      color: '#5c4033',
+      weight: 1.5,
+      fillColor: '#d4c4a8',
+      fillOpacity: 0.55
     }
-    // no onEachFeature labels
   });
 }
 loadGlacial()
-.finally(finishLoad);   // <-- runs after success or error
+  .finally(finishLoad);
 
 // Legacy Boreholes Loader
 startLoad('Legacy Boreholes');
