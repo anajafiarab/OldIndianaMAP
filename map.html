@@ -61,6 +61,7 @@ html, body {
   padding: 2px 6px 0 6px;
   display: flex;
   gap: 2px;
+  align-items: center;   /* add this */
 }
 .tab {
   background: #113d43;
@@ -487,14 +488,14 @@ html, body {
       <input id="search-input" type="text" placeholder="100 N. Senate 46204">
       <button id="search-btn">Go</button>
     </div>
-    <div id="loader" style="margin-left:auto; color:#fff; font-size:13px; padding-right:16px; display:none;">
-      <span id="loader-text"></span>
-    </div>
   </div>
   <div class="tabs">
     <div class="tab active">Map Viewer</div>
     <div class="tab">Map Gallery</div>
     <div class="tab">Layer Gallery</div>
+    <div id="loader" style="margin-left:auto; color:#fff; font-size:13px; padding-right:16px; display:none; align-self:center;">
+      <span id="loader-text"></span>
+    </div>
   </div>
 
   <div class="tool-wrap">
