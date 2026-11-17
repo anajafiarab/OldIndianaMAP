@@ -1864,7 +1864,7 @@ map.on('click', function (e) { // CLICK HANDLER
     'Geologic Age': p.GEOLOGIC_A || '—',
     'Deposition': p.DEPOSITION || '—'
   }));
-}} else if (id === 'karst') {
+} else if (id === 'karst') {
   if (!def.layer || !map.hasLayer(def.layer)) return;
   def.layer.eachLayer(l => {
     if (!l.getLatLng) return;
@@ -1881,7 +1881,8 @@ map.on('click', function (e) { // CLICK HANDLER
         source: def.source || null
       });
     }
-}); // closes active.forEach
+  });
+} // closes active.forEach
 
   document.getElementById('legend-btn').click();
   const sb = document.getElementById('sidebar');
