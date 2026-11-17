@@ -446,6 +446,28 @@ html, body {
   color: #4a3c1a;
   text-shadow: 0 0 2px #fff, 0 0 2px #fff;
 }
+#loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 4px;
+  background: #8BA6AA;
+  width: 0%;
+  z-index: 9999;
+  transition: width 0.3s;
+}
+#loading-status {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  background: #113d43;
+  color: #fff;
+  padding: 4px 10px;
+  font-size: 12px;
+  border-radius: 2px;
+  z-index: 9999;
+  display: none;
+}
   </style>
 </head>
 <body>
@@ -570,10 +592,35 @@ html, body {
     </div>
     <div id="map"></div>
   </div>
+  <div id="loading-bar"></div>
+<div id="loading-status">Loading layers…</div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
+  // Loader Helper
+  let pendingLoads = 0;
+
+function startLoad(label) {
+  pendingLoads++;
+  document.getElementById('loading-status').style.display = 'block';
+  document.getElementById('loading-status').textContent = 'Loading ' + label + '…';
+  // rough progress (just visual)
+  const pct = Math.min(90, 20 + pendingLoads * 15);
+  document.getElementById('loading-bar').style.width = pct + '%';
+}
+
+function finishLoad() {
+  pendingLoads = Math.max(0, pendingLoads - 1);
+  if (pendingLoads === 0) {
+    document.getElementById('loading-bar').style.width = '100%';
+    setTimeout(() => {
+      document.getElementById('loading-bar').style.display = 'none';
+      document.getElementById('loading-status').style.display = 'none';
+    }, 400);
+  }
+}
+
 let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
 function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
 
@@ -757,7 +804,7 @@ boreholes: {
   layer: null,
   opacity: 1,
   source: {
-    url: 'https://www.in.gov/indot/engineering/geotechnical-engineering-division/',
+    url: 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech', // UPDATE SOURCE
     label: 'INDOT Geotechnical Engineering Division'
   }
 },
@@ -1159,6 +1206,7 @@ function updateCountyLabels() {
 map.on('zoomend', updateCountyLabels);
 
 // PLSS
+startLoad('PLSS');
 async function loadPLSS() {
   const base = 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2/query';
   let all = [], offset = 0, page = 1000, more = true;
@@ -1180,8 +1228,10 @@ async function loadPLSS() {
     }
   });
   updatePLSSLabels();
+  finishLoad();
 }
 loadPLSS();
+
 
 function updatePLSSLabels() {
   const lyr = layerDefs.plss.layer;
