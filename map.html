@@ -2074,7 +2074,13 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
           attrs[k] = p[k];
         }
       }
-      hits.push({ layerName: 'National Bridge Inventory', attrs, layer: l });
+      hits.push({
+  layerName: 'National Bridge Inventory',
+  attrs,
+  layer: l,
+  source: 'https://www.bts.gov/ntad',
+  requestForm: 'https://entapps.indot.in.gov/opsm/Dashboard/UserRequest'
+});
     }
   });
 }
@@ -2140,7 +2146,7 @@ if (h.erms) {
   html += `<div style="margin-top:10px;"><a href="${h.erms}" target="_blank" style="color:#113d43; font-weight:bold;">Open ERMS Report</a></div>`;
 }
 
-// Source link
+// Source link (Source Block)
 if (h.source) {
   const url = typeof h.source === 'string' ? h.source : h.source.url;
   const label = typeof h.source === 'string' ? 'Source' : (h.source.label || 'Source');
@@ -2149,6 +2155,10 @@ if (h.source) {
     html += `Source: <a href="${url}" target="_blank" style="color:#3d5c3d;">${label}</a>`;
     html += `</div>`;
   }
+}
+// INDOT request form for NBI
+if (h.requestForm) {
+  html += `<div style="margin-top:6px; font-size:11px;"><a href="${h.requestForm}" target="_blank" rel="noopener" style="color:#113d43;">INDOT Bridge Request Form</a></div>`;
 }
     
         // Cross-section images for hydrogeologic units
