@@ -1006,12 +1006,44 @@ liq: {
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer',
   sourceLabel: 'IGWS Earthquake Liquefaction Potential (MM81)'
 },
+nbi: {
+  name: 'National Bridge Inventory',
+  layer: null,
+  opacity: 1,
+  source: 'https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/NTAD_National_Bridge_Inventory/FeatureServer'
+},
 
 };
 
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+// National Bridge Inventory (Indiana only)
+startLoad('National Bridge Inventory');
+async function loadNBI() {
+  const base = 'https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/NTAD_National_Bridge_Inventory/FeatureServer/0/query';
+  let all = [], offset = 0, page = 2000, more = true;
+  while (more) {
+    const url = `${base}?where=STATE_CODE%3D%2718%27&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const data = await (await fetch(url)).json();
+    if (data.features && data.features.length) {
+      all = all.concat(data.features);
+      offset += page;
+      if (data.features.length < page) more = false;
+    } else more = false;
+  }
+  layerDefs.nbi.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+      radius: 4,
+      color: '#8B0000',
+      weight: 1,
+      fillColor: '#e74c3c',
+      fillOpacity: 0.7
+    })
+  });
+}
+loadNBI().finally(finishLoad);
 
 // Liquefaction Loader
 startLoad('Liquefaction Potential');
@@ -1492,12 +1524,6 @@ async function loadThickness() {
   });
 }
 loadThickness()
-  .then(() => console.log('thickness finished'))
-  .catch(err => console.error('thickness error', err))
-  .finally(() => {
-    console.log('finally called');
-    finishLoad();
-  })
 .finally(finishLoad);   // <-- runs after success or error
 
 // Soils (dynamic by extent)
@@ -2020,6 +2046,23 @@ map.on('click', function (e) { // CLICK HANDLER
       });
     }
   });
+} else// inside the map.on('click') handler, when testing NBI
+if (map.hasLayer(layerDefs.nbi.layer)) {
+  layerDefs.nbi.layer.eachLayer(l => {
+    if (l.getLatLng && l.getLatLng().distanceTo(e.latlng) < 30) {  // meters, adjust if needed
+      const p = l.feature.properties;
+      const attrs = {};
+      // Prefer Structure Number first
+      if (p.STRUCTURE_NUMBER_008) attrs['Structure Number'] = p.STRUCTURE_NUMBER_008;
+      // Then dump everything else that has a value
+      for (let k in p) {
+        if (p[k] != null && p[k] !== '' && k !== 'STRUCTURE_NUMBER_008') {
+          attrs[k] = p[k];
+        }
+      }
+      hits.push({ layerName: 'National Bridge Inventory', attrs, layer: l });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -2211,6 +2254,7 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
       <div class="basemap-item" data-add="boreholes">Boreholes</div>
       <div class="basemap-item" data-add="liq">Liquefaction Potential</div>
+      <div class="basemap-item" data-add="nbi">National Bridge Inventory</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
 
 
