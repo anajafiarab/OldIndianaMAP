@@ -1043,7 +1043,12 @@ async function loadNBI() {
     })
   });
 }
-loadNBI().finally(finishLoad);
+loadNBI().then(() => {
+  if (layerDefs.nbi.layer) {
+    layerDefs.nbi.layer.eachLayer(l => l.setStyle({ radius: 6, fillOpacity: 1 }));
+    layerDefs.nbi.layer.addTo(map);
+  }
+}).finally(finishLoad);
 
 // Liquefaction Loader
 startLoad('Liquefaction Potential');
