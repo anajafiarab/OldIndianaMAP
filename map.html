@@ -1025,7 +1025,7 @@ async function loadNBI() {
   const base = 'https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/NTAD_National_Bridge_Inventory/FeatureServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
   while (more) {
-    const url = `${base}?where=STATE_CODE_001%3D%2718%27&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const url = base + '?where=STATE_CODE_001%3D%2718%27&outFields=*&f=geojson&resultOffset=' + offset + '&resultRecordCount=' + page;
     const data = await (await fetch(url)).json();
     if (data.features && data.features.length) {
       all = all.concat(data.features);
@@ -1043,12 +1043,7 @@ async function loadNBI() {
     })
   });
 }
-loadNBI().then(() => {
-  if (layerDefs.nbi.layer) {
-    layerDefs.nbi.layer.eachLayer(l => l.setStyle({ radius: 6, fillOpacity: 1 }));
-    layerDefs.nbi.layer.addTo(map);
-  }
-}).finally(finishLoad);
+loadNBI().finally(finishLoad);
 
 // Liquefaction Loader
 startLoad('Liquefaction Potential');
