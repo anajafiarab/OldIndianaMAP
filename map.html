@@ -1144,16 +1144,40 @@ async function loadGlacial() {
     } else more = false;
   }
 layerDefs.glacial.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-  style: f => {
-    const sym = (f.properties.SYMBOL || '').toLowerCase().trim();
-    // Problem engineering soils — stand out
-    if (sym === 'm' || sym.includes('muck'))        return { color: '#5c4033', weight: 1.5, fillColor: '#8B4513', fillOpacity: 0.7 }; // muck
-    if (sym === 'lo' || sym.includes('loess'))      return { color: '#5c4033', weight: 1.5, fillColor: '#D2B48C', fillOpacity: 0.65 }; // loess
-    if (sym === 'la' || sym.includes('lacustrine')) return { color: '#5c4033', weight: 1.5, fillColor: '#6B8E9B', fillOpacity: 0.65 }; // lake silt/clay
-    if (sym === '3k' || sym.includes('karst'))      return { color: '#5c4033', weight: 1.5, fillColor: '#A9A9A9', fillOpacity: 0.6 };  // karst
-    // Everything else stays monochromatic
-    return { color: '#5c4033', weight: 1.5, fillColor: '#d4c4a8', fillOpacity: 0.55 };
+style: f => {
+  const p = f.properties || {};
+  const sym = (p.SYMBOL || '').toLowerCase().trim();
+  const desc = (p.DESCRIPTIO || '').toLowerCase();
+  const dep = (p.DEPOSITION || '').toLowerCase();
+
+  // Organic / muck — match the soil brown
+  if (sym === 'm' || /muck|peat|organic/.test(desc)) {
+    return { color: '#8B2500', weight: 1.2, fillColor: '#A0522D', fillOpacity: 0.65 };
   }
+
+  // Lake silt & clay (lc) and other lacustrine — match the soil blue
+  if (sym === 'lc' || sym === 'la' || /lacustrine|lake silt|lake clay|glaciolacustrine/.test(desc) || /lacustrine/.test(dep)) {
+    return { color: '#1a5276', weight: 1.2, fillColor: '#5D8AA8', fillOpacity: 0.55 };
+  }
+
+  // Loess — match the soil dingy yellow
+  if (sym === 'lo' || /loess/.test(desc) || /loess/.test(dep)) {
+    return { color: '#8B7500', weight: 1.2, fillColor: '#C5A046', fillOpacity: 0.55 };
+  }
+
+  // Dune sand — light sandy yellow, lighter than loess
+  if (sym === 'd' || /dune|eolian sand|windblown sand/.test(desc)) {
+    return { color: '#B8860B', weight: 1.0, fillColor: '#F0E68C', fillOpacity: 0.45 };
+  }
+
+  // Karst — light gray, not heavy
+  if (sym === '3k' || /karst/.test(desc)) {
+    return { color: '#666666', weight: 1.0, fillColor: '#D3D3D3', fillOpacity: 0.4 };
+  }
+
+  // Everything else — quiet tan so the special units stand out
+  return { color: '#8B7355', weight: 0.8, fillColor: '#E8DCC8', fillOpacity: 0.35 };
+}
 });
 }
 loadGlacial()
