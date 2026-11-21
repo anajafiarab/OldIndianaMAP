@@ -1592,9 +1592,21 @@ function getSoilStyle(feature) {
   const p = feature.properties || {};
   const name = (p.muname || '').toLowerCase();
   const pm = (p._pm || '').toLowerCase();
+  const text = `${name} ${pm}`;
 
+  // Marl — darker red (overrides everything else)
+  if (/marl/.test(text)) {
+    return { color: '#8B0000', weight: 1.5, fillColor: '#B22222', fillOpacity: 0.6 };
+  }
+
+  // Peat that is not already called muck — lighter red
+  if (/peat/.test(text) && !/muck/.test(text)) {
+    return { color: '#A52A2A', weight: 1.5, fillColor: '#CD5C5C', fillOpacity: 0.55 };
+  }
+
+  // Organic / muck (existing brown)
   const isOrganic =
-    /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
+    /muck|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
     /organic|muck|peat|herbaceous organic/.test(pm);
 
   const isLoess =
