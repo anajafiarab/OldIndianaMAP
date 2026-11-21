@@ -1548,15 +1548,62 @@ function getSoilStyle(feature) {
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
+  if (p._lacustrine) {
+    return { color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 };
+  }
   return { color: '#8B6914', weight: 0.6, fillColor: '#D2B48C', fillOpacity: 0.18 };
 }
 
 const soilsLayer = L.geoJSON(null, { style: getSoilStyle });
 layerDefs.soils.layer = soilsLayer;
 
+async function markLacustrineSoils() {
+  if (!map.hasLayer(soilsLayer)) return;
+
+  const mukeys = new Set();
+  soilsLayer.eachLayer(l => {
+    if (l.feature?.properties?.mukey) mukeys.add(l.feature.properties.mukey);
+  });
+  if (!mukeys.size) return;
+
+  const list = [...mukeys].map(k => `'${k}'`).join(',');
+  const query = `
+    SELECT DISTINCT co.mukey
+    FROM component co
+    LEFT JOIN (
+      SELECT cokey, pmkind, pmgroupname
+      FROM copmgrp
+      LEFT JOIN copm ON copmgrp.copmgrpkey = copm.copmgrpkey
+    ) pm ON co.cokey = pm.cokey
+    WHERE co.mukey IN (${list})
+      AND co.majcompflag = 'Yes'
+      AND (pm.pmkind LIKE '%lacustrine%' OR pm.pmgroupname LIKE '%lacustrine%')
+  `;
+
+  try {
+    const resp = await fetch('https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
+      body: new URLSearchParams({ query, format: 'JSON' })
+    });
+    const data = await resp.json();
+    const lacustrineKeys = new Set((data.Table || []).map(row => row[0]));
+
+    soilsLayer.eachLayer(l => {
+      const isLac = lacustrineKeys.has(String(l.feature.properties.mukey));
+      l.feature.properties._lacustrine = isLac;
+      if (isLac && !/muck|peat|organic|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon/.test((l.feature.properties.muname || '').toLowerCase())) {
+        l.setStyle({ color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 });
+      }
+    });
+  } catch (e) {
+    console.warn('Lacustrine query failed', e);
+  }
+}
+
 function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
-  if (map.getZoom() < 14) {
+  if (map.getZoom() < 13) {
     soilsLayer.clearLayers();
     return;
   }
@@ -1584,6 +1631,7 @@ function refreshSoils() {
           const sym = l.feature.properties.musym || '';
           if (sym) l.bindTooltip(sym, { permanent: true, direction: 'center', className: 'soil-label' });
         });
+        markLacustrineSoils();   // <-- new call
       }
     })
     .catch(err => console.error('Soils refresh failed:', err))
