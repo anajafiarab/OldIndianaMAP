@@ -1550,13 +1550,23 @@ function getSoilStyle(feature) {
     /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
     /organic|muck|peat|herbaceous organic/.test(pm);
 
+  const isLoess =
+    p._loess ||
+    /loess|alford|iona|sylvan|ross|miami|crosby|fincastle|russell|wea|princeton|bloomfield|alvin/.test(name) ||
+    /loess/.test(pm);
+
+  const isLacustrine =
+    p._lacustrine ||
+    /lacustrine|medaryville|radioville|mermill|sebewa|ragsdale|brookston|delmar|peotone/.test(name) ||
+    /lacustrine/.test(pm);
+
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
-  if (p._loess) {
-    return { color: '#8B7500', weight: 1.5, fillColor: '#C5A046', fillOpacity: 0.45 };  // dark dingy yellow
+  if (isLoess) {
+    return { color: '#8B7500', weight: 1.5, fillColor: '#C5A046', fillOpacity: 0.45 };
   }
-  if (p._lacustrine) {
+  if (isLacustrine) {
     return { color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 };
   }
   return { color: '#8B6914', weight: 0.6, fillColor: '#D2B48C', fillOpacity: 0.18 };
@@ -1575,17 +1585,17 @@ async function markLacustrineSoils() {
   if (!mukeys.size) return;
 
   const list = [...mukeys].map(k => `'${k}'`).join(',');
-const query = `
-  SELECT co.mukey, pm.pmkind, pm.pmgroupname, co.geomdesc
-  FROM component co
-  LEFT JOIN (
-    SELECT cokey, pmkind, pmgroupname
-    FROM copmgrp
-    LEFT JOIN copm ON copmgrp.copmgrpkey = copm.copmgrpkey
-  ) pm ON co.cokey = pm.cokey
-  WHERE co.mukey IN (${list})
-    AND co.majcompflag = 'Yes'
-`;
+  const query = `
+    SELECT co.mukey, pm.pmkind, pm.pmgroupname, co.geomdesc
+    FROM component co
+    LEFT JOIN (
+      SELECT cokey, pmkind, pmgroupname
+      FROM copmgrp
+      LEFT JOIN copm ON copmgrp.copmgrpkey = copm.copmgrpkey
+    ) pm ON co.cokey = pm.cokey
+    WHERE co.mukey IN (${list})
+      AND co.majcompflag = 'Yes'
+  `;
 
   try {
     const resp = await fetch('https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest', {
@@ -1593,32 +1603,35 @@ const query = `
       headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
       body: new URLSearchParams({ query, format: 'JSON' })
     });
+    if (!resp.ok) throw new Error('HTTP ' + resp.status);
     const data = await resp.json();
 
     const info = {};
-(data.Table || []).forEach(row => {
-  const mukey = String(row[0]);
-  const text = [row[1], row[2], row[3]].filter(Boolean).join(' ').toLowerCase();
-  if (!info[mukey]) info[mukey] = { lacustrine: false, loess: false, pm: '' };
-  info[mukey].pm = text;
-  if (/lacustrine/.test(text)) info[mukey].lacustrine = true;
-  if (/loess/.test(text)) info[mukey].loess = true;
-});
+    (data.Table || []).forEach(row => {
+      const mukey = String(row[0]);
+      const text = [row[1], row[2], row[3]].filter(Boolean).join(' ').toLowerCase();
+      if (!info[mukey]) info[mukey] = { lacustrine: false, loess: false, pm: '' };
+      info[mukey].pm = text;
+      if (/lacustrine/.test(text)) info[mukey].lacustrine = true;
+      if (/loess/.test(text)) info[mukey].loess = true;
+    });
 
-soilsLayer.eachLayer(l => {
-  const p = l.feature.properties;
-  const rec = info[String(p.mukey)];
-  if (!rec) return;
-
-  p._pm = rec.pm;
-  p._lacustrine = rec.lacustrine;
-  p._loess = rec.loess;
-
-  // Re-apply style so all rules (organic → loess → lacustrine) take effect
-  l.setStyle(getSoilStyle(l.feature));
-});
+    soilsLayer.eachLayer(l => {
+      const p = l.feature.properties;
+      const rec = info[String(p.mukey)];
+      if (!rec) return;
+      p._pm = rec.pm;
+      p._lacustrine = rec.lacustrine;
+      p._loess = rec.loess;
+      l.setStyle(getSoilStyle(l.feature));
+    });
   } catch (e) {
     console.warn('Parent-material query failed', e);
+    // Surface the failure in the existing loading bar
+    startLoad('Parent material data unavailable');
+    setTimeout(finishLoad, 4000);   // auto-clear after 4 s
+    // Still apply any name-based styles we can
+    soilsLayer.eachLayer(l => l.setStyle(getSoilStyle(l.feature)));
   }
 }
 
