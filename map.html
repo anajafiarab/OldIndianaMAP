@@ -1544,7 +1544,7 @@ loadThickness()
 function getSoilStyle(feature) {
   const p = feature.properties || {};
   const name = (p.muname || '').toLowerCase();
-  const pm = (p._pm || '').toLowerCase();   // we’ll set this from SDA
+  const pm = (p._pm || '').toLowerCase();
 
   const isOrganic =
     /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
@@ -1552,6 +1552,9 @@ function getSoilStyle(feature) {
 
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
+  }
+  if (p._loess) {
+    return { color: '#8B7500', weight: 1.5, fillColor: '#C5A046', fillOpacity: 0.45 };  // dark dingy yellow
   }
   if (p._lacustrine) {
     return { color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 };
@@ -1572,17 +1575,17 @@ async function markLacustrineSoils() {
   if (!mukeys.size) return;
 
   const list = [...mukeys].map(k => `'${k}'`).join(',');
-  const query = `
-    SELECT co.mukey, pm.pmkind, pm.pmgroupname
-    FROM component co
-    LEFT JOIN (
-      SELECT cokey, pmkind, pmgroupname
-      FROM copmgrp
-      LEFT JOIN copm ON copmgrp.copmgrpkey = copm.copmgrpkey
-    ) pm ON co.cokey = pm.cokey
-    WHERE co.mukey IN (${list})
-      AND co.majcompflag = 'Yes'
-  `;
+const query = `
+  SELECT co.mukey, pm.pmkind, pm.pmgroupname, co.geomdesc
+  FROM component co
+  LEFT JOIN (
+    SELECT cokey, pmkind, pmgroupname
+    FROM copmgrp
+    LEFT JOIN copm ON copmgrp.copmgrpkey = copm.copmgrpkey
+  ) pm ON co.cokey = pm.cokey
+  WHERE co.mukey IN (${list})
+    AND co.majcompflag = 'Yes'
+`;
 
   try {
     const resp = await fetch('https://sdmdataaccess.sc.egov.usda.gov/Tabular/post.rest', {
@@ -1593,25 +1596,27 @@ async function markLacustrineSoils() {
     const data = await resp.json();
 
     const info = {};
-    (data.Table || []).forEach(row => {
-      const mukey = String(row[0]);
-      const text = [row[1], row[2]].filter(Boolean).join(' ').toLowerCase();
-      if (!info[mukey]) info[mukey] = { lacustrine: false, pm: '' };
-      info[mukey].pm = text;
-      if (/lacustrine/.test(text)) info[mukey].lacustrine = true;
-    });
+(data.Table || []).forEach(row => {
+  const mukey = String(row[0]);
+  const text = [row[1], row[2], row[3]].filter(Boolean).join(' ').toLowerCase();
+  if (!info[mukey]) info[mukey] = { lacustrine: false, loess: false, pm: '' };
+  info[mukey].pm = text;
+  if (/lacustrine/.test(text)) info[mukey].lacustrine = true;
+  if (/loess/.test(text)) info[mukey].loess = true;
+});
 
-    soilsLayer.eachLayer(l => {
-      const p = l.feature.properties;
-      const rec = info[String(p.mukey)];
-      if (!rec) return;
+soilsLayer.eachLayer(l => {
+  const p = l.feature.properties;
+  const rec = info[String(p.mukey)];
+  if (!rec) return;
 
-      p._pm = rec.pm;
-      p._lacustrine = rec.lacustrine;
+  p._pm = rec.pm;
+  p._lacustrine = rec.lacustrine;
+  p._loess = rec.loess;
 
-      // Re-apply style so organic-from-PM or lacustrine can take effect
-      l.setStyle(getSoilStyle(l.feature));
-    });
+  // Re-apply style so all rules (organic → loess → lacustrine) take effect
+  l.setStyle(getSoilStyle(l.feature));
+});
   } catch (e) {
     console.warn('Parent-material query failed', e);
   }
