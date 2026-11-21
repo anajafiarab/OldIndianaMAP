@@ -1550,13 +1550,23 @@ function getSoilStyle(feature) {
     /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
     /organic|muck|peat|herbaceous organic/.test(pm);
 
+  const isLoess =
+    p._loess === true ||
+    (/loess|alford|iona|sylvan|ross|miami|crosby|fincastle|russell|wea|princeton|bloomfield|alvin/.test(name) && p._loess !== false) ||
+    /loess/.test(pm);
+
+  const isLacustrine =
+    p._lacustrine === true ||
+    (/lacustrine|medaryville|radioville|mermill|sebewa|ragsdale|brookston|delmar|peotone/.test(name) && p._lacustrine !== false) ||
+    /lacustrine/.test(pm);
+
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
-  if (p._loess) {
+  if (isLoess) {
     return { color: '#8B7500', weight: 1.5, fillColor: '#C5A046', fillOpacity: 0.45 };
   }
-  if (p._lacustrine) {
+  if (isLacustrine) {
     return { color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 };
   }
   return { color: '#8B6914', weight: 0.6, fillColor: '#D2B48C', fillOpacity: 0.18 };
@@ -1609,17 +1619,18 @@ async function markLacustrineSoils() {
     soilsLayer.eachLayer(l => {
       const p = l.feature.properties;
       const rec = info[String(p.mukey)];
-      if (!rec) return;
-      p._pm = rec.pm;
-      p._lacustrine = rec.lacustrine;
-      p._loess = rec.loess;
+      if (rec) {
+        p._pm = rec.pm;
+        p._lacustrine = rec.lacustrine;   // true or false — SDA decides
+        p._loess = rec.loess;
+      }
       l.setStyle(getSoilStyle(l.feature));
     });
   } catch (e) {
     console.warn('Parent-material query failed', e);
-    startLoad('Parent material data unavailable — using conservative colors');
-    setTimeout(finishLoad, 4000);
-    // Fallback: only organic name rules (no aggressive lacustrine/loess name matching)
+    startLoad('Parent material data unavailable (verify soils)');
+    setTimeout(finishLoad, 5000);
+    // Name rules stay active because _lacustrine/_loess were never set to false
     soilsLayer.eachLayer(l => l.setStyle(getSoilStyle(l.feature)));
   }
 }
