@@ -1544,7 +1544,12 @@ loadThickness()
 function getSoilStyle(feature) {
   const p = feature.properties || {};
   const name = (p.muname || '').toLowerCase();
-  const isOrganic = /muck|peat|organic|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon/.test(name);
+  const pm = (p._pm || '').toLowerCase();   // we’ll set this from SDA
+
+  const isOrganic =
+    /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
+    /organic|muck|peat|herbaceous organic/.test(pm);
+
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
@@ -1568,7 +1573,7 @@ async function markLacustrineSoils() {
 
   const list = [...mukeys].map(k => `'${k}'`).join(',');
   const query = `
-    SELECT DISTINCT co.mukey
+    SELECT co.mukey, pm.pmkind, pm.pmgroupname
     FROM component co
     LEFT JOIN (
       SELECT cokey, pmkind, pmgroupname
@@ -1577,7 +1582,6 @@ async function markLacustrineSoils() {
     ) pm ON co.cokey = pm.cokey
     WHERE co.mukey IN (${list})
       AND co.majcompflag = 'Yes'
-      AND (pm.pmkind LIKE '%lacustrine%' OR pm.pmgroupname LIKE '%lacustrine%')
   `;
 
   try {
@@ -1587,23 +1591,35 @@ async function markLacustrineSoils() {
       body: new URLSearchParams({ query, format: 'JSON' })
     });
     const data = await resp.json();
-    const lacustrineKeys = new Set((data.Table || []).map(row => row[0]));
+
+    const info = {};
+    (data.Table || []).forEach(row => {
+      const mukey = String(row[0]);
+      const text = [row[1], row[2]].filter(Boolean).join(' ').toLowerCase();
+      if (!info[mukey]) info[mukey] = { lacustrine: false, pm: '' };
+      info[mukey].pm = text;
+      if (/lacustrine/.test(text)) info[mukey].lacustrine = true;
+    });
 
     soilsLayer.eachLayer(l => {
-      const isLac = lacustrineKeys.has(String(l.feature.properties.mukey));
-      l.feature.properties._lacustrine = isLac;
-      if (isLac && !/muck|peat|organic|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon/.test((l.feature.properties.muname || '').toLowerCase())) {
-        l.setStyle({ color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 });
-      }
+      const p = l.feature.properties;
+      const rec = info[String(p.mukey)];
+      if (!rec) return;
+
+      p._pm = rec.pm;
+      p._lacustrine = rec.lacustrine;
+
+      // Re-apply style so organic-from-PM or lacustrine can take effect
+      l.setStyle(getSoilStyle(l.feature));
     });
   } catch (e) {
-    console.warn('Lacustrine query failed', e);
+    console.warn('Parent-material query failed', e);
   }
 }
 
 function refreshSoils() {
   if (!map.hasLayer(soilsLayer)) return;
-  if (map.getZoom() < 13) {
+  if (map.getZoom() < 14) {
     soilsLayer.clearLayers();
     return;
   }
