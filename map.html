@@ -1550,23 +1550,13 @@ function getSoilStyle(feature) {
     /muck|peat|organic|sapric|hemic|fibric|houghton|carlisle|adrian|palms|edwards|willette|markey|toledo|roscommon|kerston|linwood|lupton|rifle|greenwood|muskego/.test(name) ||
     /organic|muck|peat|herbaceous organic/.test(pm);
 
-  const isLoess =
-    p._loess ||
-    /loess|alford|iona|sylvan|ross|miami|crosby|fincastle|russell|wea|princeton|bloomfield|alvin/.test(name) ||
-    /loess/.test(pm);
-
-  const isLacustrine =
-    p._lacustrine ||
-    /lacustrine|medaryville|radioville|mermill|sebewa|ragsdale|brookston|delmar|peotone/.test(name) ||
-    /lacustrine/.test(pm);
-
   if (isOrganic) {
     return { color: '#8B2500', weight: 1.5, fillColor: '#A0522D', fillOpacity: 0.55 };
   }
-  if (isLoess) {
+  if (p._loess) {
     return { color: '#8B7500', weight: 1.5, fillColor: '#C5A046', fillOpacity: 0.45 };
   }
-  if (isLacustrine) {
+  if (p._lacustrine) {
     return { color: '#1a5276', weight: 1.5, fillColor: '#3498db', fillOpacity: 0.45 };
   }
   return { color: '#8B6914', weight: 0.6, fillColor: '#D2B48C', fillOpacity: 0.18 };
@@ -1627,10 +1617,9 @@ async function markLacustrineSoils() {
     });
   } catch (e) {
     console.warn('Parent-material query failed', e);
-    // Surface the failure in the existing loading bar
-    startLoad('Parent material data unavailable');
-    setTimeout(finishLoad, 4000);   // auto-clear after 4 s
-    // Still apply any name-based styles we can
+    startLoad('Parent material data unavailable — using conservative colors');
+    setTimeout(finishLoad, 4000);
+    // Fallback: only organic name rules (no aggressive lacustrine/loess name matching)
     soilsLayer.eachLayer(l => l.setStyle(getSoilStyle(l.feature)));
   }
 }
