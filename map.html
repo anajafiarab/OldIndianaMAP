@@ -653,11 +653,10 @@ function pointInPoly(point, layer) {
   // simple Polygon
   return rayCast(latlngs[0]);
 }
-//Soil Data Helper
 async function fetchSoilDetails(mukey) {
   if (!mukey) return null;
 
-  const query = `
+  const sql = `
     SELECT TOP 1
       co.cokey,
       co.compname,
@@ -675,21 +674,27 @@ async function fetchSoilDetails(mukey) {
   `.replace(/\s+/g, ' ').trim();
 
   const url = 'https://sdmdataaccess.sc.egov.usda.gov/tabular/post.rest';
-  const body = `query=${encodeURIComponent(query)}&format=JSON`;
+  const body = `query=${encodeURIComponent(sql)}&format=json%2Bcolumnname`;
 
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body
   });
+
+  if (!res.ok) {
+    console.error('SDA status', res.status);
+    return null;
+  }
+
   const json = await res.json();
   if (!json.Table || !json.Table.length) return null;
 
   const row = json.Table[0];
-  const cokey = row[0];
+  const cokey = row.cokey;
 
-  // Second query: water table (monthly min/max) + horizons
-  const q2 = `
+  // Second query for water table + horizons
+  const sql2 = `
     SELECT
       cm.wtdepl, cm.wtdeph,
       ch.hzname, ch.hzdept_r, ch.hzdepb_r,
@@ -702,44 +707,44 @@ async function fetchSoilDetails(mukey) {
     ORDER BY ch.hzdept_r
   `.replace(/\s+/g, ' ').trim();
 
-  const body2 = `query=${encodeURIComponent(q2)}&format=JSON`;
+  const body2 = `query=${encodeURIComponent(sql2)}&format=json%2Bcolumnname`;
   const res2 = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: body2
   });
-  const json2 = await res2.json();
 
-  // Build display object
+  const json2 = res2.ok ? await res2.json() : { Table: [] };
+
   const details = {
-    'Component': `${row[1] || '—'} (${row[2] || '—'}%)`,
-    'Landform / Geomorph': row[6] || '—',
-    'Drainage Class': row[3] || '—',
-    'Hydrologic Soil Group': row[4] || '—',
-    'Corrosion of Concrete': row[5] || '—',
-    'Corrosion of Steel': row[5] ? row[5] : '—', // corsteel is index 5 in this select; adjust if you reorder
-    'AASHTO': row[7] || '—'
+    'Component': `${row.compname || '—'} (${row.comppct_r || '—'}%)`,
+    'Landform / Geomorph': row.geomdesc || '—',
+    'Drainage Class': row.drainagecl || '—',
+    'Hydrologic Soil Group': row.hydgrp || '—',
+    'Corrosion of Concrete': row.corcon || '—',
+    'Corrosion of Steel': row.corsteel || '—',
+    'AASHTO': row.aashtocl || '—'
   };
 
-  // Water table (cm → inches)
   let wtMin = null, wtMax = null;
   const horizons = [];
+
   if (json2.Table) {
     json2.Table.forEach(r => {
-      if (r[0] != null) wtMin = Math.min(wtMin ?? Infinity, r[0]);
-      if (r[1] != null) wtMax = Math.max(wtMax ?? -Infinity, r[1]);
-      if (r[2]) {
-        const topIn = r[3] != null ? Math.round(r[3] * 0.3937) : '—';
-        const botIn = r[4] != null ? Math.round(r[4] * 0.3937) : '—';
+      if (r.wtdepl != null) wtMin = Math.min(wtMin ?? Infinity, r.wtdepl);
+      if (r.wtdeph != null) wtMax = Math.max(wtMax ?? -Infinity, r.wtdeph);
+      if (r.hzname) {
+        const topIn = r.hzdept_r != null ? Math.round(r.hzdept_r * 0.3937) : '—';
+        const botIn = r.hzdepb_r != null ? Math.round(r.hzdepb_r * 0.3937) : '—';
         horizons.push({
-          name: r[2],
+          name: r.hzname,
           depth: `${topIn}–${botIn} in`,
-          ll: r[5],
-          pi: r[6],
-          om: r[7],
-          clay: r[8],
-          silt: r[9],
-          sand: r[10]
+          ll: r.ll_r,
+          pi: r.pi_r,
+          om: r.om_r,
+          clay: r.claytotal_r,
+          silt: r.silttotal_r,
+          sand: r.sandtotal_r
         });
       }
     });
@@ -752,7 +757,6 @@ async function fetchSoilDetails(mukey) {
     details['Depth to Water Table (max)'] = `${Math.round(wtMax * 0.3937)} in`;
   }
 
-  // Horizon summary (only rows that have useful numbers)
   let profile = '';
   horizons.forEach(h => {
     const parts = [];
@@ -769,7 +773,7 @@ async function fetchSoilDetails(mukey) {
   if (profile) details['Typical Profile / Horizons'] = profile;
 
   return details;
-}
+}//End fetchSoilDetails
 
 // Loader Helper
 let pendingLoads = 0;
