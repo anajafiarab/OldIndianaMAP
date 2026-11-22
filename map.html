@@ -745,13 +745,14 @@ async function fetchSoilDetails(mukey) {
     }
   }
 
-  // Horizons
+  // Horizons + Unified
   const sqlH = `
-    SELECT hzname, hzdept_r, hzdepb_r, ll_r, pi_r, om_r,
-           claytotal_r, silttotal_r, sandtotal_r
-    FROM chorizon
-    WHERE cokey = '${cokey}'
-    ORDER BY hzdept_r
+    SELECT ch.hzname, ch.hzdept_r, ch.hzdepb_r, ch.ll_r, ch.pi_r, ch.om_r,
+           ch.claytotal_r, ch.silttotal_r, ch.sandtotal_r,
+           (SELECT TOP 1 cu.unifiedcl FROM chunified cu WHERE cu.chkey = ch.chkey) AS unifiedcl
+    FROM chorizon ch
+    WHERE ch.cokey = '${cokey}'
+    ORDER BY ch.hzdept_r
   `.replace(/\s+/g, ' ').trim();
 
   const bodyH = `query=${encodeURIComponent(sqlH)}&format=json%2Bcolumnname`;
@@ -776,7 +777,8 @@ async function fetchSoilDetails(mukey) {
           om: r[h.indexOf('om_r')],
           clay: r[h.indexOf('claytotal_r')],
           silt: r[h.indexOf('silttotal_r')],
-          sand: r[h.indexOf('sandtotal_r')]
+          sand: r[h.indexOf('sandtotal_r')],
+          unified: r[h.indexOf('unifiedcl')]
         });
       }
     }
@@ -825,6 +827,7 @@ async function fetchSoilDetails(mukey) {
     const topIn = h.top != null ? Math.round(h.top * 0.3937) : '—';
     const botIn = h.bot != null ? Math.round(h.bot * 0.3937) : '—';
     const parts = [];
+        if (h.unified != null) parts.push(`USCS ${h.unified}`);
     if (h.ll != null) parts.push(`LL ${h.ll}`);
     if (h.pi != null) parts.push(`PI ${h.pi}`);
     if (h.clay != null) parts.push(`Clay ${h.clay}%`);
