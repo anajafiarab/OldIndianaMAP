@@ -745,11 +745,12 @@ async function fetchSoilDetails(mukey) {
     }
   }
 
-  // Horizons + Unified
+  // Horizons + Unified + AASHTO
   const sqlH = `
     SELECT ch.hzname, ch.hzdept_r, ch.hzdepb_r, ch.ll_r, ch.pi_r, ch.om_r,
            ch.claytotal_r, ch.silttotal_r, ch.sandtotal_r,
-           (SELECT TOP 1 cu.unifiedcl FROM chunified cu WHERE cu.chkey = ch.chkey) AS unifiedcl
+           (SELECT TOP 1 cu.unifiedcl FROM chunified cu WHERE cu.chkey = ch.chkey) AS unifiedcl,
+           (SELECT TOP 1 ca.aashtocl FROM chaashto ca WHERE ca.chkey = ch.chkey) AS aashtocl
     FROM chorizon ch
     WHERE ch.cokey = '${cokey}'
     ORDER BY ch.hzdept_r
@@ -778,33 +779,13 @@ async function fetchSoilDetails(mukey) {
           clay: r[h.indexOf('claytotal_r')],
           silt: r[h.indexOf('silttotal_r')],
           sand: r[h.indexOf('sandtotal_r')],
-          unified: r[h.indexOf('unifiedcl')]
+          unified: r[h.indexOf('unifiedcl')],
+          aashto: r[h.indexOf('aashtocl')]
         });
       }
     }
   }
 
-  // AASHTO
-  let aashto = null;
-  if (cokey) {
-    const sqlA = `
-      SELECT TOP 1 aashtocl
-      FROM chaashto
-      WHERE chkey IN (SELECT chkey FROM chorizon WHERE cokey = '${cokey}')
-    `.replace(/\s+/g, ' ').trim();
-    const bodyA = `query=${encodeURIComponent(sqlA)}&format=json%2Bcolumnname`;
-    const resA = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: bodyA
-    });
-    if (resA.ok) {
-      const jsonA = await resA.json();
-      if (jsonA.Table && jsonA.Table.length >= 2) {
-        aashto = jsonA.Table[1][0];
-      }
-    }
-  }
 
   const details = {
     'Component': `${get('compname') || '—'} (${get('comppct_r') || '—'}%)`,
@@ -814,7 +795,6 @@ async function fetchSoilDetails(mukey) {
     'Hydrologic Soil Group': get('hydgrp') || '—',
     'Corrosion of Concrete': get('corcon') || '—',
     'Corrosion of Steel': get('corsteel') || '—',
-    'AASHTO': aashto || '—',
     'Local Roads and Streets': roads || '—'
   };
 
@@ -827,6 +807,7 @@ async function fetchSoilDetails(mukey) {
     const topIn = h.top != null ? Math.round(h.top * 0.3937) : '—';
     const botIn = h.bot != null ? Math.round(h.bot * 0.3937) : '—';
     const parts = [];
+        if (h.aashto != null) parts.push(`AASHTO ${h.aashto}`);
         if (h.unified != null) parts.push(`USCS ${h.unified}`);
     if (h.ll != null) parts.push(`LL ${h.ll}`);
     if (h.pi != null) parts.push(`PI ${h.pi}`);
