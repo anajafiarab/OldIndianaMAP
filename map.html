@@ -1265,7 +1265,12 @@ async function loadHydrogeo() {
     } else more = false;
   }
   layerDefs.hydrogeo.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: { color: '#2e5a8c', weight: 1, fillOpacity: 0.25 },
+   style: { 
+  color: '#000000',          // black border
+  weight: 1,
+  fillColor: '#2e5a8c',      // same blue fill as before
+  fillOpacity: 0.25 
+},
     onEachFeature: (f, l) => {
       // no permanent labels for now — the identify will handle it
     }
