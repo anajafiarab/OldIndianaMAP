@@ -692,6 +692,35 @@ async function fetchSoilDetails(mukey) {
 
   const cokey = get('cokey');
 
+  // Clean geomdesc if it contains the known error string
+  let landform = get('geomdesc') || '—';
+  if (landform.includes('Error in Exists On') || landform === '-- Error in Exists On --') {
+    landform = '—';
+  }
+
+  // Parent material (representative if available)
+  let parentMat = '—';
+  if (cokey) {
+    const sqlPM = `
+      SELECT TOP 1 pmgroupname
+      FROM copmgrp
+      WHERE cokey = '${cokey}'
+      ORDER BY CASE WHEN rvindicator = 'Yes' THEN 0 ELSE 1 END
+    `.replace(/\s+/g, ' ').trim();
+    const bodyPM = `query=${encodeURIComponent(sqlPM)}&format=json%2Bcolumnname`;
+    const resPM = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: bodyPM
+    });
+    if (resPM.ok) {
+      const jsonPM = await resPM.json();
+      if (jsonPM.Table && jsonPM.Table.length >= 2) {
+        parentMat = jsonPM.Table[1][0] || '—';
+      }
+    }
+  }
+
   // Map-unit aggregated water table + local roads rating
   const sqlMu = `
     SELECT wtdepannmin, wtdepaprjunmin, englrsdcd
@@ -716,7 +745,7 @@ async function fetchSoilDetails(mukey) {
     }
   }
 
-  // Horizons (Atterberg, particle size, OM)
+  // Horizons
   const sqlH = `
     SELECT hzname, hzdept_r, hzdepb_r, ll_r, pi_r, om_r,
            claytotal_r, silttotal_r, sandtotal_r
@@ -753,7 +782,7 @@ async function fetchSoilDetails(mukey) {
     }
   }
 
-  // AASHTO from chaashto (via horizons)
+  // AASHTO
   let aashto = null;
   if (cokey) {
     const sqlA = `
@@ -777,7 +806,8 @@ async function fetchSoilDetails(mukey) {
 
   const details = {
     'Component': `${get('compname') || '—'} (${get('comppct_r') || '—'}%)`,
-    'Landform / Geomorph': get('geomdesc') || '—',
+    'Parent Material': parentMat,
+    'Landform / Geomorph': landform,
     'Drainage Class': get('drainagecl') || '—',
     'Hydrologic Soil Group': get('hydgrp') || '—',
     'Corrosion of Concrete': get('corcon') || '—',
