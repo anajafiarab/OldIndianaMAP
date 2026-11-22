@@ -653,6 +653,124 @@ function pointInPoly(point, layer) {
   // simple Polygon
   return rayCast(latlngs[0]);
 }
+//Soil Data Helper
+async function fetchSoilDetails(mukey) {
+  if (!mukey) return null;
+
+  const query = `
+    SELECT TOP 1
+      co.cokey,
+      co.compname,
+      co.comppct_r,
+      co.drainagecl,
+      co.hydgrp,
+      co.corcon,
+      co.corsteel,
+      co.geomdesc,
+      co.aashtocl
+    FROM component co
+    WHERE co.mukey = '${mukey}'
+      AND co.majcompflag = 'Yes'
+    ORDER BY co.comppct_r DESC
+  `.replace(/\s+/g, ' ').trim();
+
+  const url = 'https://sdmdataaccess.sc.egov.usda.gov/tabular/post.rest';
+  const body = `query=${encodeURIComponent(query)}&format=JSON`;
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body
+  });
+  const json = await res.json();
+  if (!json.Table || !json.Table.length) return null;
+
+  const row = json.Table[0];
+  const cokey = row[0];
+
+  // Second query: water table (monthly min/max) + horizons
+  const q2 = `
+    SELECT
+      cm.wtdepl, cm.wtdeph,
+      ch.hzname, ch.hzdept_r, ch.hzdepb_r,
+      ch.ll_r, ch.pi_r, ch.om_r,
+      ch.claytotal_r, ch.silttotal_r, ch.sandtotal_r
+    FROM component co
+    LEFT JOIN comonth cm ON cm.cokey = co.cokey
+    LEFT JOIN chorizon ch ON ch.cokey = co.cokey
+    WHERE co.cokey = '${cokey}'
+    ORDER BY ch.hzdept_r
+  `.replace(/\s+/g, ' ').trim();
+
+  const body2 = `query=${encodeURIComponent(q2)}&format=JSON`;
+  const res2 = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body2
+  });
+  const json2 = await res2.json();
+
+  // Build display object
+  const details = {
+    'Component': `${row[1] || '—'} (${row[2] || '—'}%)`,
+    'Landform / Geomorph': row[6] || '—',
+    'Drainage Class': row[3] || '—',
+    'Hydrologic Soil Group': row[4] || '—',
+    'Corrosion of Concrete': row[5] || '—',
+    'Corrosion of Steel': row[5] ? row[5] : '—', // corsteel is index 5 in this select; adjust if you reorder
+    'AASHTO': row[7] || '—'
+  };
+
+  // Water table (cm → inches)
+  let wtMin = null, wtMax = null;
+  const horizons = [];
+  if (json2.Table) {
+    json2.Table.forEach(r => {
+      if (r[0] != null) wtMin = Math.min(wtMin ?? Infinity, r[0]);
+      if (r[1] != null) wtMax = Math.max(wtMax ?? -Infinity, r[1]);
+      if (r[2]) {
+        const topIn = r[3] != null ? Math.round(r[3] * 0.3937) : '—';
+        const botIn = r[4] != null ? Math.round(r[4] * 0.3937) : '—';
+        horizons.push({
+          name: r[2],
+          depth: `${topIn}–${botIn} in`,
+          ll: r[5],
+          pi: r[6],
+          om: r[7],
+          clay: r[8],
+          silt: r[9],
+          sand: r[10]
+        });
+      }
+    });
+  }
+
+  if (wtMin != null && wtMin !== Infinity) {
+    details['Depth to Water Table (min)'] = `${Math.round(wtMin * 0.3937)} in`;
+  }
+  if (wtMax != null && wtMax !== -Infinity) {
+    details['Depth to Water Table (max)'] = `${Math.round(wtMax * 0.3937)} in`;
+  }
+
+  // Horizon summary (only rows that have useful numbers)
+  let profile = '';
+  horizons.forEach(h => {
+    const parts = [];
+    if (h.ll != null) parts.push(`LL ${h.ll}`);
+    if (h.pi != null) parts.push(`PI ${h.pi}`);
+    if (h.clay != null) parts.push(`Clay ${h.clay}%`);
+    if (h.silt != null) parts.push(`Silt ${h.silt}%`);
+    if (h.sand != null) parts.push(`Sand ${h.sand}%`);
+    if (h.om != null) parts.push(`OM ${h.om}%`);
+    if (parts.length) {
+      profile += `<div style="margin:2px 0 2px 12px; font-size:12px;">${h.name} (${h.depth}): ${parts.join(', ')}</div>`;
+    }
+  });
+  if (profile) details['Typical Profile / Horizons'] = profile;
+
+  return details;
+}
+
 // Loader Helper
 let pendingLoads = 0;
 
@@ -2005,8 +2123,8 @@ map.on('click', function (e) { // CLICK HANDLER
         return {
           'Map Unit': p.muname || '—',
           'Symbol': p.musym || '—',
-          'MUKEY': p.mukey || '—',
-          'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`
+          'Web Soil Survey': `<a href="${wss}" target="_blank">Open at this location</a>`,
+          mukey: p.mukey || null   // used by fetchSoilDetails, not shown in the list
         };
       });
 } else if (id === 'thickness') {
@@ -2240,6 +2358,7 @@ if (!hits.length) {
   sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">No features at this location.</p>`;
 } else {
   let idx = 0;
+//SHOW FUNCTION
   function show(i) {
     window._showHit = () => show(idx);
     idx = (i + hits.length) % hits.length;
@@ -2284,9 +2403,10 @@ if (!hits.length) {
     html += `</div>`;
     html += `<strong>${h.layerName}</strong>`;
     html += `<div style="margin-top:6px; font-size:13px;">`;
-    for (let k in h.attrs) {
-      html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
-    }
+for (let k in h.attrs) {
+  if (k === 'mukey') continue;   // keep internal, don't display
+  html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
+}
     html += `</div>`;
     // ERMS link for Legacy Boreholes
 if (h.erms) {
@@ -2339,6 +2459,30 @@ if (h.requestForm) {
       }
       sb.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
     };
+    // Soil details
+if (h.layerName === 'SSURGO Soil Map Units' && h.attrs.mukey) {
+  const placeholder = document.createElement('div');
+  placeholder.style.marginTop = '10px';
+  placeholder.style.fontSize = '13px';
+  placeholder.innerHTML = '<em>Loading map unit description…</em>';
+  sb.appendChild(placeholder);
+
+  fetchSoilDetails(h.attrs.mukey).then(details => {
+    if (!details) {
+      placeholder.innerHTML = '<em>No detailed data available.</em>';
+      return;
+    }
+    let extra = '<div style="margin-top:8px; border-top:1px solid #ccc; padding-top:8px;">';
+    extra += '<strong>Map Unit Description</strong>';
+    for (let k in details) {
+      extra += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${details[k]}</div>`;
+    }
+    extra += '</div>';
+    placeholder.innerHTML = extra;
+  }).catch(() => {
+    placeholder.innerHTML = '<em>Soil details unavailable.</em>';
+  });
+}
   }
   show(0);
 }
