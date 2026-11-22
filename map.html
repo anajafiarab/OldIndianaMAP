@@ -653,10 +653,14 @@ function pointInPoly(point, layer) {
   // simple Polygon
   return rayCast(latlngs[0]);
 }
+//Soil Data Helper Functions
 async function fetchSoilDetails(mukey) {
   if (!mukey) return null;
 
-  const sql = `
+  const url = 'https://sdmdataaccess.sc.egov.usda.gov/tabular/post.rest';
+
+  // Dominant component + basic properties
+  const sql1 = `
     SELECT TOP 1
       co.cokey,
       co.compname,
@@ -665,100 +669,131 @@ async function fetchSoilDetails(mukey) {
       co.hydgrp,
       co.corcon,
       co.corsteel,
-      co.geomdesc,
-      co.aashtocl
+      co.geomdesc
     FROM component co
     WHERE co.mukey = '${mukey}'
       AND co.majcompflag = 'Yes'
     ORDER BY co.comppct_r DESC
   `.replace(/\s+/g, ' ').trim();
 
-  const url = 'https://sdmdataaccess.sc.egov.usda.gov/tabular/post.rest';
-  const body = `query=${encodeURIComponent(sql)}&format=json%2Bcolumnname`;
-
-  const res = await fetch(url, {
+  const body1 = `query=${encodeURIComponent(sql1)}&format=json%2Bcolumnname`;
+  const res1 = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body
+    body: body1
   });
+  if (!res1.ok) return null;
+  const json1 = await res1.json();
+  if (!json1.Table || json1.Table.length < 2) return null;
 
-  if (!res.ok) {
-    console.error('SDA status', res.status);
-    return null;
-  }
+  const headers1 = json1.Table[0];
+  const row1 = json1.Table[1];
+  const get = (name) => row1[headers1.indexOf(name)];
 
-  const json = await res.json();
-  if (!json.Table || !json.Table.length) return null;
+  const cokey = get('cokey');
 
-  const row = json.Table[0];
-  const cokey = row.cokey;
-
-  // Second query for water table + horizons
-  const sql2 = `
-    SELECT
-      cm.wtdepl, cm.wtdeph,
-      ch.hzname, ch.hzdept_r, ch.hzdepb_r,
-      ch.ll_r, ch.pi_r, ch.om_r,
-      ch.claytotal_r, ch.silttotal_r, ch.sandtotal_r
-    FROM component co
-    LEFT JOIN comonth cm ON cm.cokey = co.cokey
-    LEFT JOIN chorizon ch ON ch.cokey = co.cokey
-    WHERE co.cokey = '${cokey}'
-    ORDER BY ch.hzdept_r
+  // Map-unit aggregated water table + local roads rating
+  const sqlMu = `
+    SELECT wtdepannmin, wtdepaprjunmin, englrsdcd
+    FROM muaggatt
+    WHERE mukey = '${mukey}'
   `.replace(/\s+/g, ' ').trim();
 
-  const body2 = `query=${encodeURIComponent(sql2)}&format=json%2Bcolumnname`;
-  const res2 = await fetch(url, {
+  const bodyMu = `query=${encodeURIComponent(sqlMu)}&format=json%2Bcolumnname`;
+  const resMu = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body2
+    body: bodyMu
   });
+  let wtMin = null, roads = null;
+  if (resMu.ok) {
+    const jsonMu = await resMu.json();
+    if (jsonMu.Table && jsonMu.Table.length >= 2) {
+      const h = jsonMu.Table[0];
+      const r = jsonMu.Table[1];
+      wtMin = r[h.indexOf('wtdepannmin')];
+      roads = r[h.indexOf('englrsdcd')];
+    }
+  }
 
-  const json2 = res2.ok ? await res2.json() : { Table: [] };
+  // Horizons (Atterberg, particle size, OM)
+  const sqlH = `
+    SELECT hzname, hzdept_r, hzdepb_r, ll_r, pi_r, om_r,
+           claytotal_r, silttotal_r, sandtotal_r
+    FROM chorizon
+    WHERE cokey = '${cokey}'
+    ORDER BY hzdept_r
+  `.replace(/\s+/g, ' ').trim();
 
-  const details = {
-    'Component': `${row.compname || '—'} (${row.comppct_r || '—'}%)`,
-    'Landform / Geomorph': row.geomdesc || '—',
-    'Drainage Class': row.drainagecl || '—',
-    'Hydrologic Soil Group': row.hydgrp || '—',
-    'Corrosion of Concrete': row.corcon || '—',
-    'Corrosion of Steel': row.corsteel || '—',
-    'AASHTO': row.aashtocl || '—'
-  };
-
-  let wtMin = null, wtMax = null;
+  const bodyH = `query=${encodeURIComponent(sqlH)}&format=json%2Bcolumnname`;
+  const resH = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: bodyH
+  });
   const horizons = [];
-
-  if (json2.Table) {
-    json2.Table.forEach(r => {
-      if (r.wtdepl != null) wtMin = Math.min(wtMin ?? Infinity, r.wtdepl);
-      if (r.wtdeph != null) wtMax = Math.max(wtMax ?? -Infinity, r.wtdeph);
-      if (r.hzname) {
-        const topIn = r.hzdept_r != null ? Math.round(r.hzdept_r * 0.3937) : '—';
-        const botIn = r.hzdepb_r != null ? Math.round(r.hzdepb_r * 0.3937) : '—';
+  if (resH.ok) {
+    const jsonH = await resH.json();
+    if (jsonH.Table && jsonH.Table.length >= 2) {
+      const h = jsonH.Table[0];
+      for (let i = 1; i < jsonH.Table.length; i++) {
+        const r = jsonH.Table[i];
         horizons.push({
-          name: r.hzname,
-          depth: `${topIn}–${botIn} in`,
-          ll: r.ll_r,
-          pi: r.pi_r,
-          om: r.om_r,
-          clay: r.claytotal_r,
-          silt: r.silttotal_r,
-          sand: r.sandtotal_r
+          name: r[h.indexOf('hzname')],
+          top: r[h.indexOf('hzdept_r')],
+          bot: r[h.indexOf('hzdepb_r')],
+          ll: r[h.indexOf('ll_r')],
+          pi: r[h.indexOf('pi_r')],
+          om: r[h.indexOf('om_r')],
+          clay: r[h.indexOf('claytotal_r')],
+          silt: r[h.indexOf('silttotal_r')],
+          sand: r[h.indexOf('sandtotal_r')]
         });
       }
-    });
+    }
   }
 
-  if (wtMin != null && wtMin !== Infinity) {
-    details['Depth to Water Table (min)'] = `${Math.round(wtMin * 0.3937)} in`;
+  // AASHTO from chaashto (via horizons)
+  let aashto = null;
+  if (cokey) {
+    const sqlA = `
+      SELECT TOP 1 aashtocl
+      FROM chaashto
+      WHERE chkey IN (SELECT chkey FROM chorizon WHERE cokey = '${cokey}')
+    `.replace(/\s+/g, ' ').trim();
+    const bodyA = `query=${encodeURIComponent(sqlA)}&format=json%2Bcolumnname`;
+    const resA = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: bodyA
+    });
+    if (resA.ok) {
+      const jsonA = await resA.json();
+      if (jsonA.Table && jsonA.Table.length >= 2) {
+        aashto = jsonA.Table[1][0];
+      }
+    }
   }
-  if (wtMax != null && wtMax !== -Infinity) {
-    details['Depth to Water Table (max)'] = `${Math.round(wtMax * 0.3937)} in`;
+
+  const details = {
+    'Component': `${get('compname') || '—'} (${get('comppct_r') || '—'}%)`,
+    'Landform / Geomorph': get('geomdesc') || '—',
+    'Drainage Class': get('drainagecl') || '—',
+    'Hydrologic Soil Group': get('hydgrp') || '—',
+    'Corrosion of Concrete': get('corcon') || '—',
+    'Corrosion of Steel': get('corsteel') || '—',
+    'AASHTO': aashto || '—',
+    'Local Roads and Streets': roads || '—'
+  };
+
+  if (wtMin != null) {
+    details['Depth to Water Table (annual min)'] = `${Math.round(wtMin * 0.3937)} in`;
   }
 
   let profile = '';
   horizons.forEach(h => {
+    const topIn = h.top != null ? Math.round(h.top * 0.3937) : '—';
+    const botIn = h.bot != null ? Math.round(h.bot * 0.3937) : '—';
     const parts = [];
     if (h.ll != null) parts.push(`LL ${h.ll}`);
     if (h.pi != null) parts.push(`PI ${h.pi}`);
@@ -767,7 +802,7 @@ async function fetchSoilDetails(mukey) {
     if (h.sand != null) parts.push(`Sand ${h.sand}%`);
     if (h.om != null) parts.push(`OM ${h.om}%`);
     if (parts.length) {
-      profile += `<div style="margin:2px 0 2px 12px; font-size:12px;">${h.name} (${h.depth}): ${parts.join(', ')}</div>`;
+      profile += `<div style="margin:2px 0 2px 12px; font-size:12px;">${h.name} (${topIn}–${botIn} in): ${parts.join(', ')}</div>`;
     }
   });
   if (profile) details['Typical Profile / Horizons'] = profile;
