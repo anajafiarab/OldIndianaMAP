@@ -798,9 +798,10 @@ async function fetchSoilDetails(mukey) {
     'Local Roads and Streets': roads || '—'
   };
 
-  if (wtMin != null) {
-    details['Depth to Water Table (annual min)'] = `${Math.round(wtMin * 0.3937)} in`;
-  }
+if (wtMin != null) {
+  const inches = Math.round(wtMin * 0.3937);
+  details['Depth to Water Table (annual min, dominant condition)'] = `${inches} in (${wtMin} cm)`;
+}
 
   let profile = '';
   horizons.forEach(h => {
