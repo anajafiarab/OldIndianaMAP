@@ -1553,13 +1553,14 @@ fetch('https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/F
   })
 .finally(finishLoad);   // <-- runs after success or error
 
-//Landslides Loader (Highways)
-startLoad('Landslides (Highways)');
-async function loadLandslides() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer/0/query';
+// Landslide Inventory
+startLoad('Landslide Inventory');
+(async function loadLandslides() {
+  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/FeatureServer/0/query';
   let all = [], offset = 0, page = 2000, more = true;
+
   while (more) {
-    const url = `${base}?where=1%3D1&outFields=slide_ID,roadway,county,errf,varnes,status,correction,cost,comments,location&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
     const data = await (await fetch(url)).json();
     if (data.features && data.features.length) {
       all = all.concat(data.features);
@@ -1567,12 +1568,14 @@ async function loadLandslides() {
       if (data.features.length < page) more = false;
     } else more = false;
   }
-layerDefs['landslides-hw'].layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-  style: { color: '#8B0000', weight: 1.5, fillColor: '#CD5C5C', fillOpacity: 0.45 }
-});
-}
-loadLandslides()
-.finally(finishLoad);   // <-- runs after success or error
+
+  layerDefs.landslides.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+    style: { color: '#c45c26', weight: 1, fillColor: '#e07a3d', fillOpacity: 0.35 },
+    onEachFeature: (f, l) => {
+      // no permanent labels — polygons can be dense
+    }
+  });
+})().finally(finishLoad);
 
 // Bedrock Geology (colored by ROCK_UNITS)
 startLoad('Bedrock Geology (MM48)');
