@@ -895,6 +895,7 @@ function applyOpacity(layer, opacity) {
     minZoom: 5
   }).setView([39.8, -86.2], 7);
 
+
   const basemaps = {
     streets: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; OpenStreetMap contributors', maxZoom: 19
@@ -1015,6 +1016,30 @@ function refreshLidarHS() {
   let currentBasemap = basemaps[savedBasemap] || basemaps.streets;
   currentBasemap.addTo(map);
   if (savedBasemap === 'hybrid') hybridLabels.addTo(map);
+
+  // Scale bar (metric + imperial)
+L.control.scale({ imperial: true, metric: true, position: 'bottomright' }).addTo(map);
+
+// Numeric scale ratio
+const scaleDiv = L.control({ position: 'bottomright' });
+scaleDiv.onAdd = function () {
+  this._div = L.DomUtil.create('div', 'leaflet-control leaflet-bar');
+  this._div.style.background = 'rgba(255,255,255,0.8)';
+  this._div.style.padding = '2px 6px';
+  this._div.style.fontSize = '12px';
+  this._div.style.marginBottom = '5px';
+  this.update();
+  return this._div;
+};
+scaleDiv.update = function () {
+  const zoom = map.getZoom();
+  // Approximate scale at the center of Indiana (latitude ~40°)
+  const metersPerPixel = 156543.03392 * Math.cos(39.8 * Math.PI / 180) / Math.pow(2, zoom);
+  const scale = Math.round(metersPerPixel * 96 / 0.0254); // 96 dpi screen
+  this._div.innerHTML = `1:${scale.toLocaleString()}`;
+};
+scaleDiv.addTo(map);
+map.on('zoomend moveend', () => scaleDiv.update());
 
  // ──────────────────────────────────────────────
 // LAYER DEFINITIONS
