@@ -1770,7 +1770,7 @@ async function loadPLSS() {
       } else more = false;
     }
     layerDefs.plss.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-      style: { color: '#8B4513', weight: 1, fillOpacity: 0.04 },
+      style: { color: '#8B4513', weight: 0.5, fillOpacity: 0.15 },
       onEachFeature: (f, l) => {
         const p = f.properties;
         const label = (p.twp && p.rng) ? `T${p.twp}${(p.twpd||'').trim()} R${p.rng}${(p.rngd||'').trim()}` : '';
