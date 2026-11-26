@@ -1429,7 +1429,7 @@ loadGlacial()
 
 // Legacy Boreholes Loader
 startLoad('Legacy Boreholes');
-fetch('data/legacy_boreholes.geojson')
+fetch('data/legacy_boreholes-fixed.geojson')
   .then(r => r.json())
   .then(data => {
     layerDefs.boreholes.layer = L.geoJSON(data, {
