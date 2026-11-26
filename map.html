@@ -2073,7 +2073,7 @@ async function addLayer(id) {
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
     def.layer.addTo(map);
-    applyOpacity(def.layer, def.opacity);
+    applyOpacity(def.layer, def.opacity, def.fillScale);
   }
   renderActive();
 }
