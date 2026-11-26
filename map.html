@@ -875,27 +875,25 @@ function finishLoad() {
 let active = JSON.parse(localStorage.getItem('activeLayers') || '[]');
 function saveActive() { localStorage.setItem('activeLayers', JSON.stringify(active)); }
 
-function applyOpacity(layer, opacity) {
+function applyOpacity(layer, opacity, fillScale) {
   if (!layer) return;
 
-  // GeoJSON / FeatureGroup / LayerGroup — walk children
+  const fill = (fillScale !== undefined ? fillScale : 1) * opacity;
+
   if (typeof layer.eachLayer === 'function') {
-    layer.eachLayer(l => applyOpacity(l, opacity));
+    layer.eachLayer(l => applyOpacity(l, opacity, fillScale));
   }
 
-  // Individual vector layers (polygons, circles, paths)
   if (typeof layer.setStyle === 'function') {
     layer.setStyle({
       opacity: opacity,
-      fillOpacity: opacity   // full range for all fills
+      fillOpacity: fill
     });
-  }
-  // Tile layers or anything that only has setOpacity
-  else if (typeof layer.setOpacity === 'function') {
+  } else if (typeof layer.setOpacity === 'function') {
     layer.setOpacity(opacity);
   }
 
-  // Fade tooltips with the layer
+  // tooltips (unchanged)
   if (typeof layer.eachLayer === 'function') {
     layer.eachLayer(l => {
       const tip = l.getTooltip && l.getTooltip();
@@ -1097,7 +1095,7 @@ boreholes: {
 unconsolidatedPSM: {
   name: 'Unconsolidated Potentiometric Surface',
   layer: null,
-  opacity: 0.8,
+  opacity: 1,
   source: 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0',
   unitField: 'static_e'
 },
@@ -1105,7 +1103,7 @@ unconsolidatedPSM: {
 hydrogeo: {
   name: 'Hydrogeologic Settings',
   layer: null,
-  opacity: 0.6,
+  opacity: 1,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer',
   unitField: 'SETTING'   // this is the key that matches the JSON
 },
@@ -1123,6 +1121,7 @@ piletests: {
   landslides: {
   name: 'Landslide Inventory',
   opacity: 1,
+  fillScale: 0.5,
   source: { label: 'IGWS Landslide Inventory', url: 'https://portal.igs.indiana.edu/portal/home/item.html?id=e8914605d3954ea18ef0da9282532297' },
   layer: null
 },
@@ -1147,6 +1146,7 @@ piletests: {
     group: 'Boundaries',
     layer: null,
     opacity: 1,
+    fillScale: 0.15,
     source: { label: 'Indiana GIO PLSS Townships', url: 'https://gisdata.in.gov/server/rest/services/Hosted/PLSS_1/FeatureServer/2' }
   },
 
@@ -1164,7 +1164,7 @@ piletests: {
     name: 'Lidar Hillshade (2016-2020)',
     group: 'Elevation',
     layer: lidarHS,
-    opacity: 0.65,
+    opacity: 1,
     source: { label: 'Indiana 2016-2020 DEM (ImageServer)', url: 'https://di-ingov.img.arcgis.com/arcgis/rest/services/DynamicWebMercator/Indiana_2016_2020_DEM/ImageServer' }
   },
   hillshade: {
@@ -1205,6 +1205,7 @@ bedrock250: {
   group: 'Geology',
   layer: null,
   opacity: 0.7,
+  fillScale: 0.15,
   source: { label: 'IGS Landslide Inventory – Indiana Highway Data', url: 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Indiana_Highway_Data/MapServer' }
 },
 karst: {
@@ -1218,7 +1219,7 @@ karst: {
 },
 liq: {
   name: 'Liquefaction Potential',
-  opacity: 0.5,
+  opacity: 1,
   layer: null,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer',
   sourceLabel: 'IGWS Earthquake Liquefaction Potential (MM81)'
