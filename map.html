@@ -2021,12 +2021,12 @@ slider.addEventListener('input', () => {
   const valSpan = row.querySelector('.slider-val');
   if (valSpan) valSpan.textContent = slider.value;
 
-  if (id === 'lidarhs') {
-    hsSettings.opacity = def.opacity;
-    applyOpacity(lidarHS, def.opacity);
-  } else if (def.layer) {
-    applyOpacity(def.layer, def.opacity);
-  }
+if (id === 'lidarhs') {
+  hsSettings.opacity = def.opacity;
+  applyOpacity(lidarHS, def.opacity, def.fillScale);
+} else if (def.layer) {
+  applyOpacity(def.layer, def.opacity, def.fillScale);
+}
 
   saveActive();
 });
