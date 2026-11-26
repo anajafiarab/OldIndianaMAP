@@ -623,7 +623,7 @@ html, body {
 
 <div class="sidebar" id="sidebar">
   <h3>Error</h3>
-  <p style="color:#666; padding:8px;">ERROR. Refresh the page or email contact@oldindianamap.com</p>
+  <p style="color:#666; padding:8px;">Refresh the page or email contact@oldindianamap.com</p>
 </div>
     <div id="map">
       <!--
@@ -667,6 +667,14 @@ function pointInPoly(point, layer) {
   // simple Polygon
   return rayCast(latlngs[0]);
 }
+// Secret code test — type "boreholes" in the search box and hit Enter
+document.getElementById('search-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.target.value.trim().toLowerCase() === 'boreholes') {
+    e.preventDefault();
+    addLayer('boreholes');
+    e.target.value = '';
+  }
+});
 //Soil Data Helper Functions
 async function fetchSoilDetails(mukey) {
   if (!mukey) return null;
