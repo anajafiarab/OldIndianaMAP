@@ -1791,26 +1791,29 @@ function updatePLSSLabels() {
 }
 map.on('zoomend', updatePLSSLabels);
 
-// Unconsolidated Thickness Contours
-startLoad('Unconsolidated Thickness Contours');
+// Unconsolidated Thickness Contours (lazy)
 async function loadThickness() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Surficial_Unconsolidated_Thickness_Contours/FeatureServer/0/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=Contour&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
+  if (layerDefs.thickness.layer) return;          // already loaded
+  startLoad('Unconsolidated Thickness Contours');
+  try {
+    const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Surficial_Unconsolidated_Thickness_Contours/FeatureServer/0/query';
+    let all = [], offset = 0, page = 2000, more = true;
+    while (more) {
+      const url = `${base}?where=1%3D1&outFields=Contour&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += page;
+        if (data.features.length < page) more = false;
+      } else more = false;
+    }
+    layerDefs.thickness.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: { color: '#555', weight: 1, opacity: 0.7 }
+    });
+  } finally {
+    finishLoad();
   }
-  layerDefs.thickness.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: { color: '#555', weight: 1, opacity: 0.7 }         // gray
-  });
 }
-loadThickness()
-.finally(finishLoad);   // <-- runs after success or error
 
 // Soils (dynamic by extent)
 function getSoilStyle(feature) {
@@ -2054,13 +2057,22 @@ slider.addEventListener('input', () => {
     if (active.includes('lidarhs')) renderHSControls();
   }
 
-  function addLayer(id) {
-    if (!active.includes(id)) { active.push(id); saveActive(); }
-    const def = layerDefs[id];
-    if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
-        if (id === 'lidarhs') refreshLidarHS();
-    renderActive();
+async function addLayer(id) {
+  if (!active.includes(id)) {
+    active.push(id);
+    saveActive();
   }
+
+  if (id === 'thickness') await loadThickness();   // <-- only this one is lazy
+
+  const def = layerDefs[id];
+  if (def.layer && !map.hasLayer(def.layer)) {
+    def.layer.addTo(map);
+    applyOpacity(def.layer, def.opacity);
+  }
+  renderActive();
+}
+
   async function loadKMZ(file) {
     if (file.size > 15 * 1024 * 1024) {   // 15 MB
     alert('File too large (max 15 MB)');
@@ -2932,6 +2944,7 @@ if (map.hasLayer(lidarHS)) {
     renderActive();
   });
 
+
   document.getElementById('legend-btn').addEventListener('click', () => {
     setActiveTool('legend-btn');
     sidebar.innerHTML = `<h3>Legend</h3><p style="color:#666;">Click the map to identify features.</p>`;
@@ -3045,6 +3058,10 @@ function dropMarker(lat, lon, label) {
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
+  // Restore layers that were active last time
+  active.forEach(id => {
+    if (layerDefs[id]) addLayer(id);
+  });
   document.getElementById('active-layers-btn').click();
 </script>
 </body>
