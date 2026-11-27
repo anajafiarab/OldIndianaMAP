@@ -1251,6 +1251,22 @@ nbi: {
   opacity: 1,
   source: 'https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/NTAD_National_Bridge_Inventory/FeatureServer'
 },
+spmsActive: {
+  name: 'Active Letting (Current FY)',
+  opacity: 1,
+  layer: null,
+  source: 'https://gis.indot.in.gov/ro/rest/services/DOT/SPMS_ACTIVE_LET/FeatureServer',
+  fields: {
+    'DES': 'DES',
+    'Contract': 'CONTRACT',
+    'Location': 'LOCATION',
+    'Work Type': 'WORKTYPE',
+    'Description': 'WORKDESC',
+    'Letting FY': 'LETTING_FY',
+    'District': 'DIST_NAME',
+    'County': 'COUNTY'
+  }
+},
 
 };
 
@@ -1258,6 +1274,37 @@ nbi: {
 // LOADERS
 // ──────────────────────────────────────────────
 
+async function loadSPMSActive() {
+  if (!active.includes('spmsActive')) return;
+
+  if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
+    map.removeLayer(layerDefs.spmsActive.layer);
+  }
+
+  const b = map.getBounds();
+  const url = `https://gis.indot.in.gov/ro/rest/services/DOT/SPMS_ACTIVE_LET/FeatureServer/0/query` +
+    `?geometry=${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}` +
+    `&geometryType=esriGeometryEnvelope&inSR=4326&outSR=4326` +
+    `&spatialRel=esriSpatialRelIntersects` +
+    `&outFields=DES,CONTRACT,LOCATION,WORKTYPE,WORKDESC,LETTING_FY,DIST_NAME,COUNTY,LETTING_DATE` +
+    `&returnGeometry=true&f=geojson&resultRecordCount=2000`;
+
+  try {
+    const data = await (await fetch(url)).json();
+    layerDefs.spmsActive.layer = L.geoJSON(data, {
+      style: { color: '#1a6b8a', weight: 3, opacity: 0.9 }
+    });
+    layerDefs.spmsActive.layer.addTo(map);
+  } catch (e) {
+    console.warn('SPMS Active load failed', e);
+  }
+}
+
+map.on('moveend', () => {
+  if (active.includes('spmsActive') && map.getZoom() >= 9) {
+    loadSPMSActive();
+  }
+});
 // SPMS projects (viewport and lazy)
 async function loadSPMS() {
   // Only run if the layer is currently active
@@ -2165,6 +2212,7 @@ async function addLayer(id) {
   if (id === 'plss')      await loadPLSS(); //Lazy load PLSS
   if (id === 'boreholes') await loadBoreRecords();
   if (id === 'spms') await loadSPMS();
+  if (id === 'spmsActive') await loadSPMSActive();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
@@ -2587,6 +2635,30 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
       });
     }
   });
+}if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
+  layerDefs.spmsActive.layer.eachLayer(l => {
+    if (l.getBounds && l.getBounds().contains(e.latlng)) {
+      const p = l.feature.properties;
+      const des = p.DES || '';
+      hits.push({
+        layerName: 'Active Letting (Current FY)',
+        layer: l,
+        attrs: {
+          'DES': des || '—',
+          'Contract': p.CONTRACT || '—',
+          'Location': p.LOCATION || '—',
+          'Work Type': p.WORKTYPE || '—',
+          'Description': p.WORKDESC || '—',
+          'Letting FY': p.LETTING_FY || '—',
+          'District': p.DIST_NAME || '—',
+          'County': p.COUNTY || '—'
+        },
+        geotechReport: des
+          ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
+          : null
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -2809,6 +2881,7 @@ if (map.hasLayer(lidarHS)) {
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
       <div class="basemap-item" data-add="boreholes">INDOT BoreRecords</div>
       <div class="basemap-item" data-add="spms">INDOT Projects (SPMS)</div>
+      <div class="basemap-item" data-add="spmsActive">INDOT PROJECTS (Current FY)</div>
       <div class="basemap-item" data-add="liq">Liquefaction Potential</div>
       <div class="basemap-item" data-add="nbi">National Bridge Inventory</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
