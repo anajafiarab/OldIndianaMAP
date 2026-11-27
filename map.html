@@ -1260,7 +1260,14 @@ nbi: {
 
 // SPMS projects (viewport and lazy)
 async function loadSPMS() {
-  if (!map.hasLayer(layerDefs.spms.layer) && layerDefs.spms.layer) return; // only load when active
+  // Only run if the layer is currently active
+  if (!active.includes('spms')) return;
+
+  // Remove previous version if it exists
+  if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
+    map.removeLayer(layerDefs.spms.layer);
+  }
+
   const b = map.getBounds();
   const url = `https://gis.indot.in.gov/ro/rest/services/DOT/VENDOR_SPMS/FeatureServer/0/query` +
     `?geometry=${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}` +
@@ -1271,19 +1278,19 @@ async function loadSPMS() {
 
   try {
     const data = await (await fetch(url)).json();
-    if (layerDefs.spms.layer) map.removeLayer(layerDefs.spms.layer);
     layerDefs.spms.layer = L.geoJSON(data, {
-      style: { color: '#c45c26', weight: 2, opacity: 0.8 },
-      onEachFeature: (f, l) => {
-        // no permanent labels — too many
-      }
+      style: { color: '#c45c26', weight: 2, opacity: 0.8 }
     });
-    if (active.includes('spms')) layerDefs.spms.layer.addTo(map);
-  } catch (e) { console.warn('SPMS load failed', e); }
+    layerDefs.spms.layer.addTo(map);
+  } catch (e) {
+    console.warn('SPMS load failed', e);
+  }
 }
 
 map.on('moveend', () => {
-  if (active.includes('spms') && map.getZoom() >= 9) loadSPMS();
+  if (active.includes('spms') && map.getZoom() >= 9) {
+    loadSPMS();
+  }
 });
 
 // National Bridge Inventory (viewport-based)
