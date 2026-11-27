@@ -1462,7 +1462,7 @@ async function loadBoreRecords() {
 
   let geojson;
   if (useBackup || all.length === 0) {
-    const r = await fetch('data/borerecords_backup.geojson');
+    const r = await fetch('data/legacy_boreholes-fixed.geojson');
     geojson = await r.json();
   } else {
     geojson = { type: 'FeatureCollection', features: all };
