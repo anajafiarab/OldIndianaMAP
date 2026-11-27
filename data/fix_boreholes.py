@@ -101,16 +101,16 @@ fixes = {
 # ===== NEW POINTS TO ADD =====
 additions = [
     {
-        'DES_NUMBER': '1901880',
+        'DES_NUMBER': '1701334',
         'POINTID': '1',
-        'lon': -86.025610,
-        'lat': 40.049135,
+        'lon': -87.171364,
+        'lat': 41.470620,
     },
     {
-        'DES_NUMBER': '2101141',
+        'DES_NUMBER': '1701335',
         'POINTID': '1',
-        'lon': -87.064387,
-        'lat': 41.466813,
+        'lon': -87.161590,
+        'lat': 41.470290,
     },
     # more here
 ]
