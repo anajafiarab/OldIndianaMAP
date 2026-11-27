@@ -96,21 +96,47 @@ fixes = {
 
 # ================================
 # ================================
+# ... existing fixes = { ... } and the loop that applies them ...
 
-fixed_count = 0
-for feat in data['features']:
-    des = feat['properties'].get('DES_NUMBER', '')
-    pid = feat['properties'].get('POINTID', '') or None
-    if des in fixes:
-        for entry in fixes[des]:
-            target_pid, lon, lat = entry
-            if target_pid is None or target_pid == pid:
-                feat['geometry']['coordinates'] = [lon, lat]
-                fixed_count += 1
-                break
+# ===== NEW POINTS TO ADD =====
+additions = [
+    {
+        'DES_NUMBER': '1901880',
+        'POINTID': '1',
+        'lon': -86.025610,
+        'lat': 40.049135,
+    },
+    {
+        'DES_NUMBER': '2101141',
+        'POINTID': '1',
+        'lon': -87.064387,
+        'lat': 41.466813,
+    },
+    # more here
+]
+# =============================
 
-print(f"\nApplied fixes to {fixed_count} features")
+existing_des = {f['properties'].get('DES_NUMBER') for f in data['features']}
 
+for a in additions:
+    if a['DES_NUMBER'] in existing_des:
+        print(f"Skipping {a['DES_NUMBER']} — already in file")
+        continue
+    new_feat = {
+        "type": "Feature",
+        "properties": {
+            "DES_NUMBER": a['DES_NUMBER'],
+            "POINTID": a.get('POINTID', ''),
+        },
+        "geometry": {
+            "type": "Point",
+            "coordinates": [a['lon'], a['lat']]
+        }
+    }
+    data['features'].append(new_feat)
+    print(f"Added new point for DES {a['DES_NUMBER']}")
+
+# then the existing write
 out_name = 'legacy_boreholes-fixed.geojson'
 with open(out_name, 'w') as f:
     json.dump(data, f)
