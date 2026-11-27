@@ -1073,7 +1073,25 @@ fetch('data/hydrogeo-units.json')
 
   const layerDefs = {
 
-  // Glacial Quaternary Geology
+    //SPMS
+  spms: {
+  name: 'INDOT Projects (SPMS)',
+  opacity: 1,
+  layer: null,
+  source: 'https://gis.indot.in.gov/ro/rest/services/DOT/VENDOR_SPMS/FeatureServer',
+  fields: {
+    'DES': 'DES',
+    'Contract': 'CONTRACT',
+    'Location': 'LOCATION',
+    'Work Type': 'WORKTYPE',
+    'Description': 'WORKDESC',
+    'Year': 'YEAR',
+    'Letting Date': 'LETTING_DATE',
+    'District': 'DIST_NAME'
+  }
+},
+
+// Glacial Quaternary Geology
 glacial: {
   name: 'Glacial Quaternary Geology',
   opacity: 1,
@@ -1239,6 +1257,34 @@ nbi: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+
+// SPMS projects (viewport and lazy)
+async function loadSPMS() {
+  if (!map.hasLayer(layerDefs.spms.layer) && layerDefs.spms.layer) return; // only load when active
+  const b = map.getBounds();
+  const url = `https://gis.indot.in.gov/ro/rest/services/DOT/VENDOR_SPMS/FeatureServer/0/query` +
+    `?geometry=${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}` +
+    `&geometryType=esriGeometryEnvelope&inSR=4326&outSR=4326` +
+    `&spatialRel=esriSpatialRelIntersects` +
+    `&outFields=DES,CONTRACT,LOCATION,WORKTYPE,WORKDESC,YEAR,LETTING_DATE,DIST_NAME` +
+    `&returnGeometry=true&f=geojson&resultRecordCount=2000`;
+
+  try {
+    const data = await (await fetch(url)).json();
+    if (layerDefs.spms.layer) map.removeLayer(layerDefs.spms.layer);
+    layerDefs.spms.layer = L.geoJSON(data, {
+      style: { color: '#c45c26', weight: 2, opacity: 0.8 },
+      onEachFeature: (f, l) => {
+        // no permanent labels — too many
+      }
+    });
+    if (active.includes('spms')) layerDefs.spms.layer.addTo(map);
+  } catch (e) { console.warn('SPMS load failed', e); }
+}
+
+map.on('moveend', () => {
+  if (active.includes('spms') && map.getZoom() >= 9) loadSPMS();
+});
 
 // National Bridge Inventory (viewport-based)
 const nbiLayer = L.geoJSON(null, {
@@ -2111,6 +2157,7 @@ async function addLayer(id) {
   if (id === 'thickness') await loadThickness();   // Lazy load thickness contours
   if (id === 'plss')      await loadPLSS(); //Lazy load PLSS
   if (id === 'boreholes') await loadBoreRecords();
+  if (id === 'spms') await loadSPMS();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
@@ -2510,6 +2557,30 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
 });
     }
   });
+} if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
+  layerDefs.spms.layer.eachLayer(l => {
+    if (l.getBounds && l.getBounds().contains(e.latlng) || (l.getLatLng && l.getLatLng().distanceTo(e.latlng) < 20)) {
+      const p = l.feature.properties;
+      const des = p.DES || '';
+      const erms = des
+        ? `<a href="https://erms12c.indot.in.gov/viewdocs/Results.aspx?DocumentType=Geotech%20Reports" target="_blank">Open Geotech Reports (search DES ${des})</a>`
+        : '—';
+      hits.push({
+        layerName: 'INDOT Projects (SPMS)',
+        layer: l,
+        attrs: {
+          'DES': des || '—',
+          'Contract': p.CONTRACT || '—',
+          'Location': p.LOCATION || '—',
+          'Work Type': p.WORKTYPE || '—',
+          'Description': p.WORKDESC || '—',
+          'Year': p.YEAR || '—',
+          'District': p.DIST_NAME || '—',
+          'Geotech Report': erms
+        }
+      });
+    }
+  });
 }
 }); // closes active.forEach
 
@@ -2731,6 +2802,7 @@ if (map.hasLayer(lidarHS)) {
 
       <div style="font-weight:bold; margin:12px 0 4px;">Engineering</div>
       <div class="basemap-item" data-add="boreholes">INDOT BoreRecords</div>
+      <div class="basemap-item" data-add="spms">INDOT Projects (SPMS)</div>
       <div class="basemap-item" data-add="liq">Liquefaction Potential</div>
       <div class="basemap-item" data-add="nbi">National Bridge Inventory</div>
         <div class="basemap-item" data-add="piletests">PDA & Static Test Data</div>
