@@ -1274,47 +1274,12 @@ spmsActive: {
 // LOADERS
 // ──────────────────────────────────────────────
 
-// SPMS Active Letting (viewport and lazy)
-async function loadSPMSActive() {
-  if (!active.includes('spmsActive')) return;
-
-  if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
-    map.removeLayer(layerDefs.spmsActive.layer);
-  }
-
-  const b = map.getBounds();
-  const url = `https://gis.indot.in.gov/ro/rest/services/DOT/SPMS_ACTIVE_LET/FeatureServer/0/query` +
-    `?geometry=${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}` +
-    `&geometryType=esriGeometryEnvelope&inSR=4326&outSR=4326` +
-    `&spatialRel=esriSpatialRelIntersects` +
-    `&outFields=DES,CONTRACT,LOCATION,WORKTYPE,WORKDESC,LETTING_FY,DIST_NAME,COUNTY,LETTING_DATE` +
-    `&returnGeometry=true&f=geojson&resultRecordCount=2000`;
-
-  try {
-    const data = await (await fetch(url)).json();
-    layerDefs.spmsActive.layer = L.geoJSON(data, {
-      style: { color: '#1a6b8a', weight: 3, opacity: 0.9 }
-    });
-    layerDefs.spmsActive.layer.addTo(map);
-  } catch (e) {
-    console.warn('SPMS Active load failed', e);
-  }
-}
-
-map.on('moveend', () => {
-  if (active.includes('spmsActive') && map.getZoom() >= 9) {
-    loadSPMSActive();
-  }
-});
 // SPMS projects (viewport and lazy)
 async function loadSPMS() {
-  // Only run if the layer is currently active
   if (!active.includes('spms')) return;
 
-  // Remove previous version if it exists
-  if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
-    map.removeLayer(layerDefs.spms.layer);
-  }
+  const wasOn = layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer);
+  if (wasOn) map.removeLayer(layerDefs.spms.layer);
 
   const b = map.getBounds();
   const url = `https://gis.indot.in.gov/ro/rest/services/DOT/VENDOR_SPMS/FeatureServer/0/query` +
@@ -1329,15 +1294,46 @@ async function loadSPMS() {
     layerDefs.spms.layer = L.geoJSON(data, {
       style: { color: '#c45c26', weight: 2, opacity: 0.8 }
     });
-    layerDefs.spms.layer.addTo(map);
+    if (wasOn) layerDefs.spms.layer.addTo(map);
   } catch (e) {
     console.warn('SPMS load failed', e);
   }
 }
 
+// SPMS Active Letting (viewport and lazy)
+async function loadSPMSActive() {
+  if (!active.includes('spmsActive')) return;
+
+  const wasOn = layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer);
+  if (wasOn) map.removeLayer(layerDefs.spmsActive.layer);
+
+  const b = map.getBounds();
+  const url = `https://gis.indot.in.gov/ro/rest/services/DOT/SPMS_ACTIVE_LET/FeatureServer/0/query` +
+    `?geometry=${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}` +
+    `&geometryType=esriGeometryEnvelope&inSR=4326&outSR=4326` +
+    `&spatialRel=esriSpatialRelIntersects` +
+    `&outFields=DES,CONTRACT,LOCATION,WORKTYPE,WORKDESC,LETTING_FY,DIST_NAME,COUNTY,LETTING_DATE` +
+    `&returnGeometry=true&f=geojson&resultRecordCount=2000`;
+
+  try {
+    const data = await (await fetch(url)).json();
+    layerDefs.spmsActive.layer = L.geoJSON(data, {
+      style: { color: '#1a6b8a', weight: 3, opacity: 0.9 }
+    });
+    if (wasOn) layerDefs.spmsActive.layer.addTo(map);
+  } catch (e) {
+    console.warn('SPMS Active load failed', e);
+  }
+}
+
+// One shared moveend for both
 map.on('moveend', () => {
-  if (active.includes('spms') && map.getZoom() >= 9) {
+  if (map.getZoom() < 9) return;
+  if (active.includes('spms') && layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
     loadSPMS();
+  }
+  if (active.includes('spmsActive') && layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
+    loadSPMSActive();
   }
 });
 
