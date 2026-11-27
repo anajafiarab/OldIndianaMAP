@@ -2419,28 +2419,28 @@ map.on('click', function (e) { // CLICK HANDLER
     const d = map.distance(e.latlng, l.getLatLng());
     if (d < 40) {
       const p = l.feature.properties;
-      hits.push({
-        layerName: 'INDOT BoreRecords',
-        layer: l,
-        attrs: {
-          'Point ID': p.POINTID || '—',
-          'Hole Depth (ft)': p.HOLEDEPTH || '—',
-          'DES Number': p.DES_NUMBER || '—',
-          'County': p.COUNTY || '—',
-          'Elevation': p.ELEVATION || '—',
-          'Station': p.STATION || '—',
-          'Offset': p.OFFSET || '—',
-          'Method': p.BORING_METHOD || '—',
-          'GW Encountered': p.GW_DEPTH_ENCOUNTERED || '—',
-          'GW at Completion': p.GW_DEPTH_AT_COMPLETION || '—',
-          'Date Started': (p.DATE_STARTED || '').slice(0, 10) || '—',
-          'Driller': p.DRILLER || '—'
-        },
-        source: def.source || null,
-        'Geotech Report': p.DES_NUMBER
-          ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(p.DES_NUMBER)}`
-          : null
-      });
+hits.push({
+  layerName: 'INDOT BoreRecords',
+  layer: l,
+  attrs: {
+    'Point ID': p.POINTID || '—',
+    'Hole Depth (ft)': p.HOLEDEPTH || '—',
+    'DES Number': p.DES_NUMBER || '—',
+    'County': p.COUNTY || '—',
+    'Elevation': p.ELEVATION || '—',
+    'Station': p.STATION || '—',
+    'Offset': p.OFFSET || '—',
+    'Method': p.BORING_METHOD || '—',
+    'GW Encountered': p.GW_DEPTH_ENCOUNTERED || '—',
+    'GW at Completion': p.GW_DEPTH_AT_COMPLETION || '—',
+    'Date Started': (p.DATE_STARTED || '').slice(0, 10) || '—',
+    'Driller': p.DRILLER || '—'
+  },
+  source: def.source || null,
+  geotechReport: p.DES_NUMBER
+    ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(p.DES_NUMBER)}`
+    : null
+});
     }
   });
 } else if (id === 'glacial') {
@@ -2569,9 +2569,10 @@ for (let k in h.attrs) {
   html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
 }
     html += `</div>`;
-    // ERMS link for Legacy Boreholes
-if (h.erms) {
-  html += `<div style="margin-top:10px;"><a href="${h.erms}" target="_blank" style="color:#113d43; font-weight:bold;">Open ERMS Report</a></div>`;
+    
+// Geotech Report link for INDOT BoreRecords
+if (h.geotechReport) {
+  html += `<div style="margin-top:10px;"><a href="${h.geotechReport}" target="_blank" style="color:#113d43; font-weight:bold;">Geotech Report</a></div>`;
 }
 
 // Source link (Source Block)
