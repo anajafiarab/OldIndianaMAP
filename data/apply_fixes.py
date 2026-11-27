@@ -67,16 +67,15 @@ for feat in data['features']:
     des = str(feat['properties'].get('DES_NUMBER', ''))
     if des not in fixes:
         continue
-    pid = feat['properties'].get('POINTID') or None
+    pid = feat['properties'].get('POINTID')
+    if pid == '':
+        pid = None
     for fix_pid, lon, lat in fixes[des]:
-        if fix_pid == pid or (fix_pid is None and pid is None):
+        if fix_pid == pid:
             old = feat['geometry']['coordinates']
             feat['geometry']['coordinates'] = [lon, lat]
             print(f"Fixed DES {des} POINTID={pid!r}: {old} → [{lon}, {lat}]")
             changed += 1
             break
 
-with open('legacy_boreholes-fixed.geojson', 'w') as f:
-    json.dump(data, f)
-
-print(f"Done. Updated {changed} points.")
+print(f"Updated {changed} points.")
