@@ -1274,6 +1274,7 @@ spmsActive: {
 // LOADERS
 // ──────────────────────────────────────────────
 
+// SPMS Active Letting (viewport and lazy)
 async function loadSPMSActive() {
   if (!active.includes('spmsActive')) return;
 
@@ -2612,52 +2613,80 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
 });
     }
   });
+// SPMS
 } if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
   layerDefs.spms.layer.eachLayer(l => {
-    if (l.getBounds && l.getBounds().contains(e.latlng)) {
-      const p = l.feature.properties;
-      const des = p.DES || '';
-      hits.push({
-        layerName: 'INDOT Projects (SPMS)',
-        layer: l,
-        attrs: {
-          'DES': des || '—',
-          'Contract': p.CONTRACT || '—',
-          'Location': p.LOCATION || '—',
-          'Work Type': p.WORKTYPE || '—',
-          'Description': p.WORKDESC || '—',
-          'Year': p.YEAR || '—',
-          'District': p.DIST_NAME || '—'
-        },
-        geotechReport: des
-          ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
-          : null
-      });
+    let hit = false;
+    if (l.getLatLngs) {
+      const latlngs = l.getLatLngs().flat ? l.getLatLngs().flat() : l.getLatLngs();
+      for (let i = 0; i < latlngs.length; i++) {
+        if (e.latlng.distanceTo(latlngs[i]) < 25) {
+          hit = true;
+          break;
+        }
+      }
+    } else if (l.getLatLng) {
+      hit = e.latlng.distanceTo(l.getLatLng()) < 25;
     }
+    if (!hit) return;
+
+    const p = l.feature.properties;
+    const des = p.DES || '';
+    hits.push({
+      layerName: 'INDOT Projects (SPMS)',
+      layer: l,
+      attrs: {
+        'DES': des || '—',
+        'Contract': p.CONTRACT || '—',
+        'Location': p.LOCATION || '—',
+        'Work Type': p.WORKTYPE || '—',
+        'Description': p.WORKDESC || '—',
+        'Year': p.YEAR || '—',
+        'District': p.DIST_NAME || '—'
+      },
+      geotechReport: des
+        ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
+        : null
+    });
   });
-}if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
+}
+
+// Active Letting
+if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
   layerDefs.spmsActive.layer.eachLayer(l => {
-    if (l.getBounds && l.getBounds().contains(e.latlng)) {
-      const p = l.feature.properties;
-      const des = p.DES || '';
-      hits.push({
-        layerName: 'Active Letting (Current FY)',
-        layer: l,
-        attrs: {
-          'DES': des || '—',
-          'Contract': p.CONTRACT || '—',
-          'Location': p.LOCATION || '—',
-          'Work Type': p.WORKTYPE || '—',
-          'Description': p.WORKDESC || '—',
-          'Letting FY': p.LETTING_FY || '—',
-          'District': p.DIST_NAME || '—',
-          'County': p.COUNTY || '—'
-        },
-        geotechReport: des
-          ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
-          : null
-      });
+    let hit = false;
+    if (l.getLatLngs) {
+      const latlngs = l.getLatLngs().flat ? l.getLatLngs().flat() : l.getLatLngs();
+      for (let i = 0; i < latlngs.length; i++) {
+        if (e.latlng.distanceTo(latlngs[i]) < 25) {
+          hit = true;
+          break;
+        }
+      }
+    } else if (l.getLatLng) {
+      hit = e.latlng.distanceTo(l.getLatLng()) < 25;
     }
+    if (!hit) return;
+
+    const p = l.feature.properties;
+    const des = p.DES || '';
+    hits.push({
+      layerName: 'Active Letting (Current FY)',
+      layer: l,
+      attrs: {
+        'DES': des || '—',
+        'Contract': p.CONTRACT || '—',
+        'Location': p.LOCATION || '—',
+        'Work Type': p.WORKTYPE || '—',
+        'Description': p.WORKDESC || '—',
+        'Letting FY': p.LETTING_FY || '—',
+        'District': p.DIST_NAME || '—',
+        'County': p.COUNTY || '—'
+      },
+      geotechReport: des
+        ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
+        : null
+    });
   });
 }
 }); // closes active.forEach
