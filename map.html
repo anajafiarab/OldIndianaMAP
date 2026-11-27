@@ -1076,6 +1076,8 @@ fetch('data/hydrogeo-units.json')
     //SPMS
   spms: {
   name: 'INDOT Projects (SPMS)',
+  lazy: true,          // ← add this
+  load: loadSPMS,      // ← point at the existing function
   opacity: 1,
   layer: null,
   source: 'https://gis.indot.in.gov/ro/rest/services/DOT/VENDOR_SPMS/FeatureServer',
@@ -1164,6 +1166,8 @@ piletests: {
   },
   plss: {
     name: 'PLSS Townships',
+    lazy: true,          // ← add this
+    load: loadPLSS,      // ← point at the existing function
     group: 'Boundaries',
     layer: null,
     opacity: 0.5,
@@ -1174,6 +1178,8 @@ piletests: {
   // Geology
   thickness: {
     name: 'Unconsolidated Thickness Contours',
+    lazy: true,
+    load: loadThickness,      // ← point at the existing function
     group: 'Geology',
     layer: null,
     opacity: 1,
@@ -1247,12 +1253,15 @@ liq: {
 },
 nbi: {
   name: 'National Bridge Inventory',
+  lazy: true,
   layer: null,
   opacity: 1,
   source: 'https://services.arcgis.com/xOi1kZaI0eWDREZv/ArcGIS/rest/services/NTAD_National_Bridge_Inventory/FeatureServer'
 },
 spmsActive: {
   name: 'Active Letting (Current FY)',
+  lazy: true,
+  load: loadSPMSActive,
   opacity: 1,
   layer: null,
   source: 'https://gis.indot.in.gov/ro/rest/services/DOT/SPMS_ACTIVE_LET/FeatureServer',
@@ -2135,10 +2144,14 @@ map.on('moveend', refreshSoils);
       const slider = row.querySelector('input[type=range]');
       const btn = row.querySelector('.remove');
 
-      cb.addEventListener('change', () => {
-        if (!def.layer) return;
-        cb.checked ? def.layer.addTo(map) : map.removeLayer(def.layer);
-      });
+cb.addEventListener('change', async () => {
+  if (cb.checked) {
+    if (!def.layer && def.load) await def.load();
+    if (def.layer && !map.hasLayer(def.layer)) def.layer.addTo(map);
+  } else {
+    if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
+  }
+});
 
       cb.addEventListener('change', () => {//soils refresh
   if (!def.layer) return;
@@ -3284,10 +3297,14 @@ function dropMarker(lat, lon, label) {
     searchMarker.bindPopup(label).openPopup();
     map.setView([lat, lon], 14);
   }
-  // Restore layers that were active last time
-  active.forEach(id => {
-    if (layerDefs[id]) addLayer(id);
-  });
+// Restore active layers — lazy ones stay in the list but off
+active.forEach(id => {
+  const def = layerDefs[id];
+  if (!def) return;
+  if (def.lazy) return;
+  addLayer(id);
+});
+
   document.getElementById('active-layers-btn').click();
 </script>
 </body>
