@@ -1454,8 +1454,8 @@ function refreshBoreRecords() {
   startLoad('INDOT BoreRecords');
   const b = map.getBounds();
   const envelope = `${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`;
-  //const url = 'https://gis.indot.in.gov/ro/rest/services/DOT/BoreRecords/MapServer/0/query' +
-  const url = 'https://invalid.example.com/query' +
+  const url = 'https://gis.indot.in.gov/ro/rest/services/DOT/BoreRecords/MapServer/0/query' +
+
     '?where=1%3D1' +
     '&geometry=' + encodeURIComponent(envelope) +
     '&geometryType=esriGeometryEnvelope' +
@@ -1474,7 +1474,7 @@ function refreshBoreRecords() {
     .catch(async (err) => {
       console.warn('BoreRecords REST failed, falling back to local backup', err);
       try {
-        const r = await fetch('ddata/legacy_boreholes-fixed.geojson');
+        const r = await fetch('data/legacy_boreholes-fixed.geojson');
         const data = await r.json();
         boreLayer.clearLayers();
         boreLayer.addData(data);
