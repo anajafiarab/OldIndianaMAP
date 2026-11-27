@@ -2566,12 +2566,9 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
   });
 } if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
   layerDefs.spms.layer.eachLayer(l => {
-    if (l.getBounds && l.getBounds().contains(e.latlng) || (l.getLatLng && l.getLatLng().distanceTo(e.latlng) < 20)) {
+    if (l.getBounds && l.getBounds().contains(e.latlng)) {
       const p = l.feature.properties;
       const des = p.DES || '';
-      const erms = des
-        ? `<a href="https://erms12c.indot.in.gov/viewdocs/Results.aspx?DocumentType=Geotech%20Reports" target="_blank">Open Geotech Reports (search DES ${des})</a>`
-        : '—';
       hits.push({
         layerName: 'INDOT Projects (SPMS)',
         layer: l,
@@ -2582,9 +2579,11 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
           'Work Type': p.WORKTYPE || '—',
           'Description': p.WORKDESC || '—',
           'Year': p.YEAR || '—',
-          'District': p.DIST_NAME || '—',
-          'Geotech Report': erms
-        }
+          'District': p.DIST_NAME || '—'
+        },
+        geotechReport: des
+          ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
+          : null
       });
     }
   });
