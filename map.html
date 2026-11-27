@@ -1454,7 +1454,7 @@ function refreshBoreRecords() {
   startLoad('INDOT BoreRecords');
   const b = map.getBounds();
   const envelope = `${b.getWest()},${b.getSouth()},${b.getEast()},${b.getNorth()}`;
-  const url = 'https://gis.indot.in.gov/ro/rest/services/DOT/BoreRecords/MapServer/0/query' +
+  const url = 'hhttps://gis.indot.in.gov/ro/rest/services/DOT/BoreRecords/MapServer/0/query' +
     '?where=1%3D1' +
     '&geometry=' + encodeURIComponent(envelope) +
     '&geometryType=esriGeometryEnvelope' +
