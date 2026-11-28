@@ -1902,50 +1902,56 @@ loadBedrock()
 .finally(finishLoad);   // <-- runs after success or error
 
 // 250K Bedrock Loader
-startLoad('250K Bedrock Geology');
 async function loadBedrock250() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer/0/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=Unit,Name,Ages,Rank,Lithology,Group_,Formations,Members&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
-  }
-  function bedrockColor(props) {
-    const age = (props.Ages || '').toLowerCase();
-    if (age.includes('quaternary')) return '#f4e04d';
-    if (age.includes('tertiary') || age.includes('paleogene') || age.includes('neogene')) return '#f5d76e';
-    if (age.includes('cretaceous')) return '#7dcea0';
-    if (age.includes('jurassic')) return '#5dade2';
-    if (age.includes('triassic')) return '#af7ac5';
-    if (age.includes('permian')) return '#e74c3c';
-    if (age.includes('pennsylvanian')) return '#922b21';
-    if (age.includes('mississippian')) return '#e67e22';
-    if (age.includes('devonian')) return '#d4a017';
-    if (age.includes('silurian')) return '#1abc9c';
-    if (age.includes('ordovician')) return '#3498db';
-    if (age.includes('cambrian')) return '#8e44ad';
-    if (age.includes('precambrian')) return '#5d6d7e';
-    return '#B0B0B0';
-  }
+  if (layerDefs.bedrock250.layer) return;   // already loaded
 
-  layerDefs.bedrock250.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: function (f) {
-      return {
-        color: '#444',
-        weight: 0.5,
-        fillColor: bedrockColor(f.properties),
-        fillOpacity: 0.85
-      };
+  startLoad('250K Bedrock Geology');
+
+  try {
+    const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geology_RGM_250K_IN/FeatureServer/0/query';
+    let all = [], offset = 0, page = 2000, more = true;
+    while (more) {
+      const url = `${base}?where=1%3D1&outFields=Unit,Name,Ages,Rank,Lithology,Group_,Formations,Members&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += page;
+        if (data.features.length < page) more = false;
+      } else more = false;
     }
-  });
+
+    function bedrockColor(props) {
+      const age = (props.Ages || '').toLowerCase();
+      if (age.includes('quaternary')) return '#f4e04d';
+      if (age.includes('tertiary') || age.includes('paleogene') || age.includes('neogene')) return '#f5d76e';
+      if (age.includes('cretaceous')) return '#7dcea0';
+      if (age.includes('jurassic')) return '#5dade2';
+      if (age.includes('triassic')) return '#af7ac5';
+      if (age.includes('permian')) return '#e74c3c';
+      if (age.includes('pennsylvanian')) return '#922b21';
+      if (age.includes('mississippian')) return '#e67e22';
+      if (age.includes('devonian')) return '#d4a017';
+      if (age.includes('silurian')) return '#1abc9c';
+      if (age.includes('ordovician')) return '#3498db';
+      if (age.includes('cambrian')) return '#8e44ad';
+      if (age.includes('precambrian')) return '#5d6d7e';
+      return '#B0B0B0';
+    }
+
+    layerDefs.bedrock250.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: function (f) {
+        return {
+          color: '#444',
+          weight: 0.5,
+          fillColor: bedrockColor(f.properties),
+          fillOpacity: 0.85
+        };
+      }
+    });
+  } finally {
+    finishLoad();
+  }
 }
-loadBedrock250()
-.finally(finishLoad);   // <-- runs after success or error
 
 // Counties
 async function loadCounties() {
@@ -2305,6 +2311,7 @@ async function addLayer(id) {
   if (id === 'spmsActive') await loadSPMSActive();
   if (id === 'nibi') await loadNIBI();
   if (id === 'counties') await loadCounties();
+  if (id === 'bedrock250') await loadBedrock250();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
