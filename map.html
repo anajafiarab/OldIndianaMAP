@@ -1340,6 +1340,7 @@ async function loadNIBI() {
         };
       }
     });
+    def.layer.addTo(map);
   } catch (e) {
     console.warn('NIBI load failed', e);
     def.layer = L.layerGroup();
