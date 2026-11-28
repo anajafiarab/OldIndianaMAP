@@ -1483,43 +1483,53 @@ function refreshNBI() {
 map.on('moveend', refreshNBI);
 
 // Liquefaction Loader
-startLoad('Liquefaction Potential');
 async function loadLiq() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer/0/query';
-  let all = [], offset = 0, page = 1000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=*&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else {
-      more = false;
+  if (layerDefs.liq.layer) return;
+
+  startLoad('Liquefaction Potential');
+
+  try {
+    const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer/0/query';
+    let all = [], offset = 0, page = 1000;
+
+    while (true) {
+      const url = `${base}?where=1%3D1&outFields=*&f=geojson&outSR=4326&returnGeometry=true&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += data.features.length;
+      }
+
+      if (!data.exceededTransferLimit && (!data.features || data.features.length < page)) {
+        break;
+      }
     }
-  }
 
-  function liqColor(desc) {
-    if (!desc) return '#999';
-    const d = desc.toLowerCase();
-    if (d.includes('high'))     return '#d0021b';
-    if (d.includes('moderate')) return '#f5a623';
-    if (d.includes('low'))      return '#4a90d9';
-    if (d.includes('lake'))     return '#7ed321';
-    return '#999';
-  }
+    function liqColor(desc) {
+      if (!desc) return '#999';
+      const d = desc.toLowerCase();
+      if (d.includes('high'))     return '#d0021b';
+      if (d.includes('moderate')) return '#f5a623';
+      if (d.includes('low'))      return '#4a90d9';
+      if (d.includes('lake'))     return '#7ed321';
+      return '#999';
+    }
 
-  layerDefs.liq.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: f => ({
-      color: '#333',
-      weight: 0.5,
-      fillColor: liqColor(f.properties.DESCRIPTIO),
-      fillOpacity: 0.4
-    })
-  });
+    layerDefs.liq.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: f => ({
+        color: '#333',
+        weight: 0.5,
+        fillColor: liqColor(f.properties.DESCRIPTIO),
+        fillOpacity: 0.4
+      })
+    });
+  } finally {
+    finishLoad();
+  }
 }
-loadLiq().finally(finishLoad);
 
+//Karst Sinkholes Loader
 async function loadKarst() {
   if (layerDefs.karst.layer) return;
 
@@ -2357,6 +2367,7 @@ async function addLayer(id) {
   if (id === 'unconsolidatedPSM') await loadUnconsolidatedPSM();
   if (id === 'glacial') await loadGlacial();
   if (id === 'karst') await loadKarst();
+  if (id === 'liq') await loadLiq();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
