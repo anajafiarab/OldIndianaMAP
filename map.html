@@ -1949,20 +1949,19 @@ loadBedrock250()
 
 // Counties
 async function loadCounties() {
-  if (layerDefs.counties.layer) return;          // already loaded
+  if (layerDefs.counties.layer) return;
 
   startLoad('Indiana Counties');
 
   try {
-    const url = 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer/0/query'
-      + '?where=1%3D1&outFields=NAME&f=geojson';
+    const url = 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer/0/query?where=1%3D1&outFields=name&f=geojson';
 
     const data = await (await fetch(url)).json();
 
     layerDefs.counties.layer = L.geoJSON(data, {
       style: { color: '#000', weight: 1.5, fillColor: '#3d5c3d', fillOpacity: 0.08 },
       onEachFeature: (f, l) => {
-        const name = f.properties.NAME || '';
+        const name = f.properties.name || '';
         if (name) l.bindTooltip(name, { permanent: true, direction: 'center', className: 'county-label' });
       }
     });
@@ -2452,9 +2451,9 @@ map.on('click', function (e) { // CLICK HANDLER
     const def = layerDefs[id];
     if (!def || !def.layer || !map.hasLayer(def.layer)) return;
 
-    if (id === 'counties') {
-      checkLayer(def, 'Indiana Counties', p => ({ Name: p.NAME || '—' }));
-    } else if (id === 'plss') {
+if (id === 'counties') {
+  checkLayer(def, 'Indiana Counties', p => ({ Name: p.name || '—' }));
+} else if (id === 'plss') {
       checkLayer(def, 'PLSS Townships', p => ({
         'Principal Meridian': p.meridian || '—',
         'Township': p.twp || '—',
