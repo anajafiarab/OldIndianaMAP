@@ -1106,6 +1106,8 @@ fetch('data/hydrogeo-units.json')
 // Glacial Quaternary Geology
 glacial: {
   name: 'Glacial Quaternary Geology',
+  lazy: true,
+  load: loadGlacial,
   opacity: 1,
   layer: null,
   source: {
@@ -1127,6 +1129,8 @@ boreholes: {
     // Unconsolidated Potentiometric Surface   
 unconsolidatedPSM: {
   name: 'Unconsolidated Potentiometric Surface',
+  lazy: true,
+  load: loadUnconsolidatedPSM,
   layer: null,
   opacity: 1,
   source: 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0',
@@ -1136,6 +1140,7 @@ unconsolidatedPSM: {
 hydrogeo: {
   name: 'Hydrogeologic Settings',
   lazy: true,
+  load: loadHydrogeo,
   layer: null,
   opacity: 1,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer',
@@ -1146,6 +1151,7 @@ hydrogeo: {
 piletests: {
   name: 'PDA & Static Test Data',
   lazy: true,
+  load: loadPileTests,
   group: 'Engineering',
   layer: null,
   opacity: 1,
@@ -1156,6 +1162,7 @@ piletests: {
   landslides: {
   name: 'Landslide Inventory',
   lazy: true,
+  load: loadLandslides,
   opacity: 1,
   fillScale: 0.5,
   source: { label: 'IGWS Landslide Inventory', url: 'https://portal.igs.indiana.edu/portal/home/item.html?id=e8914605d3954ea18ef0da9282532297' },
@@ -1173,6 +1180,7 @@ piletests: {
 counties: {
   name: 'Indiana Counties',
   lazy: true,
+  load: loadCounties,
   group: 'Boundaries',
   layer: null,
   opacity: 1,
@@ -1231,6 +1239,7 @@ counties: {
   bedrock: {
     name: 'Bedrock Geology (MM48)',
     lazy: true,
+    load: loadBedrock,
     group: 'Geology',
     layer: null,
     opacity: 1,
@@ -1240,6 +1249,7 @@ counties: {
 bedrock250: {
   name: '250K Bedrock Geology',
   lazy: true,
+  load: loadBedrock250,
   group: 'Geology',
   layer: null,
   opacity: 1,
@@ -1258,6 +1268,7 @@ bedrock250: {
 karst: {
   name: 'Karst Sinkhole Inventory',
   lazy: true,
+  load: loadKarst,
   layer: null,
   opacity: 1,
   source: {
@@ -1268,6 +1279,7 @@ karst: {
 liq: {
   name: 'Liquefaction Potential',
   lazy: true,
+  load: loadLiquefaction,
   opacity: 1,
   layer: null,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer',
