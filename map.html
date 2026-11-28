@@ -1719,37 +1719,48 @@ loadHydrogeo()
 .finally(finishLoad);   // <-- runs after success or error
 
 //Pile Testing Loader
-startLoad('Pile Testing Reports');
 async function loadPileTests() {
-  const base = 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/query';
-  let all = [], offset = 0, page = 1000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=OBJECTID,YEAR,CONTRACT,ROAD,NAME,ITEM_TYPE,PILE_TYPE,HYPERLINK&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
+  if (layerDefs.piletests.layer) return;
+
+  startLoad('Pile Testing Reports');
+
+  try {
+    const base = 'https://gis.indot.in.gov/ro/rest/services/Asset_Management_GeoTech/INDOT_AGO_PileDriving_ro/FeatureServer/6/query';
+    let all = [], offset = 0, page = 1000;
+
+    while (true) {
+      const url = `${base}?where=1%3D1&outFields=OBJECTID,YEAR,CONTRACT,ROAD,NAME,ITEM_TYPE,PILE_TYPE,HYPERLINK&f=geojson&outSR=4326&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += data.features.length;
+      }
+
+      if (!data.exceededTransferLimit && (!data.features || data.features.length < page)) {
+        break;
+      }
+    }
+
+    layerDefs.piletests.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      pointToLayer: (f, latlng) => {
+        const pt = (f.properties.PILE_TYPE || '').toLowerCase();
+        let color = '#c45c26';
+        if (pt.includes('h pile')) color = '#2e8b57';
+        else if (pt.includes('pipe')) color = '#1e90ff';
+        return L.circleMarker(latlng, {
+          radius: 5,
+          color: '#222',
+          weight: 1,
+          fillColor: color,
+          fillOpacity: 0.9
+        });
+      }
+    });
+  } finally {
+    finishLoad();
   }
-  layerDefs.piletests.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-pointToLayer: (f, latlng) => {
-  const pt = (f.properties.PILE_TYPE || '').toLowerCase();
-  let color = '#c45c26'; // Other / Drilled Shaft (orange)
-  if (pt.includes('h pile')) color = '#2e8b57'; // brighter green
-  else if (pt.includes('pipe')) color = '#1e90ff'; // brighter blue
-  return L.circleMarker(latlng, {
-    radius: 5,
-    color: '#222',
-    weight: 1,
-    fillColor: color,
-    fillOpacity: 0.9
-  });
 }
-  });
-}
-loadPileTests()
-.finally(finishLoad);   // <-- runs after success or error
 
 // INDR Water Wells Loader
 let wellsLayer = L.layerGroup();
@@ -2281,6 +2292,7 @@ async function addLayer(id) {
   if (id === 'bedrock250') await loadBedrock250();
   if (id === 'bedrock') await loadBedrock();
   if (id === 'landslides') await loadLandslides();
+  if (id === 'piletests') await loadPileTests();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
