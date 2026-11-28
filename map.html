@@ -1319,6 +1319,7 @@ async function loadNIBI() {
   try {
     const data = await (await fetch(url)).json();
     const features = data.features || [];
+    console.log('NIBI features:', features.length); //Temporary log for debugging
 
     def.layer = L.geoJSON(features, {
       pointToLayer: (f, latlng) => L.circleMarker(latlng, {
