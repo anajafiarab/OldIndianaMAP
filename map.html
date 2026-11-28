@@ -2774,18 +2774,66 @@ else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer))
   layerDefs.nibi.layer.eachLayer(l => {
     if (l.getLatLng && map.latLngToLayerPoint(l.getLatLng()).distanceTo(map.latLngToLayerPoint(e.latlng)) < 12) {
       const n = l._nibi || {};
-      hits.push({
+      const p = l.feature ? l.feature.properties : {};
+      const elevM = p.elevnavd88;
+      const elevFt = elevM != null && elevM > -9000 ? (elevM * 3.28084).toFixed(1) : null;
+      const depthFt = n.depth != null && n.depth > -9000 ? (n.depth * 3.28084).toFixed(1) : null;
+
+      const hit = {
         layerName: 'Natl Index of Borehole Info',
-        layer: l,                    // ← this was missing
+        layer: l,
         attrs: {
           'Name': n.name || '—',
           'Borehole ID': n.id || '—',
-          'Total Depth': n.depth != null ? n.depth + ' ft' : '—',
+          'Unique Borehole Identifier': p.ubi || '—',
+          'Organization': p.organizationname || '—',
+          'Elevation': elevFt ? `${elevFt} ft (${elevM} m)` : '—',
+          'Total Depth': depthFt ? `${depthFt} ft (${n.depth} m)` : '—',
           'Drill Date': n.date ? new Date(n.date).toLocaleDateString() : '—',
-          'Link': n.uri ? `<a href="${n.uri}" target="_blank" rel="noopener">Open source record</a>` : '—'
+          'Latitude': p.latwgs84 != null ? Number(p.latwgs84).toFixed(5) : '—',
+          'Longitude': p.longwgs84 != null ? Number(p.longwgs84).toFixed(5) : '—',
+          'View Borehole URI': n.uri ? `<a href="${n.uri}" target="_blank" rel="noopener">View Borehole URI</a>` : '—'
         },
-        source: 'https://webapps.usgs.gov/nibi/'
-      });
+        source: 'https://webapps.usgs.gov/nibi/',
+        logsHtml: ''   // filled in below
+      };
+      hits.push(hit);
+
+      // fetch related logs
+      if (n.id) {
+        const logUrl = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/NIBI_Borehole_Prod/FeatureServer/1/query'
+          + '?where=' + encodeURIComponent(`boreholeid='${n.id}'`)
+          + '&outFields=loguri,logcategory,logtype&f=json';
+        fetch(logUrl)
+          .then(r => r.json())
+          .then(data => {
+            const cats = {15:'Well Construction',11:'Nuclear',10:'Lithology',1:'Acoustic',3:'Caliper',8:'Electromagnetic',12:'Optical',14:'Stratigraphy'};
+            const types = {108:'Well Report/History',88:'Gamma',86:'Drillers log',109:'Drillers log and well construction diagram',107:'Well construction diagram'};
+            let html = '';
+            if (data.features && data.features.length) {
+              html = '<div style="margin-top:10px; border-top:1px solid #ccc; padding-top:6px;"><strong>Logs</strong><div style="margin-top:4px;">';
+              data.features.forEach(f => {
+                const a = f.attributes;
+                const label = `${cats[a.logcategory] || 'Log'} - ${types[a.logtype] || 'Record'}`;
+                html += `<div><a href="${a.loguri}" target="_blank" rel="noopener">${label}</a></div>`;
+              });
+              html += '</div></div>';
+            }
+            hit.logsHtml = html;
+            // if this hit is currently displayed, refresh the legend
+            if (document.getElementById('sidebar') && document.getElementById('sidebar').innerHTML.includes(hit.layerName)) {
+              document.getElementById('legend-btn').click();
+              // re-trigger show so the logs appear
+              setTimeout(() => {
+                const prev = document.getElementById('prev-hit');
+                if (prev) prev.click();
+                const next = document.getElementById('next-hit');
+                if (next) next.click();
+              }, 50);
+            }
+          })
+          .catch(() => {});
+      }
     }
   });
 }
@@ -2848,6 +2896,9 @@ for (let k in h.attrs) {
   html += `<div style="margin:3px 0;"><span style="color:#555;">${k}:</span> ${h.attrs[k]}</div>`;
 }
     html += `</div>`;
+
+// NIBI Log Links
+if (h.logsHtml) html += h.logsHtml;
     
 // Geotech Report link for INDOT BoreRecords
 if (h.geotechReport) {
