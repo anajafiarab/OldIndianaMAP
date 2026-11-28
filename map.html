@@ -1972,7 +1972,14 @@ async function loadCounties() {
     finishLoad();
   }
 }
+function updateCountyLabels() {
+  const lyr = layerDefs.counties.layer;
+  if (!lyr) return;
+  const show = map.getZoom() >= 8;
+  lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
+}
 map.on('zoomend', updateCountyLabels);
+
 
 // PLSS (lazy)
 async function loadPLSS() {
