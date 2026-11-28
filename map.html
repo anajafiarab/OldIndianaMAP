@@ -1296,8 +1296,36 @@ async function loadNIBI() {
   const def = layerDefs.nibi;
   if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
 
+  def.layer = L.geoJSON(null, {
+    pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+      radius: 4,
+      fillColor: '#8B4513',
+      color: '#5a2d0c',
+      weight: 1,
+      fillOpacity: 0.85
+    }),
+    onEachFeature: (f, l) => {
+      const p = f.properties;
+      l._nibi = {
+        name: p.boreholename || p.boreholeid || 'Borehole',
+        depth: p.totaldepth,
+        date: p.drilldate,
+        uri: p.boreholeuri,
+        id: p.boreholeid
+      };
+    }
+  });
+  def.layer.addTo(map);
+
+  // kick off the first load
+  refreshNIBI();
+}
+
+function refreshNIBI() {
+  const def = layerDefs.nibi;
+  if (!def.layer || !map.hasLayer(def.layer)) return;
   if (map.getZoom() < 11) {
-    def.layer = L.layerGroup();
+    def.layer.clearLayers();
     return;
   }
 
@@ -1312,37 +1340,18 @@ async function loadNIBI() {
     + '&f=geojson'
     + '&resultRecordCount=1000';
 
-  try {
-    const data = await (await fetch(url)).json();
-    const features = data.features || [];
-    console.log('NIBI features:', features.length); //Temporary log for debugging
-
-    def.layer = L.geoJSON(features, {
-      pointToLayer: (f, latlng) => L.circleMarker(latlng, {
-        radius: 4,
-        fillColor: '#8B4513',
-        color: '#5a2d0c',
-        weight: 1,
-        fillOpacity: 0.85
-      }),
-      onEachFeature: (f, l) => {
-        const p = f.properties;
-        // stash the useful bits for the identify handler
-        l._nibi = {
-          name: p.boreholename || p.boreholeid || 'Borehole',
-          depth: p.totaldepth,
-          date: p.drilldate,
-          uri: p.boreholeuri,
-          id: p.boreholeid
-        };
-      }
-    });
-    def.layer.addTo(map);
-  } catch (e) {
-    console.warn('NIBI load failed', e);
-    def.layer = L.layerGroup();
-  }
+  fetch(url)
+    .then(r => r.json())
+    .then(data => {
+      def.layer.clearLayers();
+      if (data.features) def.layer.addData(data.features);
+    })
+    .catch(e => console.warn('NIBI refresh failed', e))
+    .finally(finishLoad);
 }
+
+// refresh on every pan or zoom (same as NBI)
+map.on('moveend', refreshNIBI);
 
 // SPMS projects (viewport and lazy)
 async function loadSPMS() {
