@@ -1846,60 +1846,32 @@ startLoad('Landslide Inventory');
 })().finally(finishLoad);
 
 // Bedrock Geology (colored by ROCK_UNITS)
-startLoad('Bedrock Geology (MM48)');
-const bedrockColors = {
-  'Coldwater Shale': '#8B7D6B',
-  'Ellsworth Shale': '#6B8E23',
-  'Antrim Shale': '#2F4F4F',
-  'Wabash Formation': '#4682B4',
-  'Muscatatuck Group': '#DAA520',
-  'New Albany Shale': '#1C1C1C',
-  'Pleasant Mills Formation': '#5F9EA0',
-  'Borden Group': '#CD853F',
-  'Raccoon Creek Group': '#8B4513',
-  'Louisville Limestone through Brassfield Limestone, or Salamonie Dolomite, Cataract Formation, and Brassfield Limestone': '#87CEEB',
-  'Ordovician rocks undifferentiated': '#9370DB',
-  'Bond Formation': '#A0522D',
-  'West Baden Group': '#B8860B',
-  'Buffalo Wallow Group': '#D2691E',
-  'Carbondale Group': '#696969',
-  'Blue River Group': '#F0E68C',
-  'Stephensport Group': '#BC8F8F',
-  'Patoka and Shelburn Formations': '#778899',
-  'Mattoon Formation': '#556B2F',
-  'Lake': '#ADD8E6'
-};
-
-function getBedrockStyle(feature) {
-  const unit = (feature.properties.ROCK_UNITS || '').trim();
-  const color = bedrockColors[unit] || '#CCCCCC';
-  return {
-    color: '#444',
-    weight: 0.6,
-    fillColor: color,
-    fillOpacity: 1
-  };
-}
-
 async function loadBedrock() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geol_MM48_IN/MapServer/0/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=STRATA,SYSTEM,ROCK_UNITS,ROCK_TYPE,MORE_INFO&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
+  if (layerDefs.bedrock.layer) return;
+
+  startLoad('Bedrock Geology (MM48)');
+
+  try {
+    const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Bedrock_Geol_MM48_IN/MapServer/0/query';
+    let all = [], offset = 0, page = 2000, more = true;
+    while (more) {
+      const url = `${base}?where=1%3D1&outFields=STRATA,SYSTEM,ROCK_UNITS,ROCK_TYPE,MORE_INFO&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += page;
+        if (data.features.length < page) more = false;
+      } else more = false;
+    }
+
+    layerDefs.bedrock.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: getBedrockStyle
+    });
+    applyOpacity(layerDefs.bedrock.layer, layerDefs.bedrock.opacity);
+  } finally {
+    finishLoad();
   }
-  layerDefs.bedrock.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: getBedrockStyle
-  });
-  applyOpacity(layerDefs.bedrock.layer, layerDefs.bedrock.opacity);
 }
-loadBedrock()
-.finally(finishLoad);   // <-- runs after success or error
 
 // 250K Bedrock Loader
 async function loadBedrock250() {
@@ -2312,6 +2284,7 @@ async function addLayer(id) {
   if (id === 'nibi') await loadNIBI();
   if (id === 'counties') await loadCounties();
   if (id === 'bedrock250') await loadBedrock250();
+  if (id === 'bedrock') await loadBedrock();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
