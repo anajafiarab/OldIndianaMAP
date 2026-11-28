@@ -1296,7 +1296,7 @@ async function loadNIBI() {
   const def = layerDefs.nibi;
   if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
 
-  if (map.getZoom() < 12) {
+  if (map.getZoom() < 13) {
     def.layer = L.layerGroup();
     return;
   }
