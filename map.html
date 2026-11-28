@@ -2797,7 +2797,7 @@ else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer))
         source: 'https://webapps.usgs.gov/nibi/',
         logsHtml: ''   // filled in below
       };
-      hits.push(hit);
+            hits.push(hit);
 
       // fetch related logs
       if (n.id) {
@@ -2820,17 +2820,8 @@ else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer))
               html += '</div></div>';
             }
             hit.logsHtml = html;
-            // if this hit is currently displayed, refresh the legend
-            if (document.getElementById('sidebar') && document.getElementById('sidebar').innerHTML.includes(hit.layerName)) {
-              document.getElementById('legend-btn').click();
-              // re-trigger show so the logs appear
-              setTimeout(() => {
-                const prev = document.getElementById('prev-hit');
-                if (prev) prev.click();
-                const next = document.getElementById('next-hit');
-                if (next) next.click();
-              }, 50);
-            }
+            // re-show the current hit so the logs appear
+            if (typeof window._showHit === 'function') window._showHit();
           })
           .catch(() => {});
       }
