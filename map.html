@@ -1954,7 +1954,7 @@ async function loadCounties() {
   startLoad('Indiana Counties');
 
   try {
-    const url = 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer/0/query?where=1%3D1&outFields=name&f=geojson';
+const url = 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer/0/query?where=1%3D1&outFields=name,county_id,county_fips&f=geojson';
 
     const data = await (await fetch(url)).json();
 
@@ -2452,7 +2452,11 @@ map.on('click', function (e) { // CLICK HANDLER
     if (!def || !def.layer || !map.hasLayer(def.layer)) return;
 
 if (id === 'counties') {
-  checkLayer(def, 'Indiana Counties', p => ({ Name: p.name || '—' }));
+  checkLayer(def, 'Indiana Counties', p => ({
+    Name: p.name || '—',
+    'County Number': p.county_id ?? '—',
+    FIPS: p.county_fips || '—'
+  }));
 } else if (id === 'plss') {
       checkLayer(def, 'PLSS Townships', p => ({
         'Principal Meridian': p.meridian || '—',
