@@ -1336,7 +1336,7 @@ function refreshNIBI() {
     + '?where=' + encodeURIComponent(
         `latwgs84>=${b.getSouth()} AND latwgs84<=${b.getNorth()} AND longwgs84>=${b.getWest()} AND longwgs84<=${b.getEast()}`
       )
-    + '&outFields=boreholeid,boreholename,organizationname,totaldepth,drilldate,boreholeuri,latwgs84,longwgs84'
+    + '&outFields=boreholeid,boreholename,organizationname,totaldepth,drilldate,boreholeuri,latwgs84,longwgs84,ubi,elevnavd88'
     + '&returnGeometry=true'
     + '&outSR=4326'
     + '&f=geojson'
@@ -2774,35 +2774,43 @@ else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer))
   layerDefs.nibi.layer.eachLayer(l => {
     if (l.getLatLng && map.latLngToLayerPoint(l.getLatLng()).distanceTo(map.latLngToLayerPoint(e.latlng)) < 12) {
       const n = l._nibi || {};
-      const p = l.feature ? l.feature.properties : {};
+      const p = (l.feature && l.feature.properties) ? l.feature.properties : {};
+
+      // Elevation (meters from service)
       const elevM = p.elevnavd88;
-      const elevFt = elevM != null && elevM > -9000 ? (elevM * 3.28084).toFixed(1) : null;
-      const depthFt = n.depth != null && n.depth > -9000 ? (n.depth * 3.28084).toFixed(1) : null;
+      const elevFt = (elevM != null && elevM > -9000) ? (elevM * 3.28084).toFixed(1) : null;
+
+      // Total depth (prefer the value stored on the marker, fall back to properties)
+      const depthM = (n.depth != null) ? n.depth : p.totaldepth;
+      const depthFt = (depthM != null && depthM > -9000) ? (depthM * 3.28084).toFixed(1) : null;
 
       const hit = {
         layerName: 'Natl Index of Borehole Info',
         layer: l,
         attrs: {
-          'Name': n.name || '—',
-          'Borehole ID': n.id || '—',
+          'Name': n.name || p.boreholename || '—',
+          'Borehole ID': n.id || p.boreholeid || '—',
           'Unique Borehole Identifier': p.ubi || '—',
           'Organization': p.organizationname || '—',
           'Elevation': elevFt ? `${elevFt} ft (${elevM} m)` : '—',
-          'Total Depth': depthFt ? `${depthFt} ft (${n.depth} m)` : '—',
+          'Total Depth': depthFt ? `${depthFt} ft (${depthM} m)` : '—',
           'Drill Date': n.date ? new Date(n.date).toLocaleDateString() : '—',
           'Latitude': p.latwgs84 != null ? Number(p.latwgs84).toFixed(5) : '—',
           'Longitude': p.longwgs84 != null ? Number(p.longwgs84).toFixed(5) : '—',
-          'View Borehole URI': n.uri ? `<a href="${n.uri}" target="_blank" rel="noopener">View Borehole URI</a>` : '—'
+          'View Borehole URI': (n.uri || p.boreholeuri)
+            ? `<a href="${n.uri || p.boreholeuri}" target="_blank" rel="noopener">View Borehole URI</a>`
+            : '—'
         },
         source: 'https://webapps.usgs.gov/nibi/',
-        logsHtml: ''   // filled in below
+        logsHtml: ''
       };
-            hits.push(hit);
+      hits.push(hit);
 
-      // fetch related logs
-      if (n.id) {
+      // fetch related logs (unchanged)
+      if (n.id || p.boreholeid) {
+        const bid = n.id || p.boreholeid;
         const logUrl = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/NIBI_Borehole_Prod/FeatureServer/1/query'
-          + '?where=' + encodeURIComponent(`boreholeid='${n.id}'`)
+          + '?where=' + encodeURIComponent(`boreholeid='${bid}'`)
           + '&outFields=loguri,logcategory,logtype&f=json';
         fetch(logUrl)
           .then(r => r.json())
@@ -2820,7 +2828,6 @@ else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer))
               html += '</div></div>';
             }
             hit.logsHtml = html;
-            // re-show the current hit so the logs appear
             if (typeof window._showHit === 'function') window._showHit();
           })
           .catch(() => {});
