@@ -1540,82 +1540,92 @@ async function loadKarst() {
 }
 loadKarst().finally(finishLoad);
 
-// Glacial Quaternary Geology Loader
-startLoad('Glacial Quaternary Geology');
 async function loadGlacial() {
-  const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer/70/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=SYMBOL,DESCRIPTIO,GEOLOGIC_A,DEPOSITION&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
-  }
-layerDefs.glacial.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-style: f => {
-  const p = f.properties || {};
-  const sym = (p.SYMBOL || '').toLowerCase().trim();
-  const desc = (p.DESCRIPTIO || '').toLowerCase();
-  const dep = (p.DEPOSITION || '').toLowerCase();
+  if (layerDefs.glacial.layer) return;
 
-  // Organic / muck
-  if (sym === 'm' || /muck|peat|organic/.test(desc)) {
-    return { color: '#8B2500', weight: 1.2, fillColor: '#A0522D', fillOpacity: 0.65 };
-  }
+  startLoad('Glacial Quaternary Geology');
 
-  // Lacustrine (lc, la, ls) — keep the blue family
-  if (sym === 'lc' || sym === 'la' || sym === 'ls' ||
-      /lacustrine|lake silt|lake clay|lake sand|glaciolacustrine/.test(desc) ||
-      /lacustrine/.test(dep)) {
-    return { color: '#1a5276', weight: 1.2, fillColor: '#5D8AA8', fillOpacity: 0.55 };
-  }
+  try {
+    const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Glacial_Quaternary_Geology/FeatureServer/70/query';
+    let all = [], offset = 0, page = 2000;
 
-  // Loess
-  if (sym === 'lo' || /loess/.test(desc) || /loess/.test(dep)) {
-    return { color: '#8B7500', weight: 1.2, fillColor: '#C5A046', fillOpacity: 0.55 };
-  }
+    while (true) {
+      const url = `${base}?where=1%3D1&outFields=SYMBOL,DESCRIPTIO,GEOLOGIC_A,DEPOSITION&f=geojson&returnGeometry=true&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
 
-  // Blanket sand — distinct warmer yellow
-  if (sym === 'bs' || /blanket sand/.test(desc)) {
-    return { color: '#B8860B', weight: 1.2, fillColor: '#DAA520', fillOpacity: 0.55 };
-  }
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += data.features.length;
+      }
 
-  // Dune sand — lighter sandy yellow
-  if (sym === 'd' || /dune|eolian sand|windblown sand/.test(desc)) {
-    return { color: '#B8860B', weight: 1.0, fillColor: '#F0E68C', fillOpacity: 0.45 };
-  }
+      if (!data.exceededTransferLimit && (!data.features || data.features.length < page)) {
+        break;
+      }
+    }
 
-  // Outwash — green
-  if (sym === 'o' || /outwash/.test(desc) || /outwash/.test(dep)) {
-    return { color: '#2E5A1C', weight: 1.2, fillColor: '#6B8E23', fillOpacity: 0.5 };
-  }
+    layerDefs.glacial.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: f => {
+        const p = f.properties || {};
+        const sym = (p.SYMBOL || '').toLowerCase().trim();
+        const desc = (p.DESCRIPTIO || '').toLowerCase();
+        const dep = (p.DEPOSITION || '').toLowerCase();
 
-  // Alluvium — purple (dendritic networks)
-  if (sym === 'a' || /alluvium|alluvial/.test(desc) || /alluvial/.test(dep)) {
-    return { color: '#4B0082', weight: 1.2, fillColor: '#9370DB', fillOpacity: 0.5 };
-  }
+        // Organic / muck
+        if (sym === 'm' || /muck|peat|organic/.test(desc)) {
+          return { color: '#8B2500', weight: 1.2, fillColor: '#A0522D', fillOpacity: 0.65 };
+        }
 
-  // Karst — darker gray
-  if (sym === '3k' || /karst/.test(desc)) {
-    return { color: '#333333', weight: 1.2, fillColor: '#696969', fillOpacity: 0.55 };
-  }
+        // Lacustrine (lc, la, ls) — keep the blue family
+        if (sym === 'lc' || sym === 'la' || sym === 'ls' ||
+            /lacustrine|lake silt|lake clay|lake sand|glaciolacustrine/.test(desc) ||
+            /lacustrine/.test(dep)) {
+          return { color: '#1a5276', weight: 1.2, fillColor: '#5D8AA8', fillOpacity: 0.55 };
+        }
 
-  // Bedrock (sandstone, shale, limestone, etc.) — heavy dark
-  if (/sandstone|shale|limestone|dolomite|bedrock|rock/.test(desc) ||
-      /bedrock|rock/.test(dep)) {
-    return { color: '#1a1a1a', weight: 1.2, fillColor: '#2F2F2F', fillOpacity: 0.7 };
-  }
+        // Loess
+        if (sym === 'lo' || /loess/.test(desc) || /loess/.test(dep)) {
+          return { color: '#8B7500', weight: 1.2, fillColor: '#C5A046', fillOpacity: 0.55 };
+        }
 
-  // Till and everything else — quiet brown background
-  return { color: '#8B7355', weight: 0.8, fillColor: '#D2B48C', fillOpacity: 0.4 };
+        // Blanket sand — distinct warmer yellow
+        if (sym === 'bs' || /blanket sand/.test(desc)) {
+          return { color: '#B8860B', weight: 1.2, fillColor: '#DAA520', fillOpacity: 0.55 };
+        }
+
+        // Dune sand — lighter sandy yellow
+        if (sym === 'd' || /dune|eolian sand|windblown sand/.test(desc)) {
+          return { color: '#B8860B', weight: 1.0, fillColor: '#F0E68C', fillOpacity: 0.45 };
+        }
+
+        // Outwash — green
+        if (sym === 'o' || /outwash/.test(desc) || /outwash/.test(dep)) {
+          return { color: '#2E5A1C', weight: 1.2, fillColor: '#6B8E23', fillOpacity: 0.5 };
+        }
+
+        // Alluvium — purple (dendritic networks)
+        if (sym === 'a' || /alluvium|alluvial/.test(desc) || /alluvial/.test(dep)) {
+          return { color: '#4B0082', weight: 1.2, fillColor: '#9370DB', fillOpacity: 0.5 };
+        }
+
+        // Karst — darker gray
+        if (sym === '3k' || /karst/.test(desc)) {
+          return { color: '#333333', weight: 1.2, fillColor: '#696969', fillOpacity: 0.55 };
+        }
+
+        // Bedrock (sandstone, shale, limestone, etc.) — heavy dark
+        if (/sandstone|shale|limestone|dolomite|bedrock|rock/.test(desc) ||
+            /bedrock|rock/.test(dep)) {
+          return { color: '#1a1a1a', weight: 1.2, fillColor: '#2F2F2F', fillOpacity: 0.7 };
+        }
+
+        // Till and everything else — quiet brown background
+        return { color: '#8B7355', weight: 0.8, fillColor: '#D2B48C', fillOpacity: 0.4 };
+      }
+    });
+  } finally {
+    finishLoad();
+  }
 }
-});
-}
-loadGlacial()
-  .finally(finishLoad);
 
 // INDOT BoreRecords (viewport-based, local backup on failure)
 const boreLayer = L.geoJSON(null, {
@@ -2322,6 +2332,7 @@ async function addLayer(id) {
   if (id === 'piletests') await loadPileTests();
   if (id === 'hydrogeo') await loadHydrogeo();
   if (id === 'unconsolidatedPSM') await loadUnconsolidatedPSM();
+  if (id === 'glacial') await loadGlacial();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
