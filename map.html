@@ -1135,6 +1135,7 @@ unconsolidatedPSM: {
  // Hydrogeologic Settings   
 hydrogeo: {
   name: 'Hydrogeologic Settings',
+  lazy: true,
   layer: null,
   opacity: 1,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Hydrogeology_Settings_IN/MapServer',
@@ -1144,6 +1145,7 @@ hydrogeo: {
 // Pile Testing Reports
 piletests: {
   name: 'PDA & Static Test Data',
+  lazy: true,
   group: 'Engineering',
   layer: null,
   opacity: 1,
@@ -1153,6 +1155,7 @@ piletests: {
     //All Slides
   landslides: {
   name: 'Landslide Inventory',
+  lazy: true,
   opacity: 1,
   fillScale: 0.5,
   source: { label: 'IGWS Landslide Inventory', url: 'https://portal.igs.indiana.edu/portal/home/item.html?id=e8914605d3954ea18ef0da9282532297' },
@@ -1169,6 +1172,7 @@ piletests: {
     // Boundaries
 counties: {
   name: 'Indiana Counties',
+  lazy: true,
   group: 'Boundaries',
   layer: null,
   opacity: 1,
@@ -1226,6 +1230,7 @@ counties: {
   // Bedrock
   bedrock: {
     name: 'Bedrock Geology (MM48)',
+    lazy: true,
     group: 'Geology',
     layer: null,
     opacity: 1,
@@ -1234,6 +1239,7 @@ counties: {
 //250K Bedrock
 bedrock250: {
   name: '250K Bedrock Geology',
+  lazy: true,
   group: 'Geology',
   layer: null,
   opacity: 1,
@@ -1242,6 +1248,7 @@ bedrock250: {
 // Landslides (Highways)
 'landslides-hw': {
   name: 'Landslides (Highways)',
+  lazy: true,
   group: 'Geology',
   layer: null,
   opacity: 0.7,
@@ -1250,6 +1257,7 @@ bedrock250: {
 },
 karst: {
   name: 'Karst Sinkhole Inventory',
+  lazy: true,
   layer: null,
   opacity: 1,
   source: {
@@ -1259,6 +1267,7 @@ karst: {
 },
 liq: {
   name: 'Liquefaction Potential',
+  lazy: true,
   opacity: 1,
   layer: null,
   source: 'https://portal.igs.indiana.edu/arcgis/rest/services/Earthquake_Liquefaction_Potential_MM81_IN/FeatureServer',
