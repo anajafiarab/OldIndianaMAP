@@ -1329,6 +1329,8 @@ function refreshNIBI() {
     return;
   }
 
+  startLoad('Natl Index of Borehole Info');   // for the loader bar
+
   const b = map.getBounds();
   const url = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/NIBI_Borehole_Prod/FeatureServer/0/query'
     + '?where=' + encodeURIComponent(
