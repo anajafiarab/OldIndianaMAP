@@ -1167,13 +1167,16 @@ piletests: {
   source: { label: 'IDNR Water Wells', url: 'https://gisdata.in.gov/server/rest/services/Hosted/WaterWells_DNR_Water_IN_1/FeatureServer' }
 },
     // Boundaries
-  counties: {
-    name: 'Indiana Counties',
-    group: 'Boundaries',
-    layer: null,
-    opacity: 1,
-    source: { label: 'U.S. County Boundaries (public GeoJSON)', url: 'https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json' }
-  },
+counties: {
+  name: 'Indiana Counties',
+  group: 'Boundaries',
+  layer: null,
+  opacity: 1,
+  source: {
+    label: 'County Boundaries of Indiana 2023',
+    url: 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer'
+  }
+},
   plss: {
     name: 'PLSS Townships',
     lazy: true,          // ← add this
@@ -1945,30 +1948,29 @@ loadBedrock250()
 .finally(finishLoad);   // <-- runs after success or error
 
 // Counties
-startLoad('Indiana Counties');
-fetch('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json')
-  .then(r => r.json())
-  .then(data => {
-    const indiana = {
-      type: 'FeatureCollection',
-      features: data.features.filter(f => f.properties.STATE === '18' || (f.id && f.id.toString().startsWith('18')))
-    };
-    layerDefs.counties.layer = L.geoJSON(indiana, {
+async function loadCounties() {
+  if (layerDefs.counties.layer) return;          // already loaded
+
+  startLoad('Indiana Counties');
+
+  try {
+    const url = 'https://gisdata.in.gov/server/rest/services/Hosted/County_Boundaries_of_Indiana_2023/FeatureServer/0/query'
+      + '?where=1%3D1&outFields=NAME&f=geojson';
+
+    const data = await (await fetch(url)).json();
+
+    layerDefs.counties.layer = L.geoJSON(data, {
       style: { color: '#000', weight: 1.5, fillColor: '#3d5c3d', fillOpacity: 0.08 },
       onEachFeature: (f, l) => {
         const name = f.properties.NAME || '';
         if (name) l.bindTooltip(name, { permanent: true, direction: 'center', className: 'county-label' });
       }
     });
-    updateCountyLabels();
-  })
-  .finally(finishLoad);
 
-function updateCountyLabels() {
-  const lyr = layerDefs.counties.layer;
-  if (!lyr) return;
-  const show = map.getZoom() >= 8;
-  lyr.eachLayer(l => l.getTooltip() && (show ? l.openTooltip() : l.closeTooltip()));
+    updateCountyLabels();
+  } finally {
+    finishLoad();
+  }
 }
 map.on('zoomend', updateCountyLabels);
 
@@ -2296,6 +2298,7 @@ async function addLayer(id) {
   if (id === 'spms') await loadSPMS();
   if (id === 'spmsActive') await loadSPMSActive();
   if (id === 'nibi') await loadNIBI();
+  if (id === 'counties') await loadCounties();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
