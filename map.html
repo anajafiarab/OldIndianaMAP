@@ -1677,26 +1677,36 @@ function refreshBoreRecords() {
 
 map.on('moveend', refreshBoreRecords);
 
-// Unconsolidated Potentiometric Surface lines
-startLoad('Unconsolidated Potentiometric Surface');
 async function loadUnconsolidatedPSM() {
-  const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0/query';
-  let all = [], offset = 0, page = 2000, more = true;
-  while (more) {
-    const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
-    const data = await (await fetch(url)).json();
-    if (data.features && data.features.length) {
-      all = all.concat(data.features);
-      offset += page;
-      if (data.features.length < page) more = false;
-    } else more = false;
+  if (layerDefs.unconsolidatedPSM.layer) return;
+
+  startLoad('Unconsolidated Potentiometric Surface');
+
+  try {
+    const base = 'https://gisdata.in.gov/server/rest/services/Hosted/Unconsolidated/FeatureServer/0/query';
+    let all = [], offset = 0, page = 2000;
+
+    while (true) {
+      const url = `${base}?where=1%3D1&outFields=*&f=geojson&returnGeometry=true&resultOffset=${offset}&resultRecordCount=${page}`;
+      const data = await (await fetch(url)).json();
+
+      if (data.features && data.features.length) {
+        all = all.concat(data.features);
+        offset += data.features.length;
+      }
+
+      if (!data.exceededTransferLimit && (!data.features || data.features.length < page)) {
+        break;
+      }
+    }
+
+    layerDefs.unconsolidatedPSM.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
+      style: { color: '#1a5276', weight: 1.5, opacity: 0.85 }
+    });
+  } finally {
+    finishLoad();
   }
-  layerDefs.unconsolidatedPSM.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
-    style: { color: '#1a5276', weight: 1.5, opacity: 0.85 }
-  });
 }
-loadUnconsolidatedPSM()
-.finally(finishLoad);   // <-- runs after success or error
 
 // Hydrogeologic Settings Loader
 async function loadHydrogeo() {
@@ -2311,6 +2321,7 @@ async function addLayer(id) {
   if (id === 'landslides') await loadLandslides();
   if (id === 'piletests') await loadPileTests();
   if (id === 'hydrogeo') await loadHydrogeo();
+  if (id === 'unconsolidatedPSM') await loadUnconsolidatedPSM();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
