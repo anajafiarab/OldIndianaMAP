@@ -1296,23 +1296,19 @@ async function loadNIBI() {
   const def = layerDefs.nibi;
   if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
 
-  if (map.getZoom() < 13) {
+  if (map.getZoom() < 11) {
     def.layer = L.layerGroup();
     return;
   }
 
   const b = map.getBounds();
   const url = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/NIBI_Borehole_Prod/FeatureServer/0/query'
-    + '?geometry=' + encodeURIComponent(JSON.stringify({
-        xmin: b.getWest(), ymin: b.getSouth(),
-        xmax: b.getEast(), ymax: b.getNorth(),
-        spatialReference: { wkid: 4326 }
-      }))
-    + '&geometryType=esriGeometryEnvelope'
-    + '&inSR=4326&outSR=4326'
-    + '&spatialRel=esriSpatialRelIntersects'
+    + '?where=' + encodeURIComponent(
+        `latwgs84>=${b.getSouth()} AND latwgs84<=${b.getNorth()} AND longwgs84>=${b.getWest()} AND longwgs84<=${b.getEast()}`
+      )
     + '&outFields=boreholeid,boreholename,organizationname,totaldepth,drilldate,boreholeuri,latwgs84,longwgs84'
     + '&returnGeometry=true'
+    + '&outSR=4326'
     + '&f=geojson'
     + '&resultRecordCount=1000';
 
