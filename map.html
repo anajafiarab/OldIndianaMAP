@@ -1073,7 +1073,17 @@ fetch('data/hydrogeo-units.json')
 
   const layerDefs = {
 
-    //SPMS
+  nibi: {
+  name: 'Natl Index of Borehole Info',
+  group: 'Geology',
+  source: 'https://webapps.usgs.gov/nibi/',
+  lazy: true,
+  opacity: 1,
+  layer: null,
+  load: loadNIBI
+},
+
+  //SPMS
   spms: {
   name: 'INDOT Projects (SPMS)',
   lazy: true,          // ← add this
@@ -1282,6 +1292,59 @@ spmsActive: {
 // ──────────────────────────────────────────────
 // LOADERS
 // ──────────────────────────────────────────────
+async function loadNIBI() {
+  const def = layerDefs.nibi;
+  if (def.layer && map.hasLayer(def.layer)) map.removeLayer(def.layer);
+
+  if (map.getZoom() < 13) {
+    def.layer = L.layerGroup();
+    return;
+  }
+
+  const b = map.getBounds();
+  const url = 'https://services.arcgis.com/v01gqwM5QqNysAAi/ArcGIS/rest/services/NIBI_Borehole_Prod/FeatureServer/0/query'
+    + '?geometry=' + encodeURIComponent(JSON.stringify({
+        xmin: b.getWest(), ymin: b.getSouth(),
+        xmax: b.getEast(), ymax: b.getNorth(),
+        spatialReference: { wkid: 4326 }
+      }))
+    + '&geometryType=esriGeometryEnvelope'
+    + '&inSR=4326&outSR=4326'
+    + '&spatialRel=esriSpatialRelIntersects'
+    + '&outFields=boreholeid,boreholename,organizationname,totaldepth,drilldate,boreholeuri,latwgs84,longwgs84'
+    + '&returnGeometry=true'
+    + '&f=geojson'
+    + '&resultRecordCount=1000';
+
+  try {
+    const data = await (await fetch(url)).json();
+    const features = data.features || [];
+
+    def.layer = L.geoJSON(features, {
+      pointToLayer: (f, latlng) => L.circleMarker(latlng, {
+        radius: 4,
+        fillColor: '#8B4513',
+        color: '#5a2d0c',
+        weight: 1,
+        fillOpacity: 0.85
+      }),
+      onEachFeature: (f, l) => {
+        const p = f.properties;
+        // stash the useful bits for the identify handler
+        l._nibi = {
+          name: p.boreholename || p.boreholeid || 'Borehole',
+          depth: p.totaldepth,
+          date: p.drilldate,
+          uri: p.boreholeuri,
+          id: p.boreholeid
+        };
+      }
+    });
+  } catch (e) {
+    console.warn('NIBI load failed', e);
+    def.layer = L.layerGroup();
+  }
+}
 
 // SPMS projects (viewport and lazy)
 async function loadSPMS() {
@@ -2223,6 +2286,7 @@ async function addLayer(id) {
   if (id === 'boreholes') await loadBoreRecords();
   if (id === 'spms') await loadSPMS();
   if (id === 'spmsActive') await loadSPMSActive();
+  if (id === 'nibi') await loadNIBI();
 
   const def = layerDefs[id];
   if (def.layer && !map.hasLayer(def.layer)) {
@@ -2623,7 +2687,7 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
     }
   });
 // SPMS
-} if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
+} else if (layerDefs.spms.layer && map.hasLayer(layerDefs.spms.layer)) {
   layerDefs.spms.layer.eachLayer(l => {
     let hit = false;
     if (l.getLatLngs) {
@@ -2661,7 +2725,7 @@ if (map.hasLayer(layerDefs.nbi.layer)) {
 }
 
 // Active Letting
-if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
+else if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
   layerDefs.spmsActive.layer.eachLayer(l => {
     let hit = false;
     if (l.getLatLngs) {
@@ -2696,6 +2760,23 @@ if (layerDefs.spmsActive.layer && map.hasLayer(layerDefs.spmsActive.layer)) {
         ? `https://erms12c.indot.in.gov/DocViewer/Default.aspx?Category=Geotech%20Report&DESNumber=${encodeURIComponent(des)}`
         : null
     });
+  });
+} else if (layerDefs.nibi.layer && map.hasLayer(layerDefs.nibi.layer)) {
+  layerDefs.nibi.layer.eachLayer(l => {
+    if (l.getLatLng && map.latLngToLayerPoint(l.getLatLng()).distanceTo(map.latLngToLayerPoint(e.latlng)) < 12) {
+      const n = l._nibi || {};
+      hits.push({
+        layerName: 'Natl Index of Borehole Info',
+        attrs: {
+          'Name': n.name || '—',
+          'Borehole ID': n.id || '—',
+          'Total Depth': n.depth != null ? n.depth + ' ft' : '—',
+          'Drill Date': n.date ? new Date(n.date).toLocaleDateString() : '—',
+          'Link': n.uri ? `<a href="${n.uri}" target="_blank" rel="noopener">Open source record</a>` : '—'
+        },
+        source: 'https://webapps.usgs.gov/nibi/'
+      });
+    }
   });
 }
 }); // closes active.forEach
@@ -2933,6 +3014,7 @@ if (map.hasLayer(lidarHS)) {
         <div class="basemap-item" data-add="karst">Karst Sinkhole Inventory</div>
         <div class="basemap-item" data-add="landslides-hw">Landslide Inventory (Highways)</div>
         <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
+        <div class="basemap-item" data-add="nibi">Natl Index of Borehole Info</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
 
       <div style="font-weight:bold; margin:12px 0 4px;">Hydrogeology</div>
