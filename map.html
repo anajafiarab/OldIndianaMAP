@@ -1807,21 +1807,7 @@ map.on('moveend', refreshWells);
 map.on('zoomend', refreshWells);
 map.on('click', refreshWells);
 
-// Landslide Inventory
-startLoad('Landslide Inventory');
-fetch('https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/FeatureServer/0/query?where=1%3D1&outFields=*&f=geojson&resultRecordCount=8000')
-  .then(r => r.json())
-  .then(data => {
-    layerDefs.landslides.layer = L.geoJSON(data, {
-      style: { color: '#c45c26', weight: 1, fillColor: '#e07a3d', fillOpacity: 0.35 },
-      onEachFeature: (f, l) => {
-        // no permanent labels — polygons can be dense
-      }
-    });
-  })
-.finally(finishLoad);   // <-- runs after success or error
-
-//Landslides Loader (full, lazy)
+//Landslide Inventory Loader (viewport-based, lazy)
 async function loadLandslides() {
   if (layerDefs.landslides.layer) return;
 
@@ -1829,16 +1815,20 @@ async function loadLandslides() {
 
   try {
     const base = 'https://portal.igs.indiana.edu/arcgis/rest/services/Landslide_Inventory/FeatureServer/0/query';
-    let all = [], offset = 0, page = 2000, more = true;
+    let all = [], offset = 0, page = 2000;
 
-    while (more) {
-      const url = `${base}?where=1%3D1&outFields=*&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
+    while (true) {
+      const url = `${base}?where=1%3D1&outFields=*&returnGeometry=true&f=geojson&resultOffset=${offset}&resultRecordCount=${page}`;
       const data = await (await fetch(url)).json();
+
       if (data.features && data.features.length) {
         all = all.concat(data.features);
-        offset += page;
-        if (data.features.length < page) more = false;
-      } else more = false;
+        offset += data.features.length;
+      }
+
+      if (!data.exceededTransferLimit && (!data.features || data.features.length < page)) {
+        break;
+      }
     }
 
     layerDefs.landslides.layer = L.geoJSON({ type: 'FeatureCollection', features: all }, {
@@ -3070,7 +3060,7 @@ if (map.hasLayer(lidarHS)) {
         <div class="basemap-item" data-add="bedrock">Bedrock Geology (MM48)</div>
         <div class="basemap-item" data-add="glacial">Glacial Quaternary Geology</div>
         <div class="basemap-item" data-add="karst">Karst Sinkhole Inventory</div>
-        <div class="basemap-item" data-add="landslides-hw">Landslide Inventory (Highways)</div>
+       <!-- <div class="basemap-item" data-add="landslides-hw">Landslide Inventory (Highways)</div>-->
         <div class="basemap-item" data-add="landslides">Landslide Inventory</div>
         <div class="basemap-item" data-add="nibi">Natl Index of Borehole Info</div>
         <div class="basemap-item" data-add="thickness">Unconsolidated Thickness Contours</div>
